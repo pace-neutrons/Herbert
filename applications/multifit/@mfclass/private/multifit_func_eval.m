@@ -93,23 +93,30 @@ if eval_fore
     if numel(func)==1
         if ~isempty(func{1})
             pars=plist_update(plist(1),p{1});
-            for i=1:numel(w)
-                caller.ind=i;
-                if xye(i)
-                    wfore{i}=w{i};
-                    if ~f_pass_caller_info
-                        wfore{i}.y=func{1}(w{i}.x{:},pars{:});
+            if all(~xye) % call the function only once
+                caller.ind=1:numel(w);
+                fstate_store = repmat(fstate_store,1,numel(w));
+                wfore=num2cell(func{1}( cell2mat_obj(w), caller, fstate_store, store_fore, pars{:}));
+            else
+                for i=1:numel(w)
+                    caller.ind=i;
+                    if xye(i)
+                        wfore{i}=w{i};
+                        if ~f_pass_caller_info
+                            wfore{i}.y=func{1}(w{i}.x{:},pars{:});
+                        else
+                            [wfore{i}.y,~,store_fore]=func{1}(w{i}.x{:},caller,...
+                                fstate_store,store_fore,pars{:});
+                        end
+                        wfore{i}.e=zeros(size((w{i}.y)));
                     else
-                        [wfore{i}.y,~,store_fore]=func{1}(w{i}.x{:},caller,...
-                            fstate_store,store_fore,pars{:});
-                    end
-                    wfore{i}.e=zeros(size((w{i}.y)));
-                else
-                    if ~f_pass_caller_info
-                        wfore{i}=func{1}(w{i},pars{:});
-                    else
-                        [wfore{i},~,store_fore]=func{1}(w{i},caller,...
-                            fstate_store,store_fore,pars{:});
+                        if ~f_pass_caller_info
+                            wfore{i}=func{1}(w{i},pars{:});
+                        else
+                            [wfore{i},~,store_fore]=func{1}(w{i},caller,...
+                                fstate_store,store_fore,pars{:});
+
+                        end
                     end
                 end
             end
