@@ -94,9 +94,13 @@ if eval_fore
         if ~isempty(func{1})
             pars=plist_update(plist(1),p{1});
             if all(~xye) % call the function only once
-                caller.ind=1:numel(w);
-                fstate_store = repmat(fstate_store,1,numel(w));
-                wfore=num2cell(func{1}( cell2mat_obj(w), caller, fstate_store, store_fore, pars{:}));
+                if ~f_pass_caller_info
+                    wfore = num2cell( func{1}( cell2mat_obj(w), pars{:} ) );
+                else
+                    caller.ind=1:numel(w);
+                    fstate_store = repmat(fstate_store,1,numel(w));
+                    wfore=num2cell(func{1}( cell2mat_obj(w), caller, fstate_store, store_fore, pars{:}));
+                end
             else
                 for i=1:numel(w)
                     caller.ind=i;

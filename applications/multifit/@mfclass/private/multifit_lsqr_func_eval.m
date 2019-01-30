@@ -144,6 +144,27 @@ if numel(func)==1
             fcalculated=false(nw,1);
         else
             pars=plist_update(plist(1),p{1});
+            if all(~xye) % call the function only once
+                if ~f_pass_caller_info
+                    wcalc = num2cell( func{1}( cell2mat_obj(w), pars{:} ) );
+                else
+                    caller.ind=1:numel(w);
+                    [wvec,fstate,Store.fore]=func{1}( cell2mat_obj(w), caller, S.fstate_store, Store.fore, pars{:});
+                    wcalc = num2cell(wvec);
+                end
+                [fcalc,fvar,msk]=cellfun(@sigvar_get,wcalc,'uniformoutput',false);
+                for iw=1:nw
+                    fcalc{iw}=fcalc{iw}(msk{iw});
+                    fcalc{iw}=fcalc{iw}(:);
+                    fvar{iw} =fvar{iw}(msk{iw});
+                    fvar{iw}=fvar{iw}(:);
+                    if store_calc
+                        S.fcalc_store{iw}=fcalc{iw};
+                        S.fvar_store{iw}=fvar{iw};
+                    end
+                end
+                if store_calc&&f_pass_caller_info; S.fstate_store=fstate; end
+            else
             for iw=1:nw
                 caller.ind=iw;
                 if xye(iw)
@@ -172,6 +193,7 @@ if numel(func)==1
                     S.fvar_store{iw}=fvar{iw};
                     if f_pass_caller_info, S.fstate_store(iw)=fstate; end
                 end
+            end
             end
             fcalculated=true(nw,1);
         end
