@@ -33,6 +33,11 @@ classdef herbert_config<config_base
     %                       The larger the value, the more information is printed
     %   init_tests          Enable the unit test functions
     %
+    %   nxspe_zero_intensity_uncertainty  
+    %                       The value of uncertainty ascribed to points 
+    %                       with zero as they are read from a NXSPE file
+    %                       *or* a char flag indicating how to calculate it
+    %
     % Type >> herbert_config  to see the list of current configuration option values.
     
     %
@@ -56,6 +61,8 @@ classdef herbert_config<config_base
         log_level
         % add unit test folders to search path (option for Herbert testing)
         init_tests;
+        % allow for non-zero uncertainty for zero-intensity SPE/NXSPE points
+        zero_intensity_uncertainty;
     end
     properties(Dependent,SetAccess=private)
         % location of the folder with unit tests
@@ -65,7 +72,7 @@ classdef herbert_config<config_base
     %
     properties(Constant,Access=private)
         saved_properties_list_={'use_mex','use_mex_C','force_mex_if_use_mex',...
-            'log_level','init_tests'};
+            'log_level','init_tests','nxspe_zero_intensity_uncertainty'};
     end
     properties(Access=private)
         % these values provide defaults for the properties above
@@ -74,6 +81,7 @@ classdef herbert_config<config_base
         force_mex_if_use_mex_ = false;
         log_level_            = 0;
         init_tests_           = false;
+        zero_intensity_uncertainty_ = 0; 
     end
     methods
         function this = herbert_config()
@@ -96,6 +104,9 @@ classdef herbert_config<config_base
         end
         function doinit=get.init_tests(this)
             doinit = get_or_restore_field(this,'init_tests');
+        end
+        function ziu = get.zero_intensity_uncertainty(this)
+            ziu = get_or_restore_field(this,'zero_intensity_uncertainty');
         end
 
         %-----------------------------------------------------------------
@@ -139,6 +150,20 @@ classdef herbert_config<config_base
             end
             config_store.instance().store_config(this,'init_tests',init);
             process_unit_test_path(init,'set_path');
+        end
+        function this=set.zero_intensity_uncertainty(this,val)
+            if ~(isnumeric(val)||ischar(val))
+                error('HERBERT_CONFIG:set_zero_intensity_uncertainty',' zero intensity uncertainty should be a number or a char flag');
+            end
+            if ischar(val)
+                switch lower(val(1:3))
+                    case 'min'; val = 'minimum uncertainty';
+                    case 'max'; val = 'maximum uncertainty';
+                    otherwise
+                        error('HERBERT_CONFIG:set_zero_intensity_uncertainty',' zero intensity uncertainty known char flags are: ''minimum uncertainty'' and ''maximum uncertainty''');
+                end
+            end
+            config_store.instance().store_config(this,'zero_intensity_uncertainty',val);
         end
         %------------------------------------------------------------------
         function folder=get.unit_test_folder(this)

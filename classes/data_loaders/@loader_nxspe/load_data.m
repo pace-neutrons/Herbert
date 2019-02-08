@@ -47,6 +47,19 @@ nans = (S(:,:)<-1.e+29);
 data{1}(nans) = NaN;
 data{2}(nans) = 0;
 
+hc=herbert_config();
+ziustyle = hc.zero_intensity_uncertainty(); % possible values: 0, 'minimum uncertainty', 'maximum uncertainty'
+if ischar(ziustyle)
+    switch lower(ziustyle(1:3))
+        case 'min'; ufcn=@min;
+        case 'max'; ufcn=@max;
+    end
+    replacement_ziu = ufcn( data{2}(data{2}>0) ); % minimum or maximum non-zero uncertainty
+    % apply this only zero-intensity zero-uncertainty points:
+    data{2}(data{1}==0 & data{2}==0) = replacement_ziu;
+elseif isnumeric(ziustyle) && ziustyle~=0
+    data{2}(data{1}==0 & data{2}==0) = ziustyle;
+end
 
 this.S_   = data{1};
 this.ERR_ = data{2};

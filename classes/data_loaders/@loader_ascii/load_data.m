@@ -51,6 +51,20 @@ if ~use_mex
     [S,ERR,en] = get_spe_matlab(file_name);
 end
 
+hc=herbert_config();
+ziustyle = hc.zero_intensity_uncertainty(); % possible values: 0, 'minimum uncertainty', 'maximum uncertainty'
+if ischar(ziustyle)
+    switch lower(ziustyle(1:3))
+        case 'min'; ufcn=@min;
+        case 'max'; ufcn=@max;
+    end
+    replacement_ziu = ufcn( ERR(ERR>0) ); % minimum or maximum non-zero uncertainty
+    % apply this only zero-intensity zero-uncertainty points:
+    ERR(S==0 & ERR==0) = replacement_ziu;
+elseif isnumeric(ziustyle) && ziustyle~=0
+    ERR(S==0 & ERR==0) = ziustyle;
+end
+
 % Convert symbolic NaN-s into ISO NaN-s
 nans      = (S(:,:)<-1.e+29);
 S(nans)   = NaN;
