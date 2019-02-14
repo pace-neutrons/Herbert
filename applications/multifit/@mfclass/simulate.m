@@ -218,5 +218,5 @@ sig = zeros(1,nf);
 cor = zeros(nf);
 chisqr_red = NaN;
 converged = false;
-calcdata = repackage_output_parameters (pfin, sig, cor, chisqr_red, converged, p_info,...
+calcdata = repackage_output_parameters (pfin, sig, cor, chisqr_red, converged, 1 , p_info,...
     foreground_present, background_present);

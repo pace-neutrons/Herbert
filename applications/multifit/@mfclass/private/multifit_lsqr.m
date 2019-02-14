@@ -1,4 +1,4 @@
-function [p_best,sig,cor,chisqr_red,converged,ok,mess]=multifit_lsqr(w,xye,func,bfunc,pin,bpin,...
+function [p_best,sig,cor,chisqr_red,converged,nFuncEvals,ok,mess]=multifit_lsqr(w,xye,func,bfunc,pin,bpin,...
     f_pass_caller_info,bf_pass_caller_info,pfin,p_info,listing,fcp,perform_fit)
 % Perform least-squares minimisation
 %
@@ -239,6 +239,7 @@ sig=zeros(1,numel(pfin));
 cor=zeros(numel(pfin));
 chisqr_red=0;
 converged=false;
+nFuncEvals = 0;
 ok=true;
 mess='';
 
@@ -288,6 +289,7 @@ if exist('perform_fit','var') && ~perform_fit
     if listing>2, disp(' Function evaluation:'), end
     f=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
         f_pass_caller_info,bf_pass_caller_info,pfin,p_info,false,[],[],listing);
+    nFuncEvals = nFuncEvals + 1;
     resid=wt.*(yval-f);
     
     c_best=resid'*resid; % Un-normalised chi-squared
@@ -319,6 +321,7 @@ else
     if listing>2, disp(' '), disp(' Function evaluation at starting parameter values:'), end
     [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
         f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
+    nFuncEvals = nFuncEvals + 1;
     resid=wt.*(yval-f);
     
     p_best=pfin; % Best values for parameters at start
@@ -339,8 +342,9 @@ else
         
         % Compute Jacobian matrix
         resid=wt.*(yval-f_best);
-        jac=multifit_dfdpf(w,xye,func,bfunc,pin,bpin,...
+        [jac,nFE]=multifit_dfdpf(w,xye,func,bfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,p_best,p_info,f_best,dp,S,Store,listing);
+        nFuncEvals = nFuncEvals+nFE;
         nrm=zeros(npfree,1);
         for j=1:npfree
             jac(:,j)=wt.*jac(:,j);
@@ -373,6 +377,7 @@ else
                 if listing>2, disp(' Function evaluation after stepping parmeters:'), end
                 [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
                     f_pass_caller_info,bf_pass_caller_info,p,p_info,true,S,Store,listing);
+                nFuncEvals = nFuncEvals + 1;
                 resid=wt.*(yval-f);
                 c=resid'*resid;
                 if c<c_best || c==0
@@ -427,9 +432,11 @@ else
         if listing>2, disp(' '), disp(' Function evaluation at best fit parameters:'), end
         [~,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,p_best,p_info,true,S,Store,listing);
+        nFuncEvals = nFuncEvals + 1;
         % Now get Jacobian matrix
-        jac=multifit_dfdpf(w,xye,func,bfunc,pin,bpin,...
+        [jac,nFE]=multifit_dfdpf(w,xye,func,bfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,p_best,p_info,f_best,dp,S,Store,listing);
+        nFuncEvals = nFuncEvals + nFE;
         for j=1:npfree
             jac(:,j)=wt.*jac(:,j);
         end
@@ -452,7 +459,7 @@ end
 
 
 %------------------------------------------------------------------------------------------
-function jac=multifit_dfdpf(w,xye,func,bkdfunc,pin,bpin,...
+function [jac,nFE]=multifit_dfdpf(w,xye,func,bkdfunc,pin,bpin,...
     f_pass_caller_info,bf_pass_caller_info,p,p_info,f,dp,S,Store,listing)
 % Calculate partial derivatives of function with respect to parameters
 %
@@ -497,6 +504,7 @@ function jac=multifit_dfdpf(w,xye,func,bkdfunc,pin,bpin,...
 if listing>2, disp(' Calculating partial derivatives:'), end
 
 jac=zeros(length(f),length(p)); % initialise Jacobian to zero
+nFE = 0;
 min_abs_del=1e-12;
 for j=1:length(p)
     if listing>2, disp(['    Parameter ',num2str(j),':']), end
@@ -512,6 +520,7 @@ for j=1:length(p)
         ppos=p; ppos(j)=p(j)+del;
         jac(:,j)=(multifit_lsqr_func_eval(w,xye,func,bkdfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,ppos,p_info,false,S,Store,listing)-f)/del;
+        nFE = nFE + 1;
     else
         ppos=p; ppos(j)=p(j)+del;
         pneg=p; pneg(j)=p(j)-del;
@@ -519,6 +528,7 @@ for j=1:length(p)
             f_pass_caller_info,bf_pass_caller_info,ppos,p_info,false,S,Store,listing) -...
                   multifit_lsqr_func_eval(w,xye,func,bkdfunc,pin,bpin,...
                   f_pass_caller_info,bf_pass_caller_info,pneg,p_info,false,S,Store,listing))/(2*del);
+        nFE = nFE + 2;
     end
 end
 

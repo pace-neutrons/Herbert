@@ -1,4 +1,4 @@
-function fitdata = repackage_output_parameters (p_best, sig, cor, chisqr_red, converged, p_info, fore, bkgd)
+function fitdata = repackage_output_parameters (p_best, sig, cor, chisqr_red, converged, nFuncEvals, p_info, fore, bkgd)
 % Pack the output fit parameters into standard form
 %
 %   >> fitdata = repackage_output_parameters (p_best, sig, cor, chisqr_red, converged, p_info, bkd)
@@ -115,6 +115,7 @@ end
 fitdata.corr=cor;
 fitdata.chisq=chisqr_red;
 fitdata.converged=converged;
+fitdata.evaluations=nFuncEvals;
 
 if fore
     if nforefunc==1
