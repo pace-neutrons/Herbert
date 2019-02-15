@@ -72,7 +72,7 @@ classdef herbert_config<config_base
     %
     properties(Constant,Access=private)
         saved_properties_list_={'use_mex','use_mex_C','force_mex_if_use_mex',...
-            'log_level','init_tests','nxspe_zero_intensity_uncertainty'};
+            'log_level','init_tests','zero_intensity_uncertainty'};
     end
     properties(Access=private)
         % these values provide defaults for the properties above
