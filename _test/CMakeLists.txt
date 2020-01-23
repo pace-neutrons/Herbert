@@ -10,10 +10,16 @@ set(TEST_DIRECTORIES
     "test_instrument_classes"
     "test_docify"
     "test_admin"
-    # "test_mpi"
+    "test_mpi"
 )
 
 foreach(_test_dir ${TEST_DIRECTORIES})
+    # Set a longer timeout for test_mpi
+    set(TEST_TIMEOUT_LENGTH 300)  # 5 mins
+    if("${_test_dir}" STREQUAL "test_mpi")
+        set(TEST_TIMEOUT_LENGTH 3600)  # 1 hour
+    endif()
+
     set(TEST_NAME "Matlab.${_test_dir}")
     matlab_add_unit_test(
         NAME "${TEST_NAME}"
