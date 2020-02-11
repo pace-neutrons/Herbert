@@ -52,6 +52,12 @@ pipeline {
     label env.AGENT
   }
 
+  environment {
+    // This variable becomes the path returned by `tempdir` in Matlab
+    // It avoids any collisions between jobs when writing temporary files
+    TMP = env.WORKSPACE + '/temp'
+  }
+
   stages {
 
     stage('Notify') {
