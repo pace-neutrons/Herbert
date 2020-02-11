@@ -30,6 +30,7 @@ foreach(_test_dir ${TEST_DIRECTORIES})
         NAME "${TEST_NAME}"
         CUSTOM_TEST_COMMAND
             "try;\
+                disp(tempdir);\
                 herbert_init;\
                 res = runtests('${CMAKE_SOURCE_DIR}/_test/${_test_dir}');\
             catch ME;\
