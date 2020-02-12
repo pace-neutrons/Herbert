@@ -30,7 +30,9 @@ foreach(_test_dir ${TEST_DIRECTORIES})
         NAME "${TEST_NAME}"
         CUSTOM_TEST_COMMAND
             "try;\
-                herbert_init;\
+                herbert_on;\
+                pc = parallel_config;\
+                pc.working_directory = '${CMAKE_BINARY_DIR}/local_init';\
                 res = runtests('${CMAKE_SOURCE_DIR}/_test/${_test_dir}');\
             catch ME;\
                 disp('Error caught attempting to run test:');\
