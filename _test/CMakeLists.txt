@@ -32,7 +32,8 @@ foreach(_test_dir ${TEST_DIRECTORIES})
             "try;\
                 herbert_on;\
                 pc = parallel_config;\
-                pc.working_directory = '${CMAKE_BINARY_DIR}/local_init';\
+                pc.working_directory = '${CMAKE_BINARY_DIR}/tests';\
+                disp(pc);\
                 res = runtests('${CMAKE_SOURCE_DIR}/_test/${_test_dir}');\
             catch ME;\
                 disp('Error caught attempting to run test:');\
