@@ -45,7 +45,7 @@ $VS_VERSION_MAP = @{
 }
 # Herbert's root directory is two levels above this script
 $HERBERT_ROOT = Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '/../..')
-$MAX_CTEST_SUCCESS_OUTPUT_LENGTH = 10000 # 10kB
+$MAX_CTEST_SUCCESS_OUTPUT_LENGTH = 1000000 # 1000kB
 
 function Write-And-Invoke([string]$command) {
   Write-Output "+ $command"
