@@ -7,5 +7,6 @@ if ~(exist(remote_config_f ,'dir' ) == 7)
     mkdir(remote_config_f )
 end
 
-copyfile(current_config_f,remote_config_f,'f')
-
+if(~strcmp(fullfile(current_config_f), fullfile(remote_config_f)))
+    copyfile(current_config_f,remote_config_f,'f')
+end
