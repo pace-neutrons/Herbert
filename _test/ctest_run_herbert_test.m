@@ -1,5 +1,10 @@
 function result = ctest_run_herbert_test(test, varargin)
-% Execute `runtests` with the given directory
+% Execute `runtests` with the given directory.
+%     The optional arguments in this function give the ability to run the given
+%     tests with an isolated config, i.e. the directories for storing configs
+%     and message exchanges are optionally changed. This is particularly useful
+%     on Jenkins where a node may be running multiple jobs on the same machine,
+%     these options prevent the jobs attempting to read/write to the same places.
 %
 %  >> run_herbert_test(test, [kwarg1, value1, kwarg2, value2...])
 %
@@ -29,6 +34,7 @@ parse(ip, test, varargin{:});
 config_dir = ip.Results.config_dir;
 shared_local_dir = ip.Results.shared_local_dir;
 shared_remote_dir = ip.Results.shared_remote_dir;
+parallel_working_dir = ip.Results.parallel_working_dir;
 
 if isempty(which('herbert_init'))
     herbert_on;
@@ -42,12 +48,16 @@ config_man = opt_config_manager;
 config_man.this_pc_type = 'jenkins';
 config_man.load_configuration('-set_config', '-change_only_default');
 
+% Set shared directories for parallel workers
 pc = parallel_config;
 if shared_local_dir
     pc.shared_folder_on_local = shared_local_dir;
 end
 if shared_remote_dir
     pc.shared_folder_on_remote = shared_remote_dir;
+end
+if parallel_working_dir
+    pc.working_directory = parallel_working_dir;
 end
 
 result = runtests(test);
