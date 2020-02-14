@@ -29,34 +29,15 @@ foreach(_test_dir ${TEST_DIRECTORIES})
     matlab_add_unit_test(
         NAME "${TEST_NAME}"
         CUSTOM_TEST_COMMAND
-            "try;\
-                herbert_on;\
-                config_store.set_config_folder('${CMAKE_BINARY_DIR}/tests');\
-                \
-                hc = herbert_config;\
-                hc.init_tests = true;\
-                hc.use_mex = true;\
-                hc.use_mex_C = true;\
-                hc.force_mex_if_use_mex = true;\
-                \
-                pc = parallel_config;\
-                pc.shared_folder_on_local = '${CMAKE_BINARY_DIR}/tests/local';\
-                pc.shared_folder_on_remote = '${CMAKE_BINARY_DIR}/tests/remote';\
-                \
-                config_store.set_config_folder('${CMAKE_BINARY_DIR}/tests');\
-                disp(hc);\
-                disp(pc);\
-                \
-                res = runtests('${CMAKE_SOURCE_DIR}/_test/${_test_dir}');\
-            catch ME;\
-                disp('Error caught attempting to run test:');\
-                disp(ME);\
-                exit(1);\
-            end;\
-            exit(~res)"
+            "res = ctest_run_herbert_test('${CMAKE_SOURCE_DIR}/_test/${_test_dir}', \
+                'config_dir', '${CMAKE_BINARY_DIR}/tests/config', \
+                'shared_local_dir', '${CMAKE_BINARY_DIR}/tests/local', \
+                'shared_remote_dir', '${CMAKE_BINARY_DIR}/tests/remote', \
+                'parallel_working_dir', '${CMAKE_BINARY_DIR}/tests');\
+            \
+            exit(~res);"
         ADDITIONAL_PATH
-            "${CMAKE_SOURCE_DIR}/admin"
-            "${CMAKE_SOURCE_DIR}/herbert_core"
+            "${CMAKE_CURRENT_LIST_DIR}"
         TIMEOUT 300  # 5 mins
     )
     set_tests_properties("${TEST_NAME}"
