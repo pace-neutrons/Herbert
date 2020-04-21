@@ -77,11 +77,23 @@ function run_package() {
   echo_and_run "cpack -G TGZ"
 }
 
+function run_copy_san_data() {
+  local san_dir="smb://isis.cclrc.ac.uk/Shares/PACE_Project_Tool_Source/"
+
+  echo -e "\nRunning SAN copy step..."
+  echo_and_run "gio --version"
+  echo_and_run "gio mount ${san_dir}"
+  echo_and_run "gio copy ${san_dir}/README.txt . -p"
+  echo_and_run "ls"
+  echo_and_run "cat README.txt"
+}
+
 function main() {
   # set default parameter values
   local build=$FALSE
   local test=$FALSE
   local package=$FALSE
+  local download_data=$FALSE
   local print_versions=$FALSE
   local build_tests="ON"
   local build_config='Release'
@@ -98,6 +110,7 @@ function main() {
         -b|--build) build=$TRUE; shift ;;
         -t|--test) test=$TRUE; shift ;;
         -p|--package) package=$TRUE; shift ;;
+        -d|--download_data) download_data=$TRUE; shift ;;
         -v|--print_versions) print_versions=$TRUE; shift ;;
         # options
         -X|--build_tests) build_tests="$2"; shift; shift ;;
@@ -128,6 +141,10 @@ function main() {
 
   if ((package)); then
     run_package
+  fi
+
+  if ((download_data)); then
+    run_copy_san_data
   fi
 }
 

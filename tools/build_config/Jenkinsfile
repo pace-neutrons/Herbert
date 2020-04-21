@@ -67,109 +67,121 @@ pipeline {
       }
     }
 
-    stage('Build') {
+    stage('Download-Data') {
       steps {
         script {
           if (isUnix()) {
             sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              module load matlab/\$MATLAB_VERSION &&
-              module load gcc/\$GCC_VERSION &&
-              ./tools/build_config/build.sh --print_versions --build \
-                  --cmake_flags "-DHerbert_RELEASE_TYPE=$RELEASE_TYPE" \
-                  --matlab_release \$MATLAB_VERSION
-            '''
-          }
-          else {
-            powershell '''
-              ./tools/build_config/build.ps1 -print_versions -build \
-                  -cmake_flags "-DHerbert_RELEASE_TYPE=\$env:RELEASE_TYPE" \
-                  -matlab_release \$env:MATLAB_VERSION
+              dbus-run-session -- ./tools/build_config/build.sh --download_data
             '''
           }
         }
       }
     }
 
-    stage('Test') {
-      steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              module load matlab/\$MATLAB_VERSION &&
-              module load gcc/\$GCC_VERSION &&
-              ./tools/build_config/build.sh --test
-            '''
-          }
-          else {
-            powershell '''
-              ./tools/build_config/build.ps1 -test
-            '''
-          }
-        }
-      }
-    }
+  //   stage('Build') {
+  //     steps {
+  //       script {
+  //         if (isUnix()) {
+  //           sh '''
+  //             module load cmake/\$CMAKE_VERSION &&
+  //             module load matlab/\$MATLAB_VERSION &&
+  //             module load gcc/\$GCC_VERSION &&
+  //             ./tools/build_config/build.sh --print_versions --build \
+  //                 --cmake_flags "-DHerbert_RELEASE_TYPE=$RELEASE_TYPE" \
+  //                 --matlab_release \$MATLAB_VERSION
+  //           '''
+  //         }
+  //         else {
+  //           powershell '''
+  //             ./tools/build_config/build.ps1 -print_versions -build \
+  //                 -cmake_flags "-DHerbert_RELEASE_TYPE=\$env:RELEASE_TYPE" \
+  //                 -matlab_release \$env:MATLAB_VERSION
+  //           '''
+  //         }
+  //       }
+  //     }
+  //   }
 
-    stage('Package') {
-      steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              ./tools/build_config/build.sh --package
-            '''
-          }
-          else {
-            powershell '''
-              ./tools/build_config/build.ps1 -package
-            '''
-          }
-        }
+  //   stage('Test') {
+  //     steps {
+  //       script {
+  //         if (isUnix()) {
+  //           sh '''
+  //             module load cmake/\$CMAKE_VERSION &&
+  //             module load matlab/\$MATLAB_VERSION &&
+  //             module load gcc/\$GCC_VERSION &&
+  //             ./tools/build_config/build.sh --test
+  //           '''
+  //         }
+  //         else {
+  //           powershell '''
+  //             ./tools/build_config/build.ps1 -test
+  //           '''
+  //         }
+  //       }
+  //     }
+  //   }
 
-        // Archive the release package
-        archiveArtifacts(
-          artifacts: 'build/Herbert-*',
-          fingerprint: true
-        )
-      }
-    }
+  //   stage('Package') {
+  //     steps {
+  //       script {
+  //         if (isUnix()) {
+  //           sh '''
+  //             module load cmake/\$CMAKE_VERSION &&
+  //             ./tools/build_config/build.sh --package
+  //           '''
+  //         }
+  //         else {
+  //           powershell '''
+  //             ./tools/build_config/build.ps1 -package
+  //           '''
+  //         }
+  //       }
+
+  //       // Archive the release package
+  //       archiveArtifacts(
+  //         artifacts: 'build/Herbert-*',
+  //         fingerprint: true
+  //       )
+  //     }
+  //   }
   }
 
   post {
-    always {
-      // archive CTest results file
-      archiveArtifacts(
-        artifacts: 'build/Testing/**/*.xml',
-        fingerprint: true
-      )
+  //   always {
+  //     // archive CTest results file
+  //     archiveArtifacts(
+  //       artifacts: 'build/Testing/**/*.xml',
+  //       fingerprint: true
+  //     )
 
-      xunit (
-        testTimeMargin: '3000',
-        thresholdMode: 1,
-        thresholds: [
-          skipped(failureThreshold: '0'),
-          failed(failureThreshold: '0')
-        ],
-        tools: [
-          CTest(
-            pattern: 'build/Testing/**/*.xml',
-            deleteOutputFiles: true,
-            failIfNotNew: false,
-            skipNoTestFiles: true,
-            stopProcessingIfError: true
-          )
-        ]
-      )
-    }
+  //     xunit (
+  //       testTimeMargin: '3000',
+  //       thresholdMode: 1,
+  //       thresholds: [
+  //         skipped(failureThreshold: '0'),
+  //         failed(failureThreshold: '0')
+  //       ],
+  //       tools: [
+  //         CTest(
+  //           pattern: 'build/Testing/**/*.xml',
+  //           deleteOutputFiles: true,
+  //           failIfNotNew: false,
+  //           skipNoTestFiles: true,
+  //           stopProcessingIfError: true
+  //         )
+  //       ]
+  //     )
+  //   }
 
-    success {
-      post_github_status("success", "The build succeeded")
-    }
+  //   success {
+  //     post_github_status("success", "The build succeeded")
+  //   }
 
-    unsuccessful {
-      post_github_status("failure", "The build failed")
-    }
+  //   unsuccessful {
+  //     post_github_status("failure", "The build failed")
+  //   }
 
     cleanup {
       deleteDir()
