@@ -72,9 +72,10 @@ classdef JobExecutor
         % n_iterations_. Read-only
         n_steps
         
-        % Helper method used for synchronization with worker,
-        % needed to verify barrier in case of some worker failed
-        % while some finished do_job but some failed before that.
+        % Helper property used for synchronization among workers.
+        % Used to determine correct number of syncronization barriers to
+        % set in the case when some workers failed on do_job method and some
+        % have finished executing do_job before the failure. 
         do_job_completed
     end
     %

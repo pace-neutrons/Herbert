@@ -4,9 +4,6 @@ classdef ClusterHerbert < ClusterWrapper
     % of Matlab workers, controlled by Java
     % runtime, and exchanging filebased messages.
     %
-    %
-    % $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
-    %
     %----------------------------------------------------------------------
     properties(Access = protected)
         
@@ -60,6 +57,7 @@ classdef ClusterHerbert < ClusterWrapper
             end
             obj = init(obj,n_workers,mess_exchange_framework,log_level);
         end
+        %
         function obj = init(obj,n_workers,mess_exchange_framework,log_level)
             % The method to initate the cluster wrapper
             %
@@ -136,6 +134,7 @@ classdef ClusterHerbert < ClusterWrapper
             end
             
         end
+        %
         function [completed, obj] = check_progress(obj,varargin)
             % Check the job progress verifying and receiving all messages,
             % sent from worker N1
@@ -168,7 +167,6 @@ classdef ClusterHerbert < ClusterWrapper
                 end
             end
         end
-        
         %------------------------------------------------------------------
     end
     methods(Access = protected)

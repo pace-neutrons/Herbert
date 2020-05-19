@@ -7,7 +7,7 @@ classdef MPI_fmwks_factory<handle
     % Implemented as classical singleton.
     %
     properties(Dependent)
-        % current active cluster and message exchange framework
+        % current cluster with correspondent message exchange framework
         % used for messages exchange between cluster's workers.
         parallel_framework;
         %
@@ -50,10 +50,11 @@ classdef MPI_fmwks_factory<handle
     %----------------------------------------------------------------------
     methods
         %------------------------------------------------------
-        function fw = get.parallel_framework(obj)
+        function fw = get.parallel_framework(~)
             fw = config_store.instance.get_config_field(...
                 'parallel_config','parallel_framework');
         end
+        %
         function set.parallel_framework(obj,val)
             % Set up MPI framework to use. Available options are:
             % h[erbert], p[arpool] or m[pi_cluster]
@@ -75,6 +76,7 @@ classdef MPI_fmwks_factory<handle
             config_store.instance().store_config(...
                 'parallel_config','parallel_framework',fmwk_name);
         end
+        %
         function [cl,fmwk_name] = get_cluster(obj,val)
             % return non-initialized cluster wrapper for the framework with
             % the name provided as input.
@@ -84,6 +86,7 @@ classdef MPI_fmwks_factory<handle
             cl = obj.known_frameworks_(fmwk_name);
             
         end
+        %
         function cfg = get_all_configs(obj,frmw_name)
             % return all known configurations for the selected framework.
             %
@@ -105,8 +108,7 @@ classdef MPI_fmwks_factory<handle
                 cfg = controller.get_cluster_configs_available();
             end
         end
-        
-        
+        %
         function fmwks = get.known_frmwks_names(obj)
             fmwks = obj.known_frmwks_names_;
         end

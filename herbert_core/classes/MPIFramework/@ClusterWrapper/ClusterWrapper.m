@@ -3,9 +3,6 @@ classdef ClusterWrapper
     % and job progress logging operations supported by Herbert
     %
     %
-    %
-    % $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
-    %
     %----------------------------------------------------------------------
     properties(Dependent)   %
         % The string, providing unique identifier(name) for the job and cluster.
