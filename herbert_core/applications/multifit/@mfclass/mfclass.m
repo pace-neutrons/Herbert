@@ -751,58 +751,5 @@ classdef mfclass
 
     end
 
-    methods (Static)
-        %------------------------------------------------------------------
-        % Methods to interface to legacy (i.e. pre-2018) multifit
-        %------------------------------------------------------------------
-        function status = legacy(varargin)
-            % Determine if the arguments are for legacy operation of multifit
-            %
-            %   >> is_legacy = mfclass.legacy(arg2, arg2,...)
-            %
-            % If the argument list contains a function handle this is
-            % incompatible with the new operation of multifit and so the
-            % only possibility is a legacy call.
-
-            if numel(varargin)==0
-                status = false;     % no arguments is valid, and only valid, for new multifit
-            else
-                fhandle = cellfun(@fhandle_arg,varargin);
-                status = any(fhandle);
-            end
-            %--------------------------------------------------------------
-            function status = fhandle_arg(arg)
-                % Determine if argument is a function handle or cell array
-                % of function handles
-                if iscell(arg)
-                    status = all(cellfun(@(x)(isa(x,'function_handle')),arg));
-                else
-                    status = isa(arg,'function_handle');
-                end
-            end
-            %--------------------------------------------------------------
-        end
-
-        function varargout = legacy_call (mf_handle, varargin)
-            % Make call to legacy multifit function or method. Use as:
-            %
-            %   >> [varargout{1:nargout}] = mfclass.legacy_call (mf_handle, arg1, arg2,...)
-            %
-            % Input:
-            % ------
-            %   mf_handle       Handle to the legacy multifit function
-            %   arg1, arg2,...  All arguments to pass to legacy function (including data)
-
-            try
-                [varargout{1:nargout}] = mf_handle (varargin{:});
-            catch ME
-                rethrow(ME);
-%                 ex = MException('legacy_call:failure', '%s', ME.message);
-%                 ex = ex.addCause(ME);
-%                 throw(ex);
-            end
-        end
-    end
-
 end
 
