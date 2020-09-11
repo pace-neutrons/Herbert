@@ -25,6 +25,8 @@ def get_agent(String job_name) {
     withCredentials([string(credentialsId: 'win10_agent', variable: 'agent_str')]) {
       return "${agent_str}"
     }
+  } else {
+    return ''
   }
 }
 
