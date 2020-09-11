@@ -26,7 +26,6 @@ def get_agent(String job_name) {
       return "${agent_str}"
     }
   }
-  return 'doesnt exist';
 }
 
 def get_release_type(String job_name) {
