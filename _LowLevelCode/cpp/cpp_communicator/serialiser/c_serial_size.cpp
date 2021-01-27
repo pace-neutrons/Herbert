@@ -131,7 +131,7 @@ double get_size(const mxArray *input) {
       size_t nFields = mxGetNumberOfFields(input);
       double fn_size = NELEMS_SIZE*(nFields+1); // Nfields + name lens
 
-      for (int field=0; field < nFields; field++) {
+      for (size_t field=0; field < nFields; field++) {
         fn_size += strlen(mxGetFieldNameByNumber(input, field)) * types_size[CHAR];
       }
 
@@ -192,7 +192,7 @@ double get_size(const mxArray *input) {
 }
 
 /* The gateway routine. */
-void mexFunction( int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] ) {
+void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] ) {
 
   double size = 0.0;
 

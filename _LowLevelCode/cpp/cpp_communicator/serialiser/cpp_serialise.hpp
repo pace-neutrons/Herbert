@@ -11,7 +11,7 @@ enum ser_types{
 
 const uint32_t DIM_MAX = std::numeric_limits<uint32_t>::max();
 
-const double types_size[] = {
+const size_t types_size[] = {
   1,  //   LOGICAL
   1,  //   CHAR
   2,  //   STRING
