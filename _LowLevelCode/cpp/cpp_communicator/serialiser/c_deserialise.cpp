@@ -217,7 +217,7 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
       case 3:
         {
           mxArray* parentage = deserialise(data, memPtr, size, 1);
-          const int len = mxGetNumberOfElements(parentage);
+          const size_t len = mxGetNumberOfElements(parentage);
 
           // Initial output
           output = mxDuplicateArray(mxGetCell(parentage, len-1));
@@ -262,7 +262,7 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
           std::vector<mxArray*> input {mxName, mxData};
           mexCallMATLAB(2, results.data(), 2, input.data(), "c_hlp_deserialise_object_self");
           output = results[0];
-          memPtr += mxGetScalar(results[1]);
+          memPtr += (size_t) mxGetScalar(results[1]);
           mxDestroyArray(mxName);
           mxDestroyArray(mxData);
         }

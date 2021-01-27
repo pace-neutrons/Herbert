@@ -156,9 +156,9 @@ struct tag_type {
   unsigned int dim:3;
 };
 
-const double TAG_SIZE = types_size[UINT8];
-const double NELEMS_SIZE = types_size[UINT32];
-const double DIMS_SIZE = types_size[UINT32];
+const size_t TAG_SIZE = types_size[UINT8];
+const size_t NELEMS_SIZE = types_size[UINT32];
+const size_t DIMS_SIZE = types_size[UINT32];
 
 tag_type tag_data(const mxArray* input) {
   int category = mxGetClassID(input);
