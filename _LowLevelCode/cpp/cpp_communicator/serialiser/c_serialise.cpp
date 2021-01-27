@@ -114,7 +114,7 @@ void serialise(uint8_t* data, size_t& memPtr, const mxArray* input){
 
       mwIndex* ir = mxGetIr(input);
       mwIndex* jc = mxGetJc(input);
-      uint32_t nnz = jc[dims[1]];
+      size_t nnz = jc[dims[1]];
       std::vector<uint64_t> map_jc(nnz);
 
       // map Jc (see MATLAB docs on sparse arrays in MEX API)
@@ -217,12 +217,12 @@ void serialise(uint8_t* data, size_t& memPtr, const mxArray* input){
 
       ser(data, memPtr, &nFields, types_size[UINT32]);
 
-      int namePtr = memPtr + nFields*types_size[UINT32];
+      size_t namePtr = memPtr + nFields*types_size[UINT32];
 
-      int parsed = 0;
+      size_t parsed = 0;
       for (uint32_t field=0; field < nFields; field++) {
         const char* name = mxGetFieldNameByNumber(input, field);
-        uint32_t size = strlen(name);
+        size_t size = strlen(name);
         ser(data, memPtr, &size, types_size[UINT32]);
         memcpy(&data[namePtr], name, size);
         namePtr += size;
@@ -281,7 +281,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[] ) {
   mxArray* size_arr;
   mxArray* arr = const_cast<mxArray *>(prhs[0]);
   mexCallMATLAB(1, &size_arr, 1, &arr, "c_serial_size");
-  double size = mxGetScalar(size_arr);
+  size_t size = (size_t) mxGetScalar(size_arr);
   mxArray* ser_arr = mxCreateUninitNumericMatrix(size, 1, mxUINT8_CLASS, (mxComplexity) 0);
   uint8_t* serialised = (uint8_t *) mxGetData(ser_arr);
   size_t memPtr = 0;

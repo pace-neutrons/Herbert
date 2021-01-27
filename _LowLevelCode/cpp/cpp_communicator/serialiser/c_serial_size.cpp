@@ -31,7 +31,7 @@ double get_size(const mxArray *input) {
       mexCallMATLAB(1, &nnz, 1, &arr, "nnz");
       double nElem = mxGetPr(nnz)[0];
 
-      double elemSize = types_size[tag.type];
+      size_t elemSize = types_size[tag.type];
 
       size += TAG_SIZE + 2*DIMS_SIZE + NELEMS_SIZE + 2*nElem*types_size[DOUBLE] + nElem*elemSize; // Tag & Dims
 
@@ -64,7 +64,7 @@ double get_size(const mxArray *input) {
       const mwSize* dims = mxGetDimensions(input);
       size_t nDims = mxGetNumberOfDimensions(input);
 
-      double elemSize = types_size[tag.type];
+      size_t elemSize = types_size[tag.type];
 
       if (nElem == 0) { // Null
         size += TAG_SIZE + NELEMS_SIZE;
@@ -129,7 +129,7 @@ double get_size(const mxArray *input) {
       size_t nDims = mxGetNumberOfDimensions(input);
 
       size_t nFields = mxGetNumberOfFields(input);
-      double fn_size = NELEMS_SIZE*(nFields+1); // Nfields + name lens
+      size_t fn_size = NELEMS_SIZE*(nFields+1); // Nfields + name lens
 
       for (size_t field=0; field < nFields; field++) {
         fn_size += strlen(mxGetFieldNameByNumber(input, field)) * types_size[CHAR];
