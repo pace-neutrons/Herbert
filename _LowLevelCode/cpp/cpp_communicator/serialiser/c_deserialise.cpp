@@ -217,7 +217,7 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
       case 3:
         {
           mxArray* parentage = deserialise(data, memPtr, size, 1);
-          const size_t len = mxGetNumberOfElements(parentage);
+          const int len = (int) mxGetNumberOfElements(parentage);
 
           // Initial output
           output = mxDuplicateArray(mxGetCell(parentage, len-1));
