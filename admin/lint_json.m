@@ -31,12 +31,18 @@ function [raw, json] = lint_json(filesin, outputfile)
     if nargout > 0 && ~isempty(outputfile) % Already have the vars
 
         fh = fopen(outputfile,'w');
+        if fh == -1
+            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
+        end
         fprintf(fh, '%s', cell2mat(json));
         fclose(fh);
 
     elseif ~isempty(outputfile) % Just printing
 
         fh = fopen(outputfile,'w');
+        if fh == -1
+            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
+        end
         for i = 1:numel(files)
             raw = checkcode(files{i});
             json = '';
