@@ -83,6 +83,11 @@ function run_analysis() {
     analysis_cmd+=" 2> ${output_dir}/cppcheck.xml"
     echo_and_run "${analysis_cmd}"
   fi
+
+  # Mlint stage
+  echo -e "\nRunning mlint step..."
+  echo_and_run "cd ${HERBERT_ROOT}"
+  echo_and_run "matlab -nodisplay < admin/mlint.m"
 }
 
 function run_package() {
