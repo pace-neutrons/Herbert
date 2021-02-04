@@ -242,7 +242,7 @@ classdef TestSuite < TestComponent
             %   constructs a TestSuite object containing only the test case
             %   named 'testA' found in the TestCase subclass MyTests.
 
-            if exist(fullfile(pwd(), name), 'dir') == 7
+            if exist(name, 'dir') == 7
                 suite = TestSuiteInDir(name);
                 suite.gatherTestCases();
                 return;

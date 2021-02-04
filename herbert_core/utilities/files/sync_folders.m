@@ -42,8 +42,8 @@ recycle on;
 p1=fullfile(p1);
 p2=fullfile(p2);
 try
-    if exist(fullfile(pwd(), p1), 'dir') ~= 7, mkdir(p1); end
-    if exist(fullfile(pwd(), p2), 'dir') ~= 7, mkdir(p2); end
+    if ~exist(p1, 'dir'), mkdir(p1); end
+    if ~exist(p2, 'dir'), mkdir(p2); end
 catch ME
     error([p1 ' or ' p2 ' is not a directory']);
 end

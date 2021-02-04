@@ -126,6 +126,7 @@ else
     time = bigtic();
     test_ok = false(1,numel(test_folders_full));
     for i=1:numel(test_folders_full)
+        test_folders_full{i}
         [test_ok(i),suite] = runtests(test_folders_full{i}, '-verbose');
         suite.delete();
     end
