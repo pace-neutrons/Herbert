@@ -294,7 +294,7 @@ pipeline {
     always {
       // archive CTest results file and static analysis report
       archiveArtifacts(
-        artifacts: 'build/Testing/**/*.xml,**/cppcheck.xml',
+        artifacts: 'build/Testing/**/*.xml,**/cppcheck.xml,**/mlint.json',
         fingerprint: true
       )
 
