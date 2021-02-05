@@ -18,12 +18,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake"
 
 # This sets the destination for mex build artifacts (used in PACE_AddMex)
 set(Herbert_DLL_DIRECTORY "${CMAKE_SOURCE_DIR}/herbert_core/DLL")
+set(Herbert_ROOT "${Herbert_SOURCE_DIR}/herbert_core")
 
 # Look for packages early so we can exit if they're not found
 include(herbert_FindMPI)
 include(PACE_FindMatlab)
 include(PACE_Version)
 include(PACE_AddMex)
+include(CodeAnalysis)
 if(${BUILD_TESTS})
     include(CTest)
     include(PACE_FindGTest)
