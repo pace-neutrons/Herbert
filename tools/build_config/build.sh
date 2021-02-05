@@ -71,23 +71,10 @@ function run_tests() {
 }
 
 function run_analysis() {
-  local output_dir=$1
+  local build_dir=$1
 
-  if [ -f "$(which cppcheck)" ]; then
-    echo -e "\nRunning analysis step..."
-
-    analysis_cmd="cppcheck --enable=all --inconclusive"
-    analysis_cmd+=" --xml --xml-version=2"
-    analysis_cmd+=" -I ${HERBERT_ROOT}/_LowLevelCode/cpp"
-    analysis_cmd+=" ${HERBERT_ROOT}/_LowLevelCode/"
-    analysis_cmd+=" 2> ${output_dir}/cppcheck.xml"
-    echo_and_run "${analysis_cmd}"
-  fi
-
-  # Mlint stage
-  echo -e "\nRunning mlint step..."
-  echo_and_run "matlab -nodisplay <<< \"addpath('${HERBERT_ROOT}/admin');lint_wng({'${HERBERT_ROOT}/**/*.m'},'${output_dir}/mlint.out');\""
-  # echo_and_run "matlab -nodisplay <<< \"addpath('${HERBERT_ROOT}/admin');lint_json({'${HERBERT_ROOT}/**/*.m'},'${output_dir}/mlint.json');\""
+  echo_and_run "cd ${build_dir}"
+  echo_and_run "make analyse"
 }
 
 function run_package() {
@@ -111,8 +98,10 @@ flags:
       Run the Herbert build commands.
   -t, --test
       Run all Herbert tests.
+  -c, --configure
+      Run cmake configuration stage
   -a, --analyze
-      Run static analysis on Herbert C++ code.
+      Run static analysis on Herbert code.
   -p, --package
       Pacakge Herbert into a .tar.gz file.
   -v, --print_versions
@@ -143,6 +132,7 @@ function main() {
   # set default parameter values
   local build=$FALSE
   local test=$FALSE
+  local configure=$FALSE
   local analyze=$FALSE
   local package=$FALSE
   local print_versions=$FALSE
@@ -165,6 +155,7 @@ function main() {
         # flags
         -b|--build) build=$TRUE; shift ;;
         -t|--test) test=$TRUE; shift ;;
+        -c|--configure) configure=$TRUE; shift;;
         -a|--analyze) analyze=$TRUE; shift ;;
         -p|--package) package=$TRUE; shift ;;
         -v|--print_versions) print_versions=$TRUE; shift ;;
@@ -183,15 +174,18 @@ function main() {
     print_package_versions
   fi
 
-  if ((analyze)); then
-    run_analysis "${HERBERT_ROOT}"
-  fi
-
-  if ((build)); then
+  if ((configure)); then
     warning_msg="Warning: Build directory ${build_dir} already exists.\n\
         This may not be a clean build."
     echo_and_run "mkdir ${build_dir}" || warning "${warning_msg}"
     run_configure "${build_dir}" "${build_config}" "${build_tests}" "${matlab_release}" "${cmake_flags}"
+  fi
+
+  if ((analyze)); then
+    run_analysis "${build_dir}"
+  fi
+
+  if ((build)); then
     run_build "${build_dir}"
   fi
 
