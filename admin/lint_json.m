@@ -18,7 +18,7 @@ function [raw, json] = lint_json(filesin, outputfile)
 
     if nargout > 0 % Build raw and json for potential output
         json = cell(1, numel(files));
-        raw = checkcode(files);
+        raw = checkcode(files, '-id');
         for i = 1:numel(raw)
             for j = 1:numel(raw{i})
                 raw{i}(j).fileName = files{i};
@@ -43,7 +43,7 @@ function [raw, json] = lint_json(filesin, outputfile)
             error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
         end
         for i = 1:numel(files)
-            raw = checkcode(files{i});
+            raw = checkcode(files{i}, '-id');
             json = '';
             for j = 1:numel(raw)
                 raw(j).fileName = files{i};

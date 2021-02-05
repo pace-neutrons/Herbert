@@ -8,7 +8,7 @@ function lint_wng(filesin, outputfile)
     for i = 1:numel(out)
         for j = 1:numel(out{i})
             curr = out{i}(j);
-            fprintf(fh, "%s:%d:%d: W404 %s\n", curr.fileName, curr.line, curr.column(1), curr.message);
+            fprintf(fh, "%s:%d:%d: %s %s\n", curr.fileName, curr.line, curr.column(1), curr.id, curr.message);
         end
     end
     fclose(fh);
