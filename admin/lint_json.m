@@ -21,7 +21,7 @@ function [raw, json] = lint_json(filesin, outputfile)
         raw = checkcode(files);
         for i = 1:numel(raw)
             for j = 1:numel(raw{i})
-                raw{i}(j).filename = files{i};
+                raw{i}(j).fileName = files{i};
                 json{i} = [json{i},jsonencode(wng_compat(raw{i}(j))), nl];
             end
         end
@@ -46,7 +46,7 @@ function [raw, json] = lint_json(filesin, outputfile)
             raw = checkcode(files{i});
             json = '';
             for j = 1:numel(raw)
-                raw(j).filename = files{i};
+                raw(j).fileName = files{i};
                 json = [json,jsonencode(wng_compat(raw(j))), nl];
             end
             fprintf(fh, '%s', json);
@@ -64,6 +64,7 @@ function struc = wng_compat(struc)
     struc.columnStart = struc.column(1);
     struc.columnEnd = struc.column(2);
     struc = rmfield(struc,'column');
+    struc = rmfield(struc,'fix');
     struc.severity = "NORMAL";
 end
 
