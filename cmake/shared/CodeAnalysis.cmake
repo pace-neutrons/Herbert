@@ -5,7 +5,7 @@ add_custom_target(analyse
 add_custom_target(analyse-mlint
   COMMENT "- Performing MATLAB analysis (Mlint)..."
   BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/mlint.out"
-  COMMAND matlab -nodisplay <<< "\"addpath('${Herbert_ROOT}/../admin');lint_wng({'${CMAKE_SOURCE_DIR}/**/*.m'},'${CMAKE_CURRENT_BINARY_DIR}/mlint.out');\""
+  COMMAND matlab -nodisplay <<< "\"addpath('${Herbert_ROOT}/../admin');lint_json({'${CMAKE_SOURCE_DIR}/**/*.m'},'${CMAKE_CURRENT_BINARY_DIR}/mlint.json');\""
   WORKING_DIRECTORY
   USES_TERMINAL
   )

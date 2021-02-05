@@ -1,8 +1,18 @@
-function [raw, json] = lint_json(filesin, outputfile)
+function lint_json(filesin, outputfile)
     if isempty(filesin)
         % Default to glob all
         filesin = "**/*.m";
     end
+    if isempty(outputfile) % Default to stdout
+        fh = 1;
+    else % Open file
+        fh = fopen(outputfile,'w');
+        if fh == -1
+            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
+        end
+        cleanup = onCleanup(@()(fclose(fh)));
+    end
+
 
     files = [];
     for i = 1:numel(filesin)
@@ -10,57 +20,23 @@ function [raw, json] = lint_json(filesin, outputfile)
         files = [files; arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false)];
     end
 
-    if verLessThan('Matlab','R2016a')
-        nl = sprintf('\n');
-    else
-        nl = newline;
-    end
-
-    if nargout > 0 % Build raw and json for potential output
-        json = cell(1, numel(files));
-        raw = checkcode(files, '-id');
-        for i = 1:numel(raw)
-            for j = 1:numel(raw{i})
-                raw{i}(j).fileName = files{i};
-                json{i} = [json{i},jsonencode(wng_compat(raw{i}(j))), nl];
-            end
+    issues = struct('issues', {{}}, 'size', 0);
+    raw = checkcode(files, '-id');
+    for i = 1:numel(raw)
+        for j = 1:numel(raw{i})
+            raw{i}(j).fileName = files{i};
+            curr = wng_compat(raw{i}(j));
+            issues.issues = {issues.issues{:}, curr};
         end
     end
-
-    if nargout > 0 && ~isempty(outputfile) % Already have the vars
-
-        fh = fopen(outputfile,'w');
-        if fh == -1
-            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
-        end
-        fprintf(fh, '%s', cell2mat(json));
-        fclose(fh);
-
-    elseif ~isempty(outputfile) % Just printing
-
-        fh = fopen(outputfile,'w');
-        if fh == -1
-            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
-        end
-        for i = 1:numel(files)
-            raw = checkcode(files{i}, '-id');
-            json = '';
-            for j = 1:numel(raw)
-                raw(j).fileName = files{i};
-                json = [json,jsonencode(wng_compat(raw(j))), nl];
-            end
-            fprintf(fh, '%s', json);
-        end
-        fclose(fh);
-
-    elseif nargout == 0  % No operation to perform
-        error('MATLAB:badargs', 'lint_json called with bad args');
-    end
+    issues.size = numel(issues.issues);
+    fprintf(fh, "%s", jsonencode(issues));
 end
 
 function struc = wng_compat(struc)
 % Parse an mlint error struct into a Jenkins Warnings Next Gen compatible form
     struc = rename(struc, 'line', 'lineStart');
+    struc = rename(struc, 'id', 'type');
     struc.columnStart = struc.column(1);
     struc.columnEnd = struc.column(2);
     struc = rmfield(struc,'column');
