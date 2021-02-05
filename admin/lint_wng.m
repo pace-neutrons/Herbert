@@ -33,7 +33,7 @@ function lint_wng(filesin, outputfile)
         for j = 1:numel(out{i})
             curr = out{i}(j);
             curr.fileName = filepaths{i};
-            fprintf(fh, "%s:%d:%d: %s %s\n", curr.fileName, curr.line, curr.column(1), curr.id, curr.message);
+            fprintf(fh, "%s:%d:%d: %s %s\n", curr.fileName, curr.line, curr.column(1), W404, curr.message);
         end
     end
 
