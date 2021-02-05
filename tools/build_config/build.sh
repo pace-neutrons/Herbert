@@ -86,7 +86,8 @@ function run_analysis() {
 
   # Mlint stage
   echo -e "\nRunning mlint step..."
-  echo_and_run "matlab -nodisplay <<< \"addpath('${HERBERT_ROOT}/admin');lint_json({'${HERBERT_ROOT}/**/*.m'},'${output_dir}/mlint.json');\""
+  echo_and_run "matlab -nodisplay <<< \"addpath('${HERBERT_ROOT}/admin');lint_wng({'${HERBERT_ROOT}/**/*.m'},'${output_dir}/mlint.out');\""
+  # echo_and_run "matlab -nodisplay <<< \"addpath('${HERBERT_ROOT}/admin');lint_json({'${HERBERT_ROOT}/**/*.m'},'${output_dir}/mlint.json');\""
 }
 
 function run_package() {

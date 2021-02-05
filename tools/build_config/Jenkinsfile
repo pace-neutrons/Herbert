@@ -177,6 +177,32 @@ if (env.BRANCH_NAME) {
 }
 
 
+        return builder.setFileName(matcher.group(1))
+                .setLineStart(matcher.group(2))
+                .setColumnStart(matcher.group(3))
+                .setCategory(category)
+                .setMessage(message)
+                .setSeverity(mapPriority(category))
+
+def config = io.jenkins.plugins.analysis.warnings.groovy.ParserConfiguration.getInstance()
+if(!config.contains('mlint')){
+    def mlintParser = new io.jenkins.plugins.analysis.warnings.groovy.GroovyParser(
+        'mlint',
+        'MLint',
+        '([^:]+):([0-9]+):([0-9]+)-([0-9]+): (.*)',
+        '''return builder.setFileName(matcher.group(1))
+                         .setLineStart(matcher.group(2))
+                         .setColumnStart(matcher.group(3))
+                         .setColumnEnd(matcher.group(4))
+                         .setMessage(matcher.group(5))
+                         .buildOptional()''',
+        "L 60 (C 13-21): The value assigned here to 'func_name' appears to be unused. Consider replacing it by ~."
+    )
+    config.setParsers(config.getParsers().plus(mlint))
+}
+
+
+
 pipeline {
   agent {
     label env.AGENT
@@ -300,7 +326,8 @@ pipeline {
 
       recordIssues(tools:
                    [cppCheck(pattern: '**/cppcheck.xml', reportEncoding: 'UTF-8'),
-                    issues(id: 'mlint', name: 'MLint', pattern: '**/mlint.json')]
+                    mlint(pattern: 'mlint.out')]
+                    // issues(id: 'mlint', name: 'MLint', pattern: '**/mlint.json')]
       )
 
       xunit (
