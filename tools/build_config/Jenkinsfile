@@ -190,12 +190,7 @@ if(!config.contains('mlint')){
         'mlint',
         'MLint',
         '([^:]+):([0-9]+):([0-9]+)-([0-9]+): (.*)',
-        '''return builder.setFileName(matcher.group(1))
-                         .setLineStart(matcher.group(2))
-                         .setColumnStart(matcher.group(3))
-                         .setColumnEnd(matcher.group(4))
-                         .setMessage(matcher.group(5))
-                         .buildOptional()''',
+        'return builder.setFileName(matcher.group(1)).setLineStart(matcher.group(2)).setColumnStart(matcher.group(3)).setColumnEnd(matcher.group(4)).setMessage(matcher.group(5)).buildOptional()',
         "L 60 (C 13-21): The value assigned here to 'func_name' appears to be unused. Consider replacing it by ~."
     )
     config.setParsers(config.getParsers().plus(mlint))
