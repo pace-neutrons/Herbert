@@ -14,14 +14,7 @@ readonly HERBERT_ROOT="$(realpath "$(dirname "$0")"/../..)"
 readonly MATLAB_ROOT="$(realpath "$(dirname "$(readlink -f "$(command -v matlab)")")"/..)"
 readonly MAX_CTEST_SUCCESS_OUTPUT_LENGTH="10000" # 10kB
 
-function echo_and_run {
-  echo "+ $1"
-  eval "$1"
-}
-
-function warning {
-  echo -e "\e[33m$1\e[0m"
-}
+. "${HERBERT_ROOT}/tools/bash/bash_helpers.sh"
 
 function print_package_versions() {
   cmake --version | head -n 1
@@ -47,8 +40,7 @@ function run_configure() {
   cmake_cmd+=" ${cmake_flags}"
 
   echo -e "\nRunning CMake configure step..."
-  echo_and_run "cd ${build_dir}"
-  echo_and_run "${cmake_cmd}"
+  run_in_dir "${cmake_cmd} ${build_dir}"
 }
 
 function run_build() {
@@ -73,14 +65,13 @@ function run_tests() {
 function run_analysis() {
   local build_dir=$1
 
-  echo_and_run "cd ${build_dir}"
-  echo_and_run "make analyse"
+  echo_and_run "cmake --build ${build_dir} -- analyse"
 }
 
 function run_package() {
   echo -e "\nRunning package step..."
-  echo_and_run "cd ${build_dir}"
-  echo_and_run "cpack -G TGZ"
+
+  run_in_dir "cpack -G TGZ" "${build_dir}"
 }
 
 function print_help() {

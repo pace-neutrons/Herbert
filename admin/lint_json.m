@@ -1,4 +1,13 @@
 function lint_json(filesin, outputfile)
+% Use mlint, and convert to a json for easy parsing by WNG
+%
+% Input:
+% ------
+% filesin              char array OR cell array of char arrays detailing files to parse
+%                          if filesin is empty will recurse from current working directory
+% outputfile           char array of filename to write output to (will overwrite)
+%                          if outputfile is empty will write to stdout
+
     if isempty(filesin)
         % Default to glob all
         filesin = "**/*.m";
