@@ -8,11 +8,11 @@ function lint_json(filesin, outputfile)
 % outputfile           char array of filename to write output to (will overwrite)
 %                          if outputfile is empty will write to stdout
 
-    if isempty(filesin)
+    if ~exist('filesin', 'var') || (exist('filesin', 'var') && isempty(filesin))
         % Default to glob all
-        filesin = "**/*.m";
+        filesin = {['**', filesep, '*.m']};
     end
-    if isempty(outputfile) % Default to stdout
+    if ~exist('outputfile', 'var') || (exist('outputfile', 'var') && isempty(outputfile))
         fh = 1;
     else % Open file
         fh = fopen(outputfile,'w');
@@ -21,7 +21,6 @@ function lint_json(filesin, outputfile)
         end
         cleanup = onCleanup(@()(fclose(fh)));
     end
-
 
     files = [];
     for i = 1:numel(filesin)
