@@ -25,6 +25,13 @@ function lint_json(filesin, outputfile)
     files = [];
     for i = 1:numel(filesin)
         flist = dir(filesin{i});
+        % Filter doc files
+        filter = arrayfun(@(x)(startsWith(x.name,'doc_')), flist);
+        filtered = flist(filter);
+        for j = 1:numel(filtered)
+            fprintf("Skipping: %s\n", filtered.name);
+        end
+        flist = flist(~filter);
         files = [files; arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false)];
     end
 
