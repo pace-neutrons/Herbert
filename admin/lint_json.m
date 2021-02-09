@@ -27,7 +27,8 @@ function lint_json(filesin, outputfile)
         flist = dir(filesin{i});
         % Filter doc files
         flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
-        files = [files; arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false)];
+        flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false)
+        files = [files; flist];
     end
 
     issuesList = struct('issues', {{}}, 'size', 0);
@@ -51,7 +52,7 @@ function struc = wng_compat(struc, filename)
     struc.columnEnd = struc.column(2);
     struc = rmfield(struc,'column');
     struc = rmfield(struc,'fix');
-    struc.severity = "NORMAL";
+    struc.severity = 'NORMAL';
 end
 
 function struc = rename(struc, old, new)

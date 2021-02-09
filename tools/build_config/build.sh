@@ -165,7 +165,7 @@ function main() {
     print_package_versions
   fi
 
-  if ((configure)); then
+  if (($configure)) || [ ! -e ${build_dir}/CMakeCache.txt ]; then
     warning_msg="Warning: Build directory ${build_dir} already exists.\n\
         This may not be a clean build."
     echo_and_run "mkdir ${build_dir}" || warning "${warning_msg}"
