@@ -66,8 +66,6 @@ function to_filt = filter_list(to_filt, match)
 % Filter a list based on match function handle
     filter = arrayfun(match, to_filt);
     filtered = to_filt(filter);
-    for j = 1:numel(filtered)
-        fprintf("Skipping: %s\n", filtered.name);
-    end
+    fprintf("Skipping: %s\n", filtered.name);
     to_filt = to_filt(~filter);
 end
