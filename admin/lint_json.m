@@ -27,7 +27,7 @@ function lint_json(filesin, outputfile)
         flist = dir(filesin{i});
         % Filter doc files
         flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
-        flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false)
+        flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false);
         files = [files; flist];
     end
 
