@@ -26,32 +26,27 @@ function lint_json(filesin, outputfile)
     for i = 1:numel(filesin)
         flist = dir(filesin{i});
         % Filter doc files
-        filter = arrayfun(@(x)(startsWith(x.name,'doc_')), flist);
-        filtered = flist(filter);
-        for j = 1:numel(filtered)
-            fprintf("Skipping: %s\n", filtered.name);
-        end
-        flist = flist(~filter);
+        flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
         files = [files; arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false)];
     end
 
-    issues = struct('issues', {{}}, 'size', 0);
+    issuesList = struct('issues', {{}}, 'size', 0);
     raw = checkcode(files, '-id');
     for i = 1:numel(raw)
         for j = 1:numel(raw{i})
-            raw{i}(j).fileName = files{i};
-            curr = wng_compat(raw{i}(j));
-            issues.issues = {issues.issues{:}, curr};
+            curr = wng_compat(raw{i}(j), files{i});
+            issuesList.issues = {issuesList.issues{:}, curr};
         end
     end
-    issues.size = numel(issues.issues);
-    fprintf(fh, "%s", jsonencode(issues));
+    issuesList.size = numel(issuesList.issues);
+    fprintf(fh, "%s", jsonencode(issuesList));
 end
 
-function struc = wng_compat(struc)
+function struc = wng_compat(struc, filename)
 % Parse an mlint error struct into a Jenkins Warnings Next Gen compatible form
     struc = rename(struc, 'line', 'lineStart');
     struc = rename(struc, 'id', 'type');
+    struc.fileName = filename;
     struc.columnStart = struc.column(1);
     struc.columnEnd = struc.column(2);
     struc = rmfield(struc,'column');
@@ -64,4 +59,14 @@ function struc = rename(struc, old, new)
 % From: https://stackoverflow.com/questions/2733582/how-do-i-rename-a-field-in-a-structure-array-in-matlab
     [struc.(new)] = struc.(old);
     struc = rmfield(struc,old);
+end
+
+function to_filt = filter_list(to_filt, match)
+% Filter a list based on match function handle
+    filter = arrayfun(match, to_filt);
+    filtered = to_filt(filter);
+    for j = 1:numel(filtered)
+        fprintf("Skipping: %s\n", filtered.name);
+    end
+    to_filt = to_filt(~filter);
 end
