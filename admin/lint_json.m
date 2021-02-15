@@ -9,7 +9,7 @@ function lint_json(filesin, outputfile, varargin)
 %                          if outputfile is empty will write to stdout
 
     p = inputParser;
-    addOptional(p, 'filesin', {['**', filesep, '*.m']});
+    addOptional(p, 'filesin', {['**', filesep, '*.m']}, @iscellstr);
     addOptional(p, 'outputfile', '_screen', @ischar);
     addParameter(p, 'exclude', {}, @iscellstr);
     parse(p, filesin, outputfile, varargin{:});
