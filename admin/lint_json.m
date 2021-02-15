@@ -1,4 +1,4 @@
-function lint_json(filesin, outputfile)
+function lint_json(filesin, outputfile, varargin)
 % Use mlint, and convert to a json for easy parsing by WNG
 %
 % Input:
@@ -8,27 +8,35 @@ function lint_json(filesin, outputfile)
 % outputfile           char array of filename to write output to (will overwrite)
 %                          if outputfile is empty will write to stdout
 
-    if ~exist('filesin', 'var') || (exist('filesin', 'var') && isempty(filesin))
-        % Default to glob all
-        filesin = {['**', filesep, '*.m']};
-    end
-    if ~exist('outputfile', 'var') || (exist('outputfile', 'var') && isempty(outputfile))
+    p = inputParser;
+    addOptional(p, 'filesin', {['**', filesep, '*.m']});
+    addOptional(p, 'outputfile', '_screen', @ischar);
+    addParameter(p, 'exclude', {}, @iscellstr);
+    parse(p, filesin, outputfile, varargin{:});
+
+    if strcmp(p.Results.outputfile, '_screen')
         fh = 1;
     else % Open file
-        fh = fopen(outputfile,'w');
+        fh = fopen(p.Results.outputfile,'w');
         if fh == -1
-            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
+            error("MATLAB:FileOpenError", "Failed to open file %s", p.Results.outputfile);
         end
         cleanup = onCleanup(@()(fclose(fh)));
     end
 
     files = [];
-    for i = 1:numel(filesin)
-        flist = dir(filesin{i});
+    for i = 1:numel(p.Results.filesin)
+        flist = dir(p.Results.filesin{i});
         % Filter doc files
         flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
         flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false);
-        files = [files; flist];
+        files = unique([files; flist]);
+    end
+
+    for i = 1:numel(p.Results.exclude)
+        excl = dir(p.Results.exclude{i});
+        excl = arrayfun(@(file)(fullfile(file.folder, file.name)), excl, 'UniformOutput', false);
+        files = setdiff(files, excl);
     end
 
     issuesList = struct('issues', {{}}, 'size', 0);
@@ -39,6 +47,7 @@ function lint_json(filesin, outputfile)
             issuesList.issues = {issuesList.issues{:}, curr};
         end
     end
+
     issuesList.size = numel(issuesList.issues);
     fprintf(fh, "%s", jsonencode(issuesList));
 end
@@ -65,7 +74,9 @@ end
 function to_filt = filter_list(to_filt, match)
 % Filter a list based on match function handle
     filter = arrayfun(match, to_filt);
-    filtered = to_filt(filter);
-    fprintf("Skipping: %s\n", filtered.name);
-    to_filt = to_filt(~filter);
+    if any(filter)
+        filtered = to_filt(filter);
+        fprintf("Skipping: %s\n", filtered.name);
+        to_filt = to_filt(~filter);
+    end
 end
