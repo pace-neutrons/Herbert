@@ -112,9 +112,9 @@ properties([
   ])
 ])
 
-def handle_test_status() {
+def handle_test_status(Boolean testing_done) {
   // archive CTest results file
-  if (run_test_stage) {
+  if (testing_done) {
     archiveArtifacts(
       artifacts: 'build/Testing/**/*.xml',
       fingerprint: true
@@ -343,7 +343,7 @@ pipeline {
         ]
       )
 
-      handle_test_status()
+      handle_test_status(run_test_stage)
 
     }
 
