@@ -3,10 +3,14 @@ function lint_json(filesin, outputfile, varargin)
 %
 % Input:
 % ------
-% filesin              char array OR cell array of char arrays detailing files to parse
+% filesin              cell array of char arrays detailing files to parse
 %                          if filesin is empty will recurse from current working directory
 % outputfile           char array of filename to write output to (will overwrite)
 %                          if outputfile is empty will write to stdout
+%
+% Keyword arguments:
+% exclude              cell array of char arrays detailing files to exclude from parsing
+%
 
     p = inputParser;
     addOptional(p, 'filesin', {['**', filesep, '*.m']}, @iscellstr);
@@ -14,27 +18,31 @@ function lint_json(filesin, outputfile, varargin)
     addParameter(p, 'exclude', {}, @iscellstr);
     parse(p, filesin, outputfile, varargin{:});
 
-    if strcmp(p.Results.outputfile, '_screen')
+    filesin = p.Results.filesin;
+    outputfile = p.Results.outputfile;
+    exclude = p.Results.exclude;
+
+    if strcmp(outputfile, '_screen')
         fh = 1;
     else % Open file
-        fh = fopen(p.Results.outputfile,'w');
+        fh = fopen(outputfile,'w');
         if fh == -1
-            error("MATLAB:FileOpenError", "Failed to open file %s", p.Results.outputfile);
+            error("MATLAB:FileOpenError", "Failed to open file %s", outputfile);
         end
         cleanup = onCleanup(@()(fclose(fh)));
     end
 
     files = [];
-    for i = 1:numel(p.Results.filesin)
-        flist = dir(p.Results.filesin{i});
+    for i = 1:numel(filesin)
+        flist = dir(filesin{i});
         % Filter doc files
         flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
         flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false);
         files = unique([files; flist]);
     end
 
-    for i = 1:numel(p.Results.exclude)
-        excl = dir(p.Results.exclude{i});
+    for i = 1:numel(exclude)
+        excl = dir(exclude{i});
         excl = arrayfun(@(file)(fullfile(file.folder, file.name)), excl, 'UniformOutput', false);
         files = setdiff(files, excl);
     end

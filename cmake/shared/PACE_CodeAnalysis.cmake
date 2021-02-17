@@ -4,12 +4,19 @@ add_custom_target(analyse
 
 # Handle CMAKE list to matlab cell array
 string(JOIN "','" IGNORE_STRING ${PACE_MLINT_IGNORE})
-string(CONCAT IGNORE_STRING "{'" ${IGNORE_STRING} "'}")
+
+string(CONCAT RUN_MLINT "\""
+                        "addpath('${Herbert_ROOT}/admin');"
+                        "lint_json({'${CMAKE_SOURCE_DIR}/**/*.m'},"
+                                   "'${CMAKE_CURRENT_BINARY_DIR}/mlint.json',"
+                                   "'exclude',{'${IGNORE_STRING}'});"
+                        "exit;"
+                        "\"")
 
 add_custom_target(analyse-mlint
   COMMENT "- Performing MATLAB analysis (Mlint)..."
   BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/mlint.out"
-  COMMAND ${Matlab_MAIN_PROGRAM} -nodisplay -batch "\"addpath('${Herbert_ROOT}/admin');lint_json({'${CMAKE_SOURCE_DIR}/**/*.m'},'${CMAKE_CURRENT_BINARY_DIR}/mlint.json','exclude',${IGNORE_STRING});exit\""
+  COMMAND ${Matlab_MAIN_PROGRAM} -nodisplay -batch "${RUN_MLINT}"
   WORKING_DIRECTORY
   USES_TERMINAL
   )
