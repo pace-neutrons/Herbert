@@ -112,6 +112,33 @@ properties([
   ])
 ])
 
+def handle_test_status() {
+  // archive CTest results file
+  if (run_test_stage) {
+    archiveArtifacts(
+      artifacts: 'build/Testing/**/*.xml',
+      fingerprint: true
+    )
+    xunit (
+      testTimeMargin: '3000',
+      thresholdMode: 1,
+      thresholds: [
+        skipped(failureThreshold: '0'),
+        failed(failureThreshold: '0')
+      ],
+      tools: [
+        CTest(
+          pattern: 'build/Testing/**/*.xml',
+          deleteOutputFiles: true,
+          failIfNotNew: false,
+          skipNoTestFiles: true,
+          stopProcessingIfError: true
+        )
+      ]
+    )
+  }
+}
+
 
 def post_github_status(String state, String message) {
   // Non-PR builds will not set PR_STATUSES_URL - in which case we do not
@@ -303,7 +330,7 @@ pipeline {
 
   post {
     always {
-      // archive CTest results file and static analysis report
+      // archive static analysis report
       archiveArtifacts(
         artifacts: '**/cppcheck.xml,**/mlint.json',
         fingerprint: true
@@ -316,29 +343,8 @@ pipeline {
         ]
       )
 
-      if (run_test_stage) {
-        archiveArtifacts(
-          artifacts: 'build/Testing/**/*.xml',
-          fingerprint: true
-        )
-        xunit (
-          testTimeMargin: '3000',
-          thresholdMode: 1,
-          thresholds: [
-            skipped(failureThreshold: '0'),
-            failed(failureThreshold: '0')
-          ],
-          tools: [
-            CTest(
-              pattern: 'build/Testing/**/*.xml',
-              deleteOutputFiles: true,
-              failIfNotNew: false,
-              skipNoTestFiles: true,
-              stopProcessingIfError: true
-            )
-          ]
-        )
-      }
+      handle_test_status()
+
     }
 
     success {
