@@ -305,7 +305,7 @@ pipeline {
       // archive static analysis report
       archiveArtifacts(
         artifacts: '**/cppcheck.xml,**/mlint.json',
-        allowEmptyArchive: true
+        allowEmptyArchive: true,
         fingerprint: true
       )
 
@@ -318,7 +318,7 @@ pipeline {
 
       archiveArtifacts(
         artifacts: 'build/Testing/**/*.xml',
-        allowEmptyArchive: true
+        allowEmptyArchive: true,
         fingerprint: true
       )
       xunit (
