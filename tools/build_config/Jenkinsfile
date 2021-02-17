@@ -119,11 +119,19 @@ def post_github_status(String state, String message) {
   // want to post any statuses to Git
   String postTo = "https://api.github.com/repos/pace-neutrons/Herbert/statuses/"
   if (! env.PR_STATUSES_URL) {
-    def sout = new StringBuffer(), serr = new StringBuffer()
-    def proc ='git rev-parse HEAD'.execute()
-    proc.consumeProcessOutput(sout, serr)
-    proc.waitForOrKill(1000)
-    postTo = postTo + sout
+    if (isUnix()) {
+      String SHA = sh (
+        script: 'git rev-parse HEAD',
+        returnStdout: true
+      ).trim()
+    } else {
+      String SHA = powershell (
+        script: 'git rev-parse HEAD',
+        returnStdout: true
+      ).trim()
+
+    }
+    postTo = postTo + SHA
   } else {
     postTo = env.PR_STATUSES_URL
   }
