@@ -131,6 +131,7 @@ def post_github_status(String state, String message) {
       ).trim()
 
     }
+    println SHA
     postTo = postTo + SHA
   } else {
     postTo = env.PR_STATUSES_URL
