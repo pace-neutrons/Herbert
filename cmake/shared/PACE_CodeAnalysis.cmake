@@ -4,7 +4,7 @@ add_custom_target(analyse
 
 # Handle CMAKE list to matlab cell array
 string(JOIN "','" IGNORE_STRING ${PACE_MLINT_IGNORE})
-string(CONCAT IGNORE_STRING "{'" IGNORE_STRING "'}")
+string(CONCAT IGNORE_STRING "{'" ${IGNORE_STRING} "'}")
 
 add_custom_target(analyse-mlint
   COMMENT "- Performing MATLAB analysis (Mlint)..."
