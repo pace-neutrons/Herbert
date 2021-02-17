@@ -1,22 +1,22 @@
-function lint_json(filesin, outputfile, varargin)
+function lint_json(varargin)
 % Use mlint, and convert to a json for easy parsing by WNG
 %
 % Input:
 % ------
-% filesin              cell array of char arrays detailing files to parse
+% filesin              cell array of char arrays listing filepaths/globs to parse
 %                          if filesin is empty will recurse from current working directory
 % outputfile           char array of filename to write output to (will overwrite)
 %                          if outputfile is empty will write to stdout
 %
 % Keyword arguments:
-% exclude              cell array of char arrays detailing files to exclude from parsing
+% exclude              cell array of char arrays listing filepaths/globs to exclude from parsing
 %
 
     p = inputParser;
     addOptional(p, 'filesin', {['**', filesep, '*.m']}, @iscellstr);
     addOptional(p, 'outputfile', '_screen', @ischar);
     addParameter(p, 'exclude', {}, @iscellstr);
-    parse(p, filesin, outputfile, varargin{:});
+    parse(p, varargin{:});
 
     filesin = p.Results.filesin;
     outputfile = p.Results.outputfile;
@@ -32,20 +32,21 @@ function lint_json(filesin, outputfile, varargin)
         cleanup = onCleanup(@()(fclose(fh)));
     end
 
-    files = [];
-    for i = 1:numel(filesin)
-        flist = dir(filesin{i});
-        % Filter doc files
-        flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
-        flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false);
-        files = unique([files; flist]);
-    end
+    % Expand globbing to file objects
+    flist = cellfun(@(x)(dir(x)), filesin, 'UniformOutput', false);
+    % Flatten array
+    flist = [flist{:}]
+    % Filter doc files
+    flist = filter_list(flist, @(x)(startsWith(x.name,'doc_')));
+    % Convert to filepaths
+    flist = arrayfun(@(file)(fullfile(file.folder, file.name)), flist, 'UniformOutput', false);
 
-    for i = 1:numel(exclude)
-        excl = dir(exclude{i});
-        excl = arrayfun(@(file)(fullfile(file.folder, file.name)), excl, 'UniformOutput', false);
-        files = setdiff(files, excl);
-    end
+    % Same for exclusion (no filter step)
+    excl = cellfun(@(x)(dir(x)), exclude, 'UniformOutput', false);
+    excl = arrayfun(@(file)(fullfile(file.folder, file.name)), [excl{:}], 'UniformOutput', false);
+
+    % Exclude
+    files = setdiff(flist, excl);
 
     issuesList = struct('issues', {{}}, 'size', 0);
     raw = checkcode(files, '-id');
