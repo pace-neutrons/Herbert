@@ -11,6 +11,7 @@ Variables required by the module
 This is provided by the `FindHerbert` module which must be loaded first
 
 ``${PACE_MLINT_IGNORE}``
+CMake list of filepaths or globs describing files to exclude from mlint parsing
 
 ``${Matlab_MAIN_PROGRAM}``
 This is provided by the `herbert_FindMatlab` module which must be loaded first
@@ -66,8 +67,8 @@ if (cppcheck)
     COMMENT "- Performing C++ analysis (CppCheck)..."
     BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/cppcheck.xml"
     COMMAND cppcheck --enable=all --inconclusive --xml --xml-version=2
-    -I "${CMAKE_SOURCE_DIR}/_LowLevelCode/cpp" "${CMAKE_SOURCE_DIR}/_LowLevelCode/"
-    2> "${CMAKE_CURRENT_BINARY_DIR}/cppcheck.xml"
+                     -I "${CMAKE_SOURCE_DIR}/_LowLevelCode/cpp" "${CMAKE_SOURCE_DIR}/_LowLevelCode/"
+                     2> "${CMAKE_CURRENT_BINARY_DIR}/cppcheck.xml"
     WORKING_DIRECTORY
     USES_TERMINAL
     )
