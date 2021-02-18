@@ -65,7 +65,8 @@ String get_param(String param_name, String default_val) {
   String value = "";
   try {
     value = env."${param_name}";
-  } catch (groovy.lang.MissingPropertyException _) {
+  } catch (groovy.lang.MissingPropertyException _) { }
+  if (!value) {
     value = default_val;
   }
   return value
