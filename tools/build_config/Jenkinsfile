@@ -61,7 +61,7 @@ def get_branch_name(String job_name) {
   }
 }
 
-String get_param(String param_name, String default_val) {
+def get_param(String param_name, String default_val) {
   String value = "";
   try {
     value = env."${param_name}";
