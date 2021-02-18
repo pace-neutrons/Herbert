@@ -61,13 +61,14 @@ def get_branch_name(String job_name) {
   }
 }
 
-def get_param(String param_name, String default_val) {
+String get_param(String param_name, String default_val) {
   String value = "";
   try {
     value = env."${param_name}";
   } catch (groovy.lang.MissingPropertyException _) {
     value = default_val;
   }
+  return value
 }
 
 def post_github_status(String state, String message) {
