@@ -71,6 +71,7 @@ String get_param(String param_name, String default_val) {
   return value
 }
 
+
 def post_github_status(String state, String message) {
   // Non-PR builds will not set PR_STATUSES_URL - in which case we do not
   // want to post any statuses to Git
@@ -83,11 +84,11 @@ def post_github_status(String state, String message) {
             curl -H "Authorization: token \${api_token}" \
               --request POST \
               --data '{"state": "${state}", \
-                  "description": "${message}", \
-                  "target_url": "$BUILD_URL", \
-                  "context": "$JOB_BASE_NAME"}' \
+                "description": "${message}", \
+                "target_url": "$BUILD_URL", \
+                "context": "$JOB_BASE_NAME"}' \
               $PR_STATUSES_URL > /dev/null
-          """
+            """
         }
         else {
           powershell """
@@ -180,6 +181,9 @@ if (env.BRANCH_NAME) {
   currentBuild.description = "Git-SHA: ${env.PR_COMMIT_SHA.take(7)}"
 }
 
+Boolean run_build_stage = (! env?.PR_LABELS =~ "do-not-build")
+Boolean run_test_stage = (! env?.PR_LABELS =~ "(do-not-build|do-not-test)")
+
 pipeline {
   agent {
     label env.AGENT
@@ -230,6 +234,11 @@ pipeline {
     }
 
     stage('Build') {
+      when {
+        expression {
+          run_build_stage == true
+        }
+      }
       steps {
         script {
           if (isUnix()) {
@@ -254,6 +263,11 @@ pipeline {
     }
 
     stage('Test') {
+      when {
+        expression {
+          run_test_stage == true
+        }
+      }
       steps {
         script {
           if (isUnix()) {
@@ -272,6 +286,11 @@ pipeline {
     }
 
     stage('Package') {
+      when {
+        expression {
+          run_build_stage == true
+        }
+      }
       steps {
         script {
           if (isUnix()) {
@@ -301,9 +320,10 @@ pipeline {
 
   post {
     always {
-      // archive CTest results file and static analysis report
+      // archive static analysis report
       archiveArtifacts(
-        artifacts: 'build/Testing/**/*.xml,**/cppcheck.xml,**/mlint.json',
+        artifacts: '**/cppcheck.xml,**/mlint.json',
+        allowEmptyArchive: true,
         fingerprint: true
       )
 
@@ -314,6 +334,11 @@ pipeline {
         ]
       )
 
+      archiveArtifacts(
+        artifacts: 'build/Testing/**/*.xml',
+        allowEmptyArchive: true,
+        fingerprint: true
+      )
       xunit (
         testTimeMargin: '3000',
         thresholdMode: 1,
@@ -331,6 +356,7 @@ pipeline {
           )
         ]
       )
+
     }
 
     success {
