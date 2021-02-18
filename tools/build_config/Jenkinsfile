@@ -216,15 +216,6 @@ pipeline {
         script {
           if (isUnix()) {
             sh '''
-              echo $BRANCH_NAME
-              echo $RELEASE_TYPE
-              echo $AGENT
-              echo $MATLAB_VERSION
-              echo $CMAKE_VERSION
-              echo $GCC_VERSION
-              echo $VS_VERSION
-              echo $CPPCHECK_VERSION
-
               module load cmake/\$CMAKE_VERSION &&
               module load matlab/\$MATLAB_VERSION &&
               module load gcc/\$GCC_VERSION &&
