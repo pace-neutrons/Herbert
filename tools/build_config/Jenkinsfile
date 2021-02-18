@@ -177,18 +177,9 @@ properties([
   ])
 ])
 
-BRANCH_NAME = get_param('BRANCH_NAME', get_branch_name(env.JOB_BASE_NAME))
-RELEASE_TYPE = get_param('RELEASE_TYPE', get_release_type(env.JOB_BASE_NAME))
-AGENT = get_param('AGENT', get_agent(env.JOB_BASE_NAME))
-MATLAB_VERSION = get_param('MATLAB_VERSION', get_matlab_release(env.JOB_BASE_NAME))
-CMAKE_VERSION = get_param('CMAKE_VERSION', '3.19')
-GCC_VERSION = get_param('GCC_VERSION', '6.3.0')
-VS_VERSION = get_param('VS_VERSION', '2017')
-CPPCHECK_VERSION = get_param('CPPCHECK_VERSION', '1.77')
 
-
-if (env.BRANCH_NAME) {
-  currentBuild.description = "Branch: ${env.BRANCH_NAME}"
+if (BRANCH_NAME) {
+  currentBuild.description = "Branch: ${BRANCH_NAME}"
 } else if (env.PR_NUMBER) {
   currentBuild.displayName = "#${env.BUILD_NUMBER} PR-${env.PR_NUMBER}"
   currentBuild.description = "Git-SHA: ${env.PR_COMMIT_SHA.take(7)}"
@@ -196,7 +187,18 @@ if (env.BRANCH_NAME) {
 
 pipeline {
   agent {
-    label env.AGENT
+    label AGENT
+  }
+
+  environment {
+    BRANCH_NAME = get_param('BRANCH_NAME', get_branch_name(env.JOB_BASE_NAME))
+    RELEASE_TYPE = get_param('RELEASE_TYPE', get_release_type(env.JOB_BASE_NAME))
+    AGENT = get_param('AGENT', get_agent(env.JOB_BASE_NAME))
+    MATLAB_VERSION = get_param('MATLAB_VERSION', get_matlab_release(env.JOB_BASE_NAME))
+    CMAKE_VERSION = get_param('CMAKE_VERSION', '3.19')
+    GCC_VERSION = get_param('GCC_VERSION', '6.3.0')
+    VS_VERSION = get_param('VS_VERSION', '2017')
+    CPPCHECK_VERSION = get_param('CPPCHECK_VERSION', '1.77')
   }
 
   stages {
