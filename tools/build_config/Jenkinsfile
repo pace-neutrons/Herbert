@@ -61,6 +61,8 @@ def get_branch_name(String job_name) {
 }
 
 String get_param(String param_name, String default_val) {
+  // Return environment variable if present and non-empty
+  // Else return default
   String value = "";
   try {
     value = env."${param_name}";
