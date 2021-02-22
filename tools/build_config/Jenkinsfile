@@ -295,7 +295,10 @@ pipeline {
       steps {
         script {
           if (isUnix()) {
-            sh './tools/build_config/build.sh --package'
+            sh '''
+              module load cmake/\$CMAKE_VERSION &&
+              ./tools/build_config/build.sh --package
+            '''
           }
           else {
             powershell './tools/build_config/build.ps1 -package'
