@@ -20,7 +20,7 @@ function ok = is_folder(name)
         end
         name = fullfile(path, p.Results.name);
 
-        ok = is_folder(name);
+        ok = exist(name, 'dir') == 7;
     end
 
 end
