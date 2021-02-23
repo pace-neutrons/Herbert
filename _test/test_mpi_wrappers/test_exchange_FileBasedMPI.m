@@ -315,7 +315,7 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
             mf.migrate_message_folder();
             assertFalse(is_folder(jfn));
             jnf = fullfile(this.working_dir, cfn, mf.exchange_folder_name, mf.job_id);
-            assertEqual(is_folder(jnf));
+            assertTrue(is_folder(jnf));
 
             % message have gone
             [ok, err, the_mess] = mf.receive_message(7, 'queued');
