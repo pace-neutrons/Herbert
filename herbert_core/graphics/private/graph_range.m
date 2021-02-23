@@ -39,7 +39,7 @@ function varargout=graph_range(fig_handle,opt)
 
 
 % Check arguments
-if ~exist('opt','var') || strcmp(opt,'evaluate')
+if ~is_def('opt') || strcmp(opt,'evaluate')
     evaluate=true;
 elseif strcmp(opt,'present')
     evaluate=false;

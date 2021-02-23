@@ -15,7 +15,7 @@ default_test_file_name = fullfile (fileparts(which(class_name)),...
 
 if ~this.save_output
     % In test operation (i.e. testing against pre-stored data, if any)
-    if exist('filename','var')
+    if is_def('filename')
         % Check test results file name
         if ischarstring(filename)
             [fpath,~,fext] = fileparts(filename);
@@ -49,7 +49,7 @@ else
     
     % Create file name for saving results, checking that the file is not the same as the
     % default filename for containing data against which to test in the test suite
-    if exist('filename','var')
+    if is_def('filename')
         if ischarstring(filename)
             [fpath,~,fext] = fileparts(filename);
             if isempty(fpath)

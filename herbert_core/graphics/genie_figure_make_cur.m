@@ -17,7 +17,7 @@ function genie_figure_make_cur(fig)
 
 
 % Determine which figure(s) to make current
-if ~exist('fig','var'), fig=[]; end
+if ~is_def('fig'), fig=[]; end
 if isa(fig,'handle')
     fig_handle = fig;
 else

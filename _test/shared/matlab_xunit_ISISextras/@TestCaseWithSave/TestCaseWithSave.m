@@ -329,7 +329,7 @@ classdef TestCaseWithSave < TestCase & oldTestCaseWithSaveInterface
                 end
                 
                 % Update test results file name and data structure
-                if exist('filename','var')
+                if is_def('filename')
                     this = this.instantiate_ref_data_ (filename);
                 else
                     this = this.instantiate_ref_data_ ();

@@ -64,7 +64,7 @@ ind=strfind(source_root_path,filesep);
 target_root_path_true=fullfile(target_root_path,source_root_path(ind(end)+1:end),['@',classname]);
     
 % Parse options
-if exist('option','var') && ~isempty(option)
+if is_def('option') && ~isempty(option)
     if strncmpi('examples',option,numel(option))
         files_to_ignore='_a.*';
         rename=false;
@@ -79,7 +79,7 @@ else
     rename=false;
 end
 
-if exist('public_target','var')
+if is_def('public_target')
     public_root_target=fullfile(target_root_path,public_target,['@',classname]);
     move=true;
 else

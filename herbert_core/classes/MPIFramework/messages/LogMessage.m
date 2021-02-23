@@ -32,7 +32,7 @@ classdef LogMessage<aMessage
             %
             obj = obj@aMessage('log');
             %
-            if ~exist('step','var') % empty constructor
+            if ~is_def('step') % empty constructor
                 step = 0;
                 n_steps=0;
                 step_time =0;
@@ -42,7 +42,7 @@ classdef LogMessage<aMessage
                 step_time =0;
                 add_info = '';
             end
-            if ~exist('add_info','var')
+            if ~is_def('add_info')
                 add_info = '';
             end
             obj.payload=struct('step',step,'n_steps',n_steps,...

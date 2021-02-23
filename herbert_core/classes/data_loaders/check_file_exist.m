@@ -30,7 +30,7 @@ end
 
 
 [filepath,filename,ext]=fileparts(strtrim(file_name));
-if ~exist('supported_file_extensions','var')
+if ~is_def('supported_file_extensions')
     supported_file_extensions = {lower(ext)};
 end
 

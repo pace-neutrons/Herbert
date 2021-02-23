@@ -173,10 +173,10 @@ classdef JobDispatcher
             %              (task number) and task parameters from
             %               tasks_param_list, assigned to this task
             %
-            if ~exist('task_query_time','var')
+            if ~is_def('task_query_time')
                 task_query_time = 4;
             end
-            if ~exist('keep_workers_running','var')
+            if ~is_def('keep_workers_running')
                 keep_workers_running = false;
             end
             [outputs,n_failed,task_ids,this]=send_tasks_to_workers_(this,...
@@ -230,7 +230,7 @@ classdef JobDispatcher
             %              (task number) and task parameters from
             %               tasks_param_list, assigned to this task
             %
-            if ~exist('task_query_time','var')
+            if ~is_def('task_query_time')
                 task_query_time = 4;
             end
             [outputs,n_failed,task_ids,this]=resend_tasks_to_workers_(this,...

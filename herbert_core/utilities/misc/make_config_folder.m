@@ -38,7 +38,7 @@ function folder_path=make_config_folder(folder_name,in_folder_path,ext)
 if nargin<3
     ext = '';
 end
-if exist('in_folder_path','var')
+if is_def('in_folder_path')
     [success,folder_path,err_mess] = try_to_create_folder(in_folder_path,folder_name,ext);
     if success
         return

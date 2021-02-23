@@ -14,7 +14,7 @@ classdef test_rundata< TestCase
         
         %
         function obj=test_rundata(name)
-            if ~exist('name','var')
+            if ~is_def('name')
                 name = 'test_rundata';
             end
             obj = obj@TestCase(name);

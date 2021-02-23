@@ -15,7 +15,7 @@ classdef test_iMPI_methods< TestCase
     methods
         %
         function obj=test_iMPI_methods(name)
-            if ~exist('name','var')
+            if ~is_def('name')
                 name = 'test_iMPI_methods';
             end
             obj = obj@TestCase(name);

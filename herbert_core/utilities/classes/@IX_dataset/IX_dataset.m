@@ -95,7 +95,7 @@ classdef IX_dataset
         %------------------------------------------------------------------
         function xyz = get_xyz(obj,nd)
             % get x (y,z) values without checking for their validity
-            if ~exist('nd','var')
+            if ~is_def('nd')
                 xyz  = obj.xyz_;
             else
                 xyz  = obj.xyz_{nd};

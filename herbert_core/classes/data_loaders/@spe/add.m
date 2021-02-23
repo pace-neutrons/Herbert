@@ -95,7 +95,7 @@ else
 end
 
 % Check scale factor, if any
-if exist('scale','var')
+if is_def('scale')
     if ~isscalar(scale)||~isnumeric(scale)
         mess='Scale factor must be numeric scalar';
         return
@@ -181,7 +181,7 @@ data.filepath='';
 data.S=cumm_S./cumm_weight;
 data.ERR=sqrt(cumm_ERR2)./cumm_weight;
 data.en=en;
-if exist('scale','var')
+if is_def('scale')
     data.S=scale*data.S;
     data.ERR=scale*data.ERR;
 end

@@ -8,7 +8,7 @@ classdef test_job_executor< MPI_Test_Common
     methods
         %
         function this=test_job_executor(name)
-            if ~exist('name','var')
+            if ~is_def('name')
                 name = 'test_job_executor';
             end
             % testing this on file-based framework only

@@ -37,20 +37,20 @@ classdef InitMessage < aMessage
             %                 a cellarray it assumed to be 1
             %
             obj = obj@aMessage('init');
-            if ~exist('common_data','var')
+            if ~is_def('common_data')
                 common_data = [];
                 loop_data = 1;
             end
-            if ~exist('loop_data','var')
+            if ~is_def('loop_data')
                 loop_data = 1;
             end
-            if ~exist('return_results','var')
+            if ~is_def('return_results')
                 return_results = false;
             end
             obj.payload = struct('common_data',common_data,...
                 'loopData',[],'n_first_step',1,'n_steps',0,...
                 'return_results',return_results );
-            if ~exist('n_first_step','var')
+            if ~is_def('n_first_step')
                 n_first_step = 1;
             end
             if iscell(loop_data)

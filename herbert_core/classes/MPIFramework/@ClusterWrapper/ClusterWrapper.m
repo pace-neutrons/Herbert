@@ -129,7 +129,7 @@ classdef ClusterWrapper
             if nargin < 2
                 return;
             end
-            if ~exist('log_level','var')
+            if ~is_def('log_level')
                 log_level = -1;
             end
             
@@ -157,7 +157,7 @@ classdef ClusterWrapper
             %              which started and controls the job.
             %log_level     if present, the number, which describe the
             %              verbosity of the cluster operations output;
-            if ~exist('log_level','var')
+            if ~is_def('log_level')
                 log_level = -1;
             end
             if log_level > -1
@@ -222,7 +222,7 @@ classdef ClusterWrapper
             %                     running this job e.g. 'starting' or
             %                     'continuing'
             %
-            if ~exist('log_message_prefix','var')
+            if ~is_def('log_message_prefix')
                 log_message_prefix = 'starting';
             end
             
@@ -240,7 +240,7 @@ classdef ClusterWrapper
             % ok -- true if cluster started successfully and false if it
             % does not
             %
-            if ~exist('check_time','var')
+            if ~is_def('check_time')
                 check_time = 4;
             end
             [obj,ok] = wait_started_and_report_(obj,check_time,varargin{:});

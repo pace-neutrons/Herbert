@@ -49,13 +49,13 @@ function [cal,path] = split_to_cellarray(path,cal)
 
 [path,fn] = fileparts(path);
 if isempty(fn)
-    if exist('cal','var')
+    if is_def('cal')
         cal = [path;cal(:)];
         path = '';
         return;
     end
 end
-if ~exist('cal','var')
+if ~is_def('cal')
     if isempty(fn)
         [cal,path] = split_to_cellarray(path);
     else

@@ -15,7 +15,7 @@ end
 this_pc_type = obj.this_pc_type;
 % create structure describing this pc configuration and set-up info field
 % as the first field in the structure.
-if exist('info','var')
+if is_def('info')
     this_pc_config = struct('info',info);
 else
     this_pc_config = struct('info','');
