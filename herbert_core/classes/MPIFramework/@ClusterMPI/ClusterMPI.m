@@ -203,7 +203,7 @@ classdef ClusterMPI < ClusterWrapper
             else
                 mpi_exec = fullfile(external_dll_dir, 'mpiexec');
                 
-                if ~(exist(mpi_exec,'file')==2)
+                if ~(is_file(mpi_exec))
                     % use system-defined mpiexec
                     [~, mpi_exec] = system('which mpiexec');
                     % strip non-printing characters, spaces and eol/cr-s from the

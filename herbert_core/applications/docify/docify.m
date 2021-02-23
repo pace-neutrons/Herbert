@@ -259,7 +259,7 @@ if isempty(pars)
     span_directory = true;
     directory = pwd;
 elseif numel(pars)==1 && ~isempty(pars{1}) && is_string(pars{1})
-    if exist(pars{1},'dir')
+    if is_folder(pars{1})
         span_directory = true;
         directory = pars{1};
     elseif exist(pars{1},'file')

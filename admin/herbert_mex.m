@@ -38,7 +38,7 @@ rootpath = herbert_root();
 % Source code directories, and output directories:
 %  - Herbert target directory:
 herbert_mex_target_dir=fullfile(rootpath,'herbert_core','DLL',['_',computer],matlab_version_folder());
-if ~exist(herbert_mex_target_dir,'dir')
+if ~is_folder(herbert_mex_target_dir)
     mkdir(herbert_mex_target_dir);
 else
     ok = check_folder_permissions(herbert_mex_target_dir);

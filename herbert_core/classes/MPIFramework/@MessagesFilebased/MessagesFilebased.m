@@ -127,7 +127,7 @@ classdef MessagesFilebased < iMessagesFramework
                 return;
             end
             % We are setting new folder so should delete old message exchange folder if one exist
-            if exist(obj.mess_exchange_folder,'dir') == 7
+            if is_folder(obj.mess_exchange_folder)
                 rmdir(obj.mess_exchange_folder,'s');
             end
             construct_me_folder_(obj,val);
@@ -230,7 +230,7 @@ classdef MessagesFilebased < iMessagesFramework
         %
         function is = is_job_canceled(obj)
             % method verifies if job has been canceled
-            is = ~exist(obj.mess_exchange_folder_,'dir') || ...
+            is = ~is_folder(obj.mess_exchange_folder_) || ...
                 ~isempty(obj.probe_all('all','canceled'));
         end
         %------------------------------------------------------------------
@@ -384,7 +384,7 @@ classdef MessagesFilebased < iMessagesFramework
                     [fp,fs] = fileparts(obj.mess_exchange_folder_);
                     if strcmpi(fs,old_id)
                         obj.mess_exchange_folder_ = fullfile(fp,new_job_id);
-                        if delete_old_folder && (exist(old_exchange,'dir') == 7)
+                        if delete_old_folder && (is_folder(old_exchange))
                             ok=rmdir(old_exchange,'s');
                             n_allowed = 1000;
                             n_tries = 0;

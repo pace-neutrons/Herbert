@@ -71,7 +71,7 @@ else
     if ~isOkToWriteTo (folder)
         warning('TEST_CASE_WITH_SAVE:runtime_error',...
             ' Write protected test folder: %s; using tmp_dir folder',folder)
-        if exist(filename,'file') == 2
+        if is_file(filename)
             copyfile(filename,tmp_dir,'f');
         end
         filename = fullfile(tmp_dir,[fn,fe]);

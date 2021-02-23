@@ -60,7 +60,7 @@ end
 
 % Try to use matlab preferences directory
 location = prefdir();
-if exist(location,'dir')
+if is_folder(location)
     % store configuration in a version-independent location;
     version_folder=regexp(version() ,'\w*','match');
     verstr=version_folder{5};
@@ -82,21 +82,21 @@ else
     location = getenv('HOME');
 end
 
-if exist(location,'dir')
+if is_folder(location)
     [success,folder_path] = try_to_create_folder(location,folder_name,ext);
     if success, return, end
 end
 
 % Something wrong with user profile, try matlab user folder
 location = userpath;
-if exist(location,'dir')
+if is_folder(location)
     [success,folder_path] = try_to_create_folder(location,folder_name,ext);
     if success, return, end
 end
 
 % Something is fundamentally wrong
 location = pwd;
-if exist(location,'dir')
+if is_folder(location)
     [success,folder_path,message] = try_to_create_folder(location,folder_name,ext);
     if ~success
         help make_config_folder;

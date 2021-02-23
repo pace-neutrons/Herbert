@@ -28,7 +28,7 @@ if ~isempty(file) && ischar(file) && size(file,1)==1 && numel(size(file))==2
     % Unable to resolve global path or environment variable, so assume true file name (e.g. 'c:\temp\a.dat')
     if isempty(file_out)
         file_out=file;
-        if ~(exist(file_out,'file')==2)
+        if ~(is_file(file_out))
             file_out='';
             ok=false;
             mess=['Cannot find file: ',file];

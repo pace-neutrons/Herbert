@@ -295,7 +295,7 @@ classdef ClusterWrapper
             if ~isempty(obj.mess_exchange_)
                 obj.mess_exchange_.finalize_all();
                 new_mess_exchange_folder = obj.mess_exchange_.next_message_folder_name;
-                if exist(new_mess_exchange_folder,'dir')==7
+                if is_folder(new_mess_exchange_folder)
                     [ok,mess]=rmdir(new_mess_exchange_folder,'s');
                     if ~ok
                         warning(' can not clean-up prospective message exchange folder %s Reason %s',...

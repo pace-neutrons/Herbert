@@ -27,7 +27,7 @@ if exist(file_name,'file')
     end
 end
 config_folder = fileparts(file_name);
-if ~(exist(config_folder,'dir')==7)
+if ~(is_folder(config_folder))
     mkdir(config_folder,'s');
 end
 

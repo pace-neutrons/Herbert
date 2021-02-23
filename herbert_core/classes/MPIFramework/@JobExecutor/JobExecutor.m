@@ -336,7 +336,7 @@ classdef JobExecutor
             % check all available framework for the job cancellation state.
             %
             % Returns true if job folder has been deleted
-            is =~exist(obj.control_node_exch_.mess_exchange_folder,'dir');
+            is =~is_folder(obj.control_node_exch_.mess_exchange_folder);
             if ~is
                 [mess,tids] = obj.mess_framework_.probe_all('all','canceled');
                 if ~isempty(mess)

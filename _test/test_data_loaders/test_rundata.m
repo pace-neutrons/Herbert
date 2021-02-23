@@ -547,7 +547,7 @@ classdef test_rundata< TestCase
         function test_saveNXSPE_unbound(~)
             test_file = fullfile(tmp_dir,'test_saveNXSPE_unbound.nxspe');
             clob = onCleanup(@()delete(test_file));
-            if exist(test_file,'file')==2
+            if is_file(test_file)
                 delete(test_file);
             end
             

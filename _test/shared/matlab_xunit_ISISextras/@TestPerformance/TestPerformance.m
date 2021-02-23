@@ -139,7 +139,7 @@ classdef TestPerformance < TestCaseWithSave
             % get sutie test name. Should support overloading to generate
             % correct name for child classes
             %
-            if exist(tests_res_file,'file')==2
+            if is_file(tests_res_file)
                 obj.perf_data_ = load_performance_data_(obj);
             end
             obj.perf_suite_name = obj.build_test_suite_name(name);

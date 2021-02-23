@@ -48,7 +48,7 @@ if exist('opt','var')  % Check that the rootpath exists
     if ischar(opt) && size(opt,1)==1
         if strncmpi(opt,'-off',max(length(opt),2))
             initialise_application=false;
-        elseif exist(opt,'dir')==7
+        elseif is_folder(opt)
             initialise_application=true;
             rootpath = opt;
         else

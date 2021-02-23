@@ -35,7 +35,7 @@ if ~file_exist
         ok=false; err_mess=sprintf('sqw file: "%s"  does not exist',file_name); return
     end
     file_path=fileparts(file_name);
-    if ~isempty(file_path) && ~exist(file_path,'dir')
+    if ~isempty(file_path) && ~is_folder(file_path)
         ok=false;
         err_mess=sprintf('The folder "%s" to place the file do not exist',file_path);
         return

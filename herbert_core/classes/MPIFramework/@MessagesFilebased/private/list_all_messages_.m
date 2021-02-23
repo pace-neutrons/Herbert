@@ -43,7 +43,7 @@ if ischar(mess_names_req)
 end
 
 mess_folder = obj.mess_exchange_folder;
-if ~(exist(mess_folder,'dir')==7) % job was canceled
+if ~(is_folder(mess_folder)) % job was canceled
     error('MESSAGE_FRAMEWORK:canceled',...
         'Job with id %s has been canceled. No messages folder exist',obj.job_id)
 end
