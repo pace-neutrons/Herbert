@@ -81,7 +81,7 @@ end
 
 for i=1:numel(dir)
     file_out=fullfile(dir{i},filename);
-    if exist(file_out,'file')
+    if is_file(file_out)
         return
     end
 end

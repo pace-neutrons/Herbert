@@ -57,7 +57,7 @@ else
             if isempty(filepath)
                 spefiles{i}=fullfile(spedir,spefiles{i});
             end
-            if ~exist(spefiles{i},'file')
+            if ~is_file(spefiles{i})
                 mess=['Cannot find input .spe file ',spefiles{i}];
                 return
             end

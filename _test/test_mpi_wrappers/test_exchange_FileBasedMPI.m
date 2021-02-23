@@ -496,7 +496,7 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
             assertEqual(mess.mess_name, 'failed'); % got it from messages cache. (disabled)
             % but barrier file exist
             barrier_file = fbMPI1.mess_file_name(fbMPI1.labIndex,'barrier',2);
-            assertEqual(exist(barrier_file,'file'),2);
+            assertTrue(is_file(barrier_file));
             delete(barrier_file);
 
             [ok, err, mess] = fbMPI1.receive_message(3, 'barrier');

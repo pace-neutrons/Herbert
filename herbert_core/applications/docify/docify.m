@@ -262,7 +262,7 @@ elseif numel(pars)==1 && ~isempty(pars{1}) && is_string(pars{1})
     if is_folder(pars{1})
         span_directory = true;
         directory = pars{1};
-    elseif exist(pars{1},'file')
+    elseif is_file(pars{1})
         span_directory = false;
         file_in = pars{1};
         file_out = '';

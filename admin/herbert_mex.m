@@ -118,7 +118,7 @@ outdir = fullfile(out_dir,'');
 
 [f_path,f_name]=fileparts(files{1});
 targ_file=fullfile(outdir,[f_name,'.',mexext]);
-if(exist(targ_file,'file'))
+if(is_file(targ_file))
     try
         delete(targ_file)
     catch

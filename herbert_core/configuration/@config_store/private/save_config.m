@@ -17,7 +17,7 @@ function [ok,mess] = save_config (file_name, config_data)
 
 
 % Delete existing configuration file, if there is one
-if exist(file_name,'file')
+if is_file(file_name)
     try
         delete(file_name)
     catch

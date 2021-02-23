@@ -251,7 +251,7 @@ function [ok,mess,moderator_store,ei_store,table_store,t_av_store,fwhh_store,pro
 % Read stored moderator lookup table
 % ok=true if file does not exist
 
-if exist(filename,'file')
+if is_file(filename)
     disp('Reading stored moderator lookup table...')
     try
         load(filename,'-mat');
@@ -347,7 +347,7 @@ end
 function [ok,mess]=delete_store(filename)
 % Read stored moderator lookup table
 
-if exist(filename,'file')
+if is_file(filename)
     try
         disp('Deleting stored moderator lookup table...')
         delete(filename)

@@ -316,7 +316,7 @@ classdef test_gen_runfiles< TestCase
             assertEqual(rd.ERR,ERR);
             assertEqual(rd.en,this.en{1}');
             assertTrue(isnan(rd.lattice.psi));
-            assertTrue(~exist(rez_file{1},'file'));
+            assertTrue(~is_file(rez_file{1}));
             
             % nen ~= size(S,1)-1 throws
             S1 = S;

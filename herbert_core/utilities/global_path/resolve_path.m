@@ -33,7 +33,7 @@ else
 end
 fullpath = char(file.getCanonicalPath());
 
-if exist(fullpath,'file') > 0
+if is_file(fullpath) > 0
     ok = true;
     return
 else

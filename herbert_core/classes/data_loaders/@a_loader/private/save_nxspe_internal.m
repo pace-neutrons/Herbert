@@ -41,7 +41,7 @@ if write_access
 end
 
 % check inputs and set defaults.
-if exist(filename,'file')
+if is_file(filename)
     if readwrite_access
         error('A_LOADER:invalid_argument','File %s already exist',filename);
     else
