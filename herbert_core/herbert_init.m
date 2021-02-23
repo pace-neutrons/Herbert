@@ -106,7 +106,7 @@ for i=1:numel(application_init_old)
     try
         rootpath=fileparts(application_init_old{i});
         cd(rootpath)
-        if exist(fullfile(pwd,[app_name,'_off.m']),'file') % check that 'off' routine exists in the particular rootpath
+        if is_file(fullfile(pwd,[app_name,'_off.m'])) % check that 'off' routine exists in the particular rootpath
             try
                 feval([app_name,'_off'])    % call the 'off' routine
             catch ME

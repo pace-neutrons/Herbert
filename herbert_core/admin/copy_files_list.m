@@ -138,7 +138,7 @@ function [local_list,excludes_all]=copyFileList(sourcePath,destPath,filelist)
 global extention;
 
 excludes_all = false;
-if exist(fullfile(sourcePath,'_exclude_all.txt'),'file')
+if is_file(fullfile(sourcePath,'_exclude_all.txt'))
     % exclude all files and subfolders of current folder from copying into
     % distribution
     excludes_all = true;
@@ -146,7 +146,7 @@ if exist(fullfile(sourcePath,'_exclude_all.txt'),'file')
     
     return;
 end
-if exist(fullfile(sourcePath,'_exclude_files.txt'),'file')
+if is_file(fullfile(sourcePath,'_exclude_files.txt'))
     % exclude all files in current folder from copying into
     % distribution but keep everything in the subfolders
     local_list = {};
