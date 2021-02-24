@@ -201,14 +201,17 @@ pipeline {
           ./tools/build_config/build.sh \
             --cmake_flags \"-DHorace_RELEASE_TYPE=\$RELEASE_TYPE\" \
             --matlab_release \$MATLAB_VERSION \
-            --print_versions --configure
+            --print_versions
+            --configure
           '''
       } else {
         powershell '''
-           ./tools/build_config/build.ps1 -print_versions -configure
+           ./tools/build_config/build.ps1 \
                 -cmake_flags \"-DHorace_RELEASE_TYPE=\$env:RELEASE_TYPE\" \
                 -matlab_release \$env:MATLAB_VERSION \
-                -vs_version \$env:VS_VERSION
+                -vs_version \$env:VS_VERSION \
+                -print_versions \
+                -configure
           '''
       }
     }
