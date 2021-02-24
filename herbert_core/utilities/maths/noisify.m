@@ -69,7 +69,7 @@ function [yout,eout] = noisify(y,e,varargin)
 
     % adds e (the input variance) to eout if it exists 
     % (it may not,see @sqw/nosify)
-    if is_def('e') && ~isempty(e)
+    if is_defined('e') && ~isempty(e)
         if isequal(size(e),size(eout))
             eout=eout+e;
         else

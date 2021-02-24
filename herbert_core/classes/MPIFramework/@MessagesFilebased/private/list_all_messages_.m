@@ -4,7 +4,7 @@ function [all_messages,mid_from] = list_all_messages_(obj,task_ids_requested,mes
 %
 % if no message is returned for a job, its name cell remains empty.
 %
-if ~is_def('task_ids_requested')
+if ~is_defined('task_ids_requested')
     task_ids_requested = []; % list all available task_ids
 elseif ischar(task_ids_requested) && strcmpi(task_ids_requested,'all')
     task_ids_requested = [];
@@ -15,7 +15,7 @@ if ischar(task_ids_requested)
         evalc('disp(task_ids_requested)'));
 end
 
-if ~is_def('mess_name_or_tag')
+if ~is_defined('mess_name_or_tag')
     mess_tag_requested = [];
     mess_names_req = {};
 elseif ischar(mess_name_or_tag)

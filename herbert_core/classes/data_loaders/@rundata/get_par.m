@@ -20,7 +20,7 @@ if isempty(this.det_par)
     if isempty(this.loader_)
         error('RUNDATA:invalid_argument','get_par function needs initiated loader');
     end
-    if ~is_def('format')
+    if ~is_defined('format')
         format={};
     end
     [par,this.loader_]= this.loader.load_par(format{:});

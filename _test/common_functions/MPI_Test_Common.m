@@ -121,7 +121,7 @@ classdef MPI_Test_Common < TestCase
     methods(Static)
         function ni = num_instances(set_value)
             persistent num_instances;
-            if is_def('set_value')
+            if is_defined('set_value')
                 num_instances = set_value;
             else
                 if isempty(num_instances)

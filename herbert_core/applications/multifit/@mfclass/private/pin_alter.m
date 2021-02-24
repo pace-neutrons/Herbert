@@ -54,7 +54,7 @@ if isempty(indfun)  % nothing to alter
 end
 
 % Set optional arguments to the defaults
-if ~is_def('pin')
+if ~is_defined('pin')
     pin = repmat(mfclass_plist(),size(indfun));
     np = zeros(size(indfun));
 end

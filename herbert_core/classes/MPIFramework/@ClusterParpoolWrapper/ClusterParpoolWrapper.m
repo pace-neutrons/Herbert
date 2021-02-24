@@ -69,7 +69,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             if nargin < 2
                 return;
             end
-            if ~is_def('log_level')
+            if ~is_defined('log_level')
                 log_level = -1;
             end
             obj = obj.init(n_workers,mess_exchange_framework,log_level);
@@ -88,7 +88,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             %              which started and controls the job.
             %log_level     if present, the number, which describe the
             %              verbosity of the cluster operations outpt;
-            if ~is_def('log_level')
+            if ~is_defined('log_level')
                 log_level = -1;
             end
             

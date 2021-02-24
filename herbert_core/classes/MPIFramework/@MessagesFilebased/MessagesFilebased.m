@@ -217,7 +217,7 @@ classdef MessagesFilebased < iMessagesFramework
         function [ok,err]=labBarrier(obj,nothrow)
             %  if nothrow == true, do not throw on errors in message
             %  propagation
-            if ~is_def('nothrow')
+            if ~is_defined('nothrow')
                 nothrow = false;
             end
             if obj.is_tested % no blocking in testing mode
@@ -351,7 +351,7 @@ classdef MessagesFilebased < iMessagesFramework
             %               its receiver.
             %               if true, defines data message name for sender.
             %               false - for received.
-            if ~is_def('lab_from')
+            if ~is_defined('lab_from')
                 lab_from = obj.labIndex;
             end
             if nargin < 5
@@ -414,7 +414,7 @@ classdef MessagesFilebased < iMessagesFramework
             % The exchange folder name is equal to job_id and located
             % within the configuration folder.
             
-            if ~is_def('top_exchange_folder')
+            if ~is_defined('top_exchange_folder')
                 top_exchange_folder = config_store.instance().config_folder;
             end
             [top_exchange_folder,mess_subfolder] = constr_exchange_folder_name_(obj,top_exchange_folder);

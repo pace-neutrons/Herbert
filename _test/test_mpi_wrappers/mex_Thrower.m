@@ -16,7 +16,7 @@ function mex_Thrower(n,n_total,varargin)
 % Results:
 % Trown exeption on the level, defined by input n.
 
-if ~is_def('n_total')
+if ~is_defined('n_total')
     n_total = n;
 end
 if nargin>2

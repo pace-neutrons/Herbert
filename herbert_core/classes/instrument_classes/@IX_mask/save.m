@@ -14,7 +14,7 @@ function save (w, file)
 
 % Get file name - prompting if necessary
 % --------------------------------------
-if ~is_def('file'), file='*.msk'; end
+if ~is_defined('file'), file='*.msk'; end
 [file_full,ok,mess]=putfilecheck(file);
 if ~ok, error(mess), end
 

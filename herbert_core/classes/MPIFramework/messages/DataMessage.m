@@ -12,7 +12,7 @@ classdef DataMessage < aMessage
             %             input to payload property.
             % 
             obj = obj@aMessage('data');
-            if is_def('payload')
+            if is_defined('payload')
                 obj.payload = payload;
             end
         end

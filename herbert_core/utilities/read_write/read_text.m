@@ -5,7 +5,7 @@ function [tline,ok,mess] = read_text (file, max_size_MB)
 %   >> w = read_text (file)         % read from named file if less than 50MB
 %   >> w = read_text (file,max_MB)  % Only read if file smaller than this size
 
-if ~is_def('max_size_MB')
+if ~is_defined('max_size_MB')
     max_size_MB=50;  % max. number of lines that can be read from file
 elseif max_size_MB<=0
     error('Maximum file size must be greater than zero')
@@ -13,7 +13,7 @@ end
 
 % Get file name - prompt if file does not exist (using file to set default seach location and extension)
 % ------------------------------------------------------------------------------------------------------
-if ~is_def('file'), file=''; end
+if ~is_defined('file'), file=''; end
 [file_full,ok,mess]=getfilecheck(file);
 if ~ok, error(mess), end
 
@@ -29,7 +29,7 @@ if ~ok, error(mess), end
 % 
 % % Get file name - prompt if file does not exist (using file to set default seach location and extension)
 % % ------------------------------------------------------------------------------------------------------
-% if ~is_def('file'), file=''; end
+% if ~is_defined('file'), file=''; end
 % [file_full,ok,mess]=getfilecheck(file);
 % if ~ok, error(mess), end
 % 

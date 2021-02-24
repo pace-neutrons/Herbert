@@ -92,7 +92,7 @@ classdef MPI_clusters_factory<handle
             %             taken for the framework, selected current in
             %             parallel_config
             %
-            if is_def('cluster_name')
+            if is_defined('cluster_name')
                 cluster_name = parallel_config.select_option(...
                     obj.known_cluster_names_,cluster_name);
             else

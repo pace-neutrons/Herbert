@@ -63,7 +63,7 @@ elseif del<=0
 end
 
 % Get tolerance. Recall del=0 iff one data point per spectrum
-if is_def('tol')
+if is_defined('tol')
     if tol<0
         abstol=abs(tol*del);
     else

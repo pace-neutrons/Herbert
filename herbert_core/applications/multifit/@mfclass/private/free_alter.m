@@ -46,14 +46,14 @@ end
 
 % Replace logical arrays
 if isfore
-    if is_def('free')
+    if is_defined('free')
         Sfun.free_(indfun) = free;
     else
         np = Sfun.np_(indfun);
         Sfun.free_(indfun) = mat2cell(true(1,sum(np)),1,np);
     end
 else
-    if is_def('free')
+    if is_defined('free')
         Sfun.bfree_(indfun) = free;
     else
         np = Sfun.nbp_(indfun);

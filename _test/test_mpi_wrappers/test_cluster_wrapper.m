@@ -6,7 +6,7 @@ classdef test_cluster_wrapper < TestCase
 
     methods
         function obj = test_cluster_wrapper(varargin)
-            if ~is_def('name')
+            if ~is_defined('name')
                 name = 'test_cluster_wrapper';
             end
             obj = obj@TestCase(name);

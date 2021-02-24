@@ -9,7 +9,7 @@ function obj = init_framework_(obj,framework_info)
 %                in this case usually defines worker's message exchange
 %                framework.
 %
-if ~is_def('framework_info')
+if ~is_defined('framework_info')
     error('FILEBASED_MESSAGES:invalid_argument',...
         'inputs for init_framework function is missing')
     

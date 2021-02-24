@@ -29,11 +29,11 @@ function par=load_ASCII_par(filename,accuracy)
 %
 
 % If no input parameter given, return
-if ~is_def('filename')
+if ~is_defined('filename')
     help load_ASCII_par;
     return
 end
-if ~is_def('accuracy')
+if ~is_defined('accuracy')
     accuracy = asciipar_loader.ASCII_PARAM_ACCURACY;
 end
 % Remove blanks from beginning and end of filename

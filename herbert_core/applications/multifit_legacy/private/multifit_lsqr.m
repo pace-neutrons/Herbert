@@ -93,12 +93,12 @@ if nval<npfree
 end
 
 % Set the extent of listing to screen
-if ~is_def('listing') || isempty(listing)
+if ~is_defined('listing') || isempty(listing)
     listing=0;
 end
 
 % Set fit control parameters
-if ~is_def('fcp')
+if ~is_defined('fcp')
     fcp=[0.0001 20 0.001];
 end
 dp=fcp(1);      % derivative step length

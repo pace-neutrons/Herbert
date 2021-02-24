@@ -103,7 +103,7 @@ while ~(n_out_filled && x_out_filled)
             % Check that input array is present and monotonically increasing:
             if ~checked_x_in
                 checked_x_in = true;
-                if ~is_def('x_in')
+                if ~is_defined('x_in')
                     x_out=[]; ok=false; mess = 'No input x array provided to supply bin boundaries';
                     if nargout==1,  error('IX_dataset:invalid_argument',...
                         mess), else, return, end

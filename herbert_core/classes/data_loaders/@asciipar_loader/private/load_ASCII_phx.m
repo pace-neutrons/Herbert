@@ -31,11 +31,11 @@ function phx=load_ASCII_phx(filename,accuracy)
 
 
 % If no input parameter given, return
-if ~is_def('filename')
+if ~is_defined('filename')
     help get_par;
     return
 end
-if ~is_def('accuracy')
+if ~is_defined('accuracy')
     accuracy = asciipar_loader.ASCII_PARAM_ACCURACY;
 end
 

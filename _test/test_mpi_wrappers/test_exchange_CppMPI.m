@@ -6,7 +6,7 @@ classdef test_exchange_CppMPI < exchange_common_tests
     methods
         %
         function obj = test_exchange_CppMPI(name)
-            if ~is_def('name')
+            if ~is_defined('name')
                 name = 'test_exchange_CppMPI';
             end
             cs = struct('job_id','exchangeCppMPI','labID',1,'numLabs',3,...

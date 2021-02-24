@@ -8,7 +8,7 @@ function wout = read(file)
 
 % Get file name - prompt if file does not exist (using file to set default seach location and extension
 % -----------------------------------------------------------------------------------------------------
-if ~is_def('file'), file='*.mat'; end
+if ~is_defined('file'), file='*.mat'; end
 [file_full,ok,mess]=getfilecheck(file);
 if ~ok, error(mess), end
 

@@ -168,7 +168,7 @@ classdef MPI_State<handle
             % identify time interval between subsequent calls to this
             % function if such interval have not been provided
             if ~isempty(obj.logger_)
-                if ~is_def('tps')
+                if ~is_defined('tps')
                     tps = [];
                 end
                 if isempty(tps)
@@ -184,7 +184,7 @@ classdef MPI_State<handle
                     end
                 end
                 obj.time_per_step_ = tps;
-                if ~is_def('additional_info')
+                if ~is_defined('additional_info')
                     additional_info = [];
                 end
                 %

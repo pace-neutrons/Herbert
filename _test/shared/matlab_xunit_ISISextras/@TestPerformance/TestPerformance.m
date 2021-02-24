@@ -191,10 +191,10 @@ classdef TestPerformance < TestCaseWithSave
             % force_save -- if present, performance results are saved
             %                regardless of the changes in the performance
             %
-            if ~is_def('comments')
+            if ~is_defined('comments')
                 comments = '';
             end
-            if ~is_def('force_save')
+            if ~is_defined('force_save')
                 force_save = false;
             end
             
@@ -271,7 +271,7 @@ classdef TestPerformance < TestCaseWithSave
                 test_name = [comp_name,'_',cluster_name];
             end
             test_name = regexprep(test_name,'[/\\]','_');
-            if is_def('addinfo')
+            if is_defined('addinfo')
                 test_name = [test_name,'_',addinfo];
             end
             % remove all . from a computer name to include unix names.

@@ -13,7 +13,7 @@ function [ok,file_exist,file_name,err_mess] = check_file_writable(input_file,req
 %               it. 
 % err_mess   -- the string, containg the reason for failure if ok== false
 %
-if ~is_def('require_existance')
+if ~is_defined('require_existance')
     require_existance = false;
 end
 err_mess = '';

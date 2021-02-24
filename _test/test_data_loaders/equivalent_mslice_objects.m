@@ -7,7 +7,7 @@ function equivalent=equivalent_mslice_objects(w1,w2,max_err)
 % Checks for equality of fields, but ignores differences in the filename and filepath.
 %
 % Author: T.G.Perring
-if ~is_def('max_err')
+if ~is_defined('max_err')
     max_err = 0;
 end
 

@@ -5,7 +5,7 @@ function appdata = sliceomaticsetdata(d, iso_flag)
   
 % Simplify the isonormals
 
-if is_def('iso_flag') && iso_flag
+if is_defined('iso_flag') && iso_flag
     % modified by DJW 18/6/2007 (if statement only)
   disp('Smoothing for IsoNormals...');
   d.smooth=smooth3(d.data);% ,'box',5);

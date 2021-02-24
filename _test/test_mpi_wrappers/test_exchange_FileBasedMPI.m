@@ -5,7 +5,7 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
     methods
         %
         function obj = test_exchange_FileBasedMPI(name)
-            if ~is_def('name')
+            if ~is_defined('name')
                 name = 'test_exchange_FileBasedMPI';
             end
             cs  = iMessagesFramework.build_worker_init(tmp_dir, ...

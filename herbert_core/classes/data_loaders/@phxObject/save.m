@@ -14,7 +14,7 @@ function save (w, file)
 
 % Get file name - prompting if necessary
 % --------------------------------------
-if ~is_def('file'), file='*.phx'; end
+if ~is_defined('file'), file='*.phx'; end
 [file_full,ok,mess]=putfilecheck(file);
 if ~ok, error(mess), end
 

@@ -6,7 +6,7 @@ classdef test_MException_her < TestCase
     methods
         %
         function this=test_MException_her(name)
-            if ~is_def('name')
+            if ~is_defined('name')
                 name = 'test_MException_her';
             end
             this = this@TestCase(name);

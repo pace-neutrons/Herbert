@@ -8,7 +8,7 @@ function save(w,file)
 
 % Get file name - prompting if necessary
 % --------------------------------------
-if ~is_def('file'), file='*.mat'; end
+if ~is_defined('file'), file='*.mat'; end
 [file_full,ok,mess]=putfilecheck(file);
 if ~ok, error(mess), end
 

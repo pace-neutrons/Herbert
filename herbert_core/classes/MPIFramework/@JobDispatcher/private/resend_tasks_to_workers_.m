@@ -39,10 +39,10 @@ function [outputs,n_failed,task_ids,obj]=...
 %              task_param_list, assigned to this job
 %
 %
-if ~is_def('keep_workers_running')
+if ~is_defined('keep_workers_running')
     keep_workers_running = false;
 end
-if is_def('task_query_time') && ~isempty(task_query_time)
+if is_defined('task_query_time') && ~isempty(task_query_time)
     obj.task_check_time  = task_query_time;
 end
 if isempty(obj.cluster_)

@@ -29,7 +29,7 @@ function [undefined,fields_from_loader,fields_undef] = check_run_defined(run,fie
 
 %
 % What fields have to be defined (as function of crystal/powder parameter)?
-if ~is_def('fields_needed')
+if ~is_defined('fields_needed')
     fields_needed = what_fields_are_needed(run);
     [all_fields,lattice_fields] = what_fields_are_needed(run);
 else

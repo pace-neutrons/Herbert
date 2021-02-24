@@ -35,7 +35,7 @@ function start_app (app_name,opt,varargin)
 
 
 % Check application name argument exists
-if is_def('app_name')
+if is_defined('app_name')
     if ~isvarname(app_name)
         error ('First argument must be a valid name - no action taken.');
     end
@@ -44,7 +44,7 @@ else
 end
 
 % Get root directory or other option
-if is_def('opt')  % Check that the rootpath exists
+if is_defined('opt')  % Check that the rootpath exists
     if ischar(opt) && size(opt,1)==1
         if strncmpi(opt,'-off',max(length(opt),2))
             initialise_application=false;

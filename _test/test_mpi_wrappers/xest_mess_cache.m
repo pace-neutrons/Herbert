@@ -7,7 +7,7 @@ classdef xest_mess_cache < TestCase
     methods
         %
         function this=xest_mess_cache(name)
-            if ~is_def('name')
+            if ~is_defined('name')
                 name = 'test_mess_cache';
             end
             this = this@TestCase(name);

@@ -42,7 +42,7 @@ try
     mess='';
     
 catch
-    if is_def('fid') && fid>0 && ~isempty(fopen(fid)) % close file, if open
+    if is_defined('fid') && fid>0 && ~isempty(fopen(fid)) % close file, if open
         fclose(fid);
     end
     ok=false;

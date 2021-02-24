@@ -98,7 +98,7 @@ classdef loaders_factory < handle
                 [ok,fh] = loader.can_load(full_data_name);
                 if ok
 					% if loader can, initialize loader with the file.
-                    if is_def('par_file_name')
+                    if is_defined('par_file_name')
                         loader=loader.init(full_data_name,par_file_name,fh);
                     else
                         loader=loader.init(full_data_name,'',fh);

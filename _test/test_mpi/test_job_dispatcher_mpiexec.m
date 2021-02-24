@@ -5,7 +5,7 @@ classdef test_job_dispatcher_mpiexec < job_dispatcher_common_tests
     methods
         %
         function this=test_job_dispatcher_mpiexec(name)
-            if ~is_def('name')
+            if ~is_defined('name')
                 name = 'test_job_dispatcher_mpiexec';
             end
             this = this@job_dispatcher_common_tests(name,'mpiexec_mpi');

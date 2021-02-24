@@ -27,7 +27,7 @@ ok = false;
 err_mess = 'Failure in the initialization procedure';
 
 try
-    if ~is_def('DO_LOGGING')
+    if ~is_defined('DO_LOGGING')
         DO_LOGGING = false;
     end
     if nargin<3

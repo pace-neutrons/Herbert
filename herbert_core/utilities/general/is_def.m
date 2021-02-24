@@ -1,4 +1,4 @@
-function ok = is_def(name)
+function ok = is_defined(name)
 % Alias for exist(name, 'var') == 1
 % For agreement with other PACE "is_" functions
 
