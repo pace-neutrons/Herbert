@@ -25,7 +25,7 @@ end
 
 % Get file name - prompting if necessary
 % --------------------------------------
-if ~is_defined('file')
+if ~exist('file', 'var')
     file='*.mat';
     [file_full,ok,mess]=putfilecheck(file);
     if ~ok, error(mess), end

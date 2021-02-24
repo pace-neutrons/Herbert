@@ -33,7 +33,7 @@ function sync_folders (p1, p2, syncdirect)
 svn='.svn';
 
 % the sync direct is two-way by default
-if ~is_defined('syncdirect'), syncdirect = 0; end;
+if ~exist('syncdirect', 'var'), syncdirect = 0; end;
 if ischar(syncdirect), syncdirect = str2double(syncdirect); end
 tmpRecycle = recycle;
 recycle on;

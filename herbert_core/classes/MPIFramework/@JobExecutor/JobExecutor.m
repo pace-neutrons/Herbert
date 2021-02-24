@@ -185,7 +185,7 @@ classdef JobExecutor
             % clear all possible messages stored in message cache. Should
             % be irrelevant but may be useful for re-initializing a job
             % executor to run different task on the same parallel worker.
-            if ~is_defined('is_tested')
+            if ~exist('is_tested', 'var')
                 synchronize = true;
             else
                 synchronize = ~is_tested;
@@ -377,10 +377,10 @@ classdef JobExecutor
             % by a worker and used to initialize the job execution on the
             % second step of the worker initialization.
             %
-            if ~is_defined('exit_on_completion')
+            if ~exist('exit_on_completion', 'var')
                 exit_on_completion = true;
             end
-            if ~is_defined('keep_worker_running')
+            if ~exist('keep_worker_running', 'var')
                 keep_worker_running = false;
             end
             JE_className = class(obj);
@@ -441,10 +441,10 @@ classdef JobExecutor
             %                if present and true, sets-up test framework
             %                mode
             %
-            if ~is_defined('exit_on_completion')
+            if ~exist('exit_on_completion', 'var')
                 exit_on_completion = true;
             end
-            if ~is_defined('keep_worker_running')
+            if ~exist('keep_worker_running', 'var')
                 keep_worker_running = false;
             end
             

@@ -49,7 +49,7 @@ if is_file(filename)
     end
 end
 
-if ~is_defined('emode')
+if ~exist('emode', 'var')
     if isfield(this,'emode')
         emode = this.emode;
     else
@@ -60,7 +60,7 @@ if emode<0 || emode>2
     error('A_LOADER:invalid_argument',...
         'attempt to save with unsupported emode %d; emode has to be from 0 to 2',emode);
 end
-if ~is_defined('efix')
+if ~exist('efix', 'var')
     try
         efix = this.efix;
     catch
@@ -76,7 +76,7 @@ if ~isnumeric(efix)
     error('A_LOADER:invalid_argument',...
         ' expecting efix to have digita value but it has %s: ',efix);
 end
-if ~is_defined('psi')
+if ~exist('psi', 'var')
     try
         psi = this.psi;
     catch
@@ -159,7 +159,7 @@ H5G.close(group_id);
 H5P.close(fcpl);
 H5P.close(fapl);
 
-if is_defined('file')
+if exist('file', 'var')
     H5G.close(fid);
     H5F.close(file);
 else

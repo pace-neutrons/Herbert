@@ -16,10 +16,10 @@ end
 if any(size(obj.S)~=size(obj.ERR))||(size(obj.S,2)~=numel(obj.det_par.x2))
     error('RUNDATA:rm_masked',' signal error and detectors arrays are not consistent\n');
 end
-if ~is_defined('ignore_nan')
+if ~exist('ignore_nan', 'var')
     ignore_nan = true;
 end
-if ~is_defined('ignore_inf')
+if ~exist('ignore_inf', 'var')
     ignore_inf = true;
 end
 

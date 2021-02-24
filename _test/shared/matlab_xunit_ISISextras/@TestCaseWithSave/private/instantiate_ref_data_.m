@@ -15,7 +15,7 @@ default_test_file_name = fullfile (fileparts(which(class_name)),...
 
 if ~this.save_output
     % In test operation (i.e. testing against pre-stored data, if any)
-    if is_defined('filename')
+    if exist('filename','var')
         % Check test results file name
         if ischarstring(filename)
             [fpath,~,fext] = fileparts(filename);
@@ -49,7 +49,7 @@ else
     
     % Create file name for saving results, checking that the file is not the same as the
     % default filename for containing data against which to test in the test suite
-    if is_defined('filename')
+    if exist('filename','var')
         if ischarstring(filename)
             [fpath,~,fext] = fileparts(filename);
             if isempty(fpath)
@@ -71,7 +71,7 @@ else
     if ~isOkToWriteTo (folder)
         warning('TEST_CASE_WITH_SAVE:runtime_error',...
             ' Write protected test folder: %s; using tmp_dir folder',folder)
-        if is_file(filename)
+        if exist(filename,'file') == 2
             copyfile(filename,tmp_dir,'f');
         end
         filename = fullfile(tmp_dir,[fn,fe]);

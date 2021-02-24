@@ -5,7 +5,7 @@ function [all_messages,mid_from] = list_specific_messages_(obj,task_ids_requeste
 % if no message is returned for a job, its name cell remains empty.
 
 %
-if ~is_defined('task_ids_requested') || isempty(task_ids_requested)
+if ~exist('task_ids_requested', 'var') || isempty(task_ids_requested)
     task_ids_requested = 1:obj.numLabs; % list all available task_ids
 elseif ischar(task_ids_requested) && strcmpi(task_ids_requested,'all')
     task_ids_requested = 1:obj.numLabs;
@@ -25,7 +25,7 @@ end
 not_this = task_ids_requested ~= obj.labIndex;
 task_ids_requested = task_ids_requested(not_this);
 
-if ~is_defined('mess_name_or_tag')
+if ~exist('mess_name_or_tag', 'var')
     error('FILEBASED_MESSAGES:invalid_argument',...
         'one all of the tags among the tags provided in tags list is not recognized')
 end

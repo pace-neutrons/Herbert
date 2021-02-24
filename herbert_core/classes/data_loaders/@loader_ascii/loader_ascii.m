@@ -67,7 +67,7 @@ classdef loader_ascii < a_loader
             %                   (e.g .spe if lower case extension spe file exist or SPE if upper case extension file exist)
             %
             %
-            if ~is_defined('file_name')
+            if ~exist('file_name', 'var')
                 error('LOAD_ASCII:invalid_argument',' has to be called with valid file name');
             end
             
@@ -112,7 +112,7 @@ classdef loader_ascii < a_loader
             
             obj=obj@a_loader(varargin{:});
             obj.loader_define_ ={'S','ERR','en','n_detectors'};
-            if is_defined('full_spe_file_name')
+            if exist('full_spe_file_name', 'var')
                 obj = obj.init(full_spe_file_name);
             else
                 obj = obj.init();
@@ -134,18 +134,18 @@ classdef loader_ascii < a_loader
             %                      energy bins and full file name for this file
             %
             
-            if ~is_defined('full_spe_file_name')
+            if ~exist('full_spe_file_name', 'var')
                 return
             end
             
-            if is_defined('full_par_file_name')
-                if isstruct(full_par_file_name) && ~is_defined('fh')
+            if exist('full_par_file_name', 'var')
+                if isstruct(full_par_file_name) && ~exist('fh', 'var')
                     fh = full_par_file_name; % second parameters defines spe file structure
                 else
                     ascii_loader.par_file_name = full_par_file_name;
                 end
             end
-            if is_defined('fh')
+            if exist('fh', 'var')
                 ascii_loader.n_detindata_    = fh.n_detectors;
                 ascii_loader.en_             = fh.en;
                 ascii_loader.data_file_name_ = fh.file_name;

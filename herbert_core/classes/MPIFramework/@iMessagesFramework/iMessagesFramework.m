@@ -172,7 +172,7 @@ classdef iMessagesFramework < handle
             %
             %
             datapath = fileparts(fileparts(fileparts(obj.mess_exchange_folder)));
-            if is_defined('labID') % Herbert MPI worker. numlabs and labNum are defined by configuration
+            if exist('labID', 'var') % Herbert MPI worker. numlabs and labNum are defined by configuration
                 if nargin> 4
                     if ischar(varargin{1})
                         test_with_serialation = false;
@@ -415,10 +415,10 @@ classdef iMessagesFramework < handle
                 'job_id',jobID,...
                 'intercomm_name',intercom_name);
             serialize_message = true;
-            if is_defined('labID')
+            if exist('labID', 'var')
                 cs.labID   = labID;
                 cs.numLabs = numLabs;
-                if is_defined('test_mode')
+                if exist('test_mode', 'var')
                     serialize_message = ~test_mode;
                     cs.test_mode = true;
                 end
@@ -713,7 +713,7 @@ classdef iMessagesFramework < handle
             %                 or unblocking (asynchronous)
             %
             %
-            if ~is_defined('from_task_id') || isempty(from_task_id) ||...
+            if ~exist('from_task_id', 'var') || isempty(from_task_id) ||...
                     (isnumeric(from_task_id ) && from_task_id < 0) || ...
                     ischar(from_task_id)
                 %receive message from any task
@@ -735,7 +735,7 @@ classdef iMessagesFramework < handle
                         from_task_id,obj.numLabs)
                 end
             end
-            if ~is_defined('mess_name') %receive any message for this task
+            if ~exist('mess_name', 'var') %receive any message for this task
                 mess_name = 'any';
             end
             if isnumeric(mess_name)

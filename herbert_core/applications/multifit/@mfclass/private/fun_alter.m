@@ -57,7 +57,7 @@ if isempty(indfun)  % nothing to alter
 end
 
 % Set optional argument to the default
-if ~is_defined('fun')
+if ~exist('fun', 'var')
     fun = repmat({[]},size(indfun));
 end
 

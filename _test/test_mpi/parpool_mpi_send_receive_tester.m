@@ -9,7 +9,7 @@ if nl > 1
     mis.is_deployed = true;
 end
 
-if is_defined('pool_control')
+if exist('pool_control', 'var')
     is_tested = true;
     pm = MessagesParpool(pool_control);
 else

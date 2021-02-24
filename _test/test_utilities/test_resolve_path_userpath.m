@@ -69,7 +69,6 @@ classdef test_resolve_path_userpath< TestCase
             assertFalse(exist);
             file = java.io.File(mis_file);
             mis_file_canonical= char(file.getCanonicalPath());
-
             assertEqual(fullfile,mis_file_canonical)
             assertFalse(isempty(err_mess));
         end

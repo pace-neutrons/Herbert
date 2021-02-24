@@ -10,7 +10,7 @@ classdef test_ParpoolMPI_Framework< MPI_Test_Common
     methods
         %
         function obj=test_ParpoolMPI_Framework(name)
-            if ~is_defined('name')
+            if ~exist('name', 'var')
                 name = 'test_ParpoolMPI_Framework';
             end
             obj = obj@MPI_Test_Common(name);

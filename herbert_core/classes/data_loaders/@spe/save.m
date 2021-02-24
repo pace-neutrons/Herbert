@@ -12,7 +12,7 @@ function save (w, file)
 
 % Get file name - prompting if necessary
 % --------------------------------------
-if ~is_defined('file'), file='*.spe'; end
+if ~exist('file', 'var'), file='*.spe'; end
 [file_full,ok,mess]=putfilecheck(file);
 if ~ok, error(mess), end
 

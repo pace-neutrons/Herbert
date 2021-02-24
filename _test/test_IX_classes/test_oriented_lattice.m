@@ -173,9 +173,9 @@ classdef test_oriented_lattice< TestCase
             
             ol = oriented_lattice([2;3;4],'psi',20,'gl',3,'alatt',[1,2,3],'angular_units','rad');
             
-            assertTrue(ol.is_defined('psi'));
-            assertTrue(ol.is_defined('alatt'));
-            assertFalse(ol.is_defined('angdeg'));
+            assertTrue(ol.exist('psi', 'var'));
+            assertTrue(ol.exist('alatt', 'var'));
+            assertFalse(ol.exist('angdeg', 'var'));
             
             assertEqual(ol.alatt,[1,2,3])
             assertEqual(ol.angular_units,'rad')

@@ -58,7 +58,7 @@ else
     end
 end
 
-if is_defined('range') && ~isempty(range)
+if exist('range', 'var') && ~isempty(range)
     range_exist=true;
     if ~isnumeric(range) || isempty(range)
         error('UTILITIES:invalid_argument',...
@@ -68,7 +68,7 @@ else
     range_exist=false;
 end
 
-if is_defined('pref') && ~isempty(pref)
+if exist('pref', 'var') && ~isempty(pref)
     pref_exist=true;
     if ~isnumeric(pref)
         error('UTILITIES:invalid_argument',...
@@ -90,7 +90,7 @@ else
     pref_exist=false;
 end
 
-if is_defined('inside') && ~isempty(inside)
+if exist('inside', 'var') && ~isempty(inside)
     if isnumeric(inside)||islogical(inside) && numel(inside)==1
         inside=logical(inside);
     else

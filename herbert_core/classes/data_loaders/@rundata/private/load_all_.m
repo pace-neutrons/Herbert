@@ -27,7 +27,7 @@ if any(lattice_loaded)
     end
     for i=1:numel(lat_fields)
         fld =lat_fields{i};
-        if reload || ~lat.is_defined(fld)
+        if reload || ~lat.exist(fld, 'var')
             lat.(fld) = this.loader_.(fld);
         end
     end

@@ -4,7 +4,7 @@ if isempty(which('herbert_init'))
     herbert_on();
 end
 
-if is_defined('communicator_control')
+if exist('communicator_control', 'var')
     if isstruct(communicator_control)
         pm = MessagesParpool(communicator_control);
     else

@@ -139,7 +139,7 @@ classdef TestPerformance < TestCaseWithSave
             % get sutie test name. Should support overloading to generate
             % correct name for child classes
             %
-            if is_file(tests_res_file)
+            if exist(tests_res_file,'file')==2
                 obj.perf_data_ = load_performance_data_(obj);
             end
             obj.perf_suite_name = obj.build_test_suite_name(name);
@@ -191,10 +191,10 @@ classdef TestPerformance < TestCaseWithSave
             % force_save -- if present, performance results are saved
             %                regardless of the changes in the performance
             %
-            if ~is_defined('comments')
+            if ~exist('comments','var')
                 comments = '';
             end
-            if ~is_defined('force_save')
+            if ~exist('force_save','var')
                 force_save = false;
             end
             
@@ -271,7 +271,7 @@ classdef TestPerformance < TestCaseWithSave
                 test_name = [comp_name,'_',cluster_name];
             end
             test_name = regexprep(test_name,'[/\\]','_');
-            if is_defined('addinfo')
+            if exist('addinfo','var')
                 test_name = [test_name,'_',addinfo];
             end
             % remove all . from a computer name to include unix names.

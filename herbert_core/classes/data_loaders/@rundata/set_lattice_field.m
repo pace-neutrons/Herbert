@@ -21,7 +21,7 @@ else
     if_empty = if_empty||if_undef;
 end
 if if_empty
-    if ~this.oriented_lattice_.is_defined(name)
+    if ~this.oriented_lattice_.exist(name, 'var')
         this.oriented_lattice_.(name)=val;
     end
 else

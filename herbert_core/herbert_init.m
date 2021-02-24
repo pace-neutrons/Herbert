@@ -82,7 +82,7 @@ function addgenpath_message (varargin)
 % T.G.Perring
 
 string=fullfile(varargin{:},'');    % '' needed to circumvent bug in fullfile if only one argument, Matlab 2008b (& maybe earlier)
-if exist(string, 'dir')
+if exist(string,'dir')==7
     try
         addpath (genpath_special(string),'-frozen');
     catch ME
@@ -106,7 +106,7 @@ for i=1:numel(application_init_old)
     try
         rootpath=fileparts(application_init_old{i});
         cd(rootpath)
-        if is_file(fullfile(pwd,[app_name,'_off.m'])) % check that 'off' routine exists in the particular rootpath
+        if exist(fullfile(pwd,[app_name,'_off.m']),'file') % check that 'off' routine exists in the particular rootpath
             try
                 feval([app_name,'_off'])    % call the 'off' routine
             catch ME
@@ -136,8 +136,8 @@ function print_banner()
     lines = {'ISIS utilities for visualization and analysis', ...
              'of neutron spectroscopy data', ...
              ['Herbert ', herbert_version()]
-    };
-    fprintf('!%s!\n', repmat('=', 1, width));
+    };            
+    fprintf('!%s!\n', repmat('=', 1, width));                
     for i = 1:numel(lines)
         fprintf('!%s!\n', center_and_pad_string(lines{i}, ' ', width));
     end

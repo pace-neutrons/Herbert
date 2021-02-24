@@ -6,7 +6,7 @@ classdef test_job_dispatcher_parpool< job_dispatcher_common_tests
     methods
         %
         function this=test_job_dispatcher_parpool(name)
-            if ~is_defined('name')
+            if ~exist('name', 'var')
                 name = 'test_job_dispatcher_parpool';
             end
             this = this@job_dispatcher_common_tests(name,'parpool');

@@ -5,7 +5,7 @@ classdef test_exchange_ParpoolMPI < exchange_common_tests
     methods
         %
         function obj = test_exchange_ParpoolMPI(name)
-            if ~is_defined('name')
+            if ~exist('name', 'var')
                 name = 'test_exchange_ParpoolMPI';
             end
             cs = struct('job_id','exchangeFileBasedMPI','labID',1,'numLabs',3,...

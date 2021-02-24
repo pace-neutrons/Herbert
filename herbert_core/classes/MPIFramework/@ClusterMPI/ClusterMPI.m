@@ -54,7 +54,7 @@ classdef ClusterMPI < ClusterWrapper
             if nargin < 2
                 return;
             end
-            if ~is_defined('log_level')
+            if ~exist('log_level', 'var')
                 log_level = -1;
             end
             obj = obj.init(n_workers,mess_exchange_framework,log_level);
@@ -73,7 +73,7 @@ classdef ClusterMPI < ClusterWrapper
             %              which started and controls the job.
             %log_level     if present, the number, which describe the
             %              verbosity of the cluster operations output;
-            if ~is_defined('log_level')
+            if ~exist('log_level', 'var')
                 log_level = -1;
             end
             obj = init@ClusterWrapper(obj,n_workers,mess_exchange_framework,log_level);

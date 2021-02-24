@@ -7,7 +7,7 @@ classdef test_job_dispatcher_common_methods < TestCase
     methods
         %
         function obj=test_job_dispatcher_common_methods(name)
-            if ~is_defined('name')
+            if ~exist('name', 'var')
                 name = 'test_job_dispatcher_common_methods';
             end
             obj = obj@TestCase(name);
