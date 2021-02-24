@@ -25,16 +25,16 @@ function ok = is_file(varargin)
     [path,~,ext] = fileparts(strtrim(p.Results.name));
     extensions = p.Results.extensions;
 
-    if ~verLessThan('matlab', '9.1') % R2016b
-        ok = isfile(p.Results.name);
-    else
-        if isempty(path)
-            path = pwd();
-        end
-        name = fullfile(path, p.Results.name);
+% $$$     if ~verLessThan('matlab', '9.1') % R2016b
+% $$$         ok = isfile(p.Results.name);
+% $$$     else
+% $$$         if isempty(path)
+% $$$             path = pwd();
+% $$$         end
+% $$$         name = fullfile(path, p.Results.name);
 
         ok = exist(name, 'file') == 2;
-    end
+% $$$     end
 
     if ~isempty(extensions)
         ok = ok && any(strcmp(ext, extensions));
