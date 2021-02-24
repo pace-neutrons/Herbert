@@ -1,5 +1,8 @@
 function ok = is_folder(name)
-% tests if name is a valid folder
+% tests if name is a folder on the file system while NOT searching MATLAB path
+%
+% On older versions of matlab this is done through ensuring the path is an explicit path
+% and using exist. More recent versions simply call the MATLAB built-in isfile.
 %
 % Input:
 % ------
