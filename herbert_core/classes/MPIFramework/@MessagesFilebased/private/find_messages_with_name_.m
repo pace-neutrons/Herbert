@@ -33,5 +33,4 @@ function no = check_nolocked(filename)
 % check if given file is not locked
 [rlock,wlock] = build_lock_fname_(filename);
 
-no = ~(is_file(rlock,'file')==2 || exist(wlock));
-
+no = ~(is_file(rlock) || exist(wlock));
