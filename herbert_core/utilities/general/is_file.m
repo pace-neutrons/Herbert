@@ -1,4 +1,4 @@
-function ok = is_file(varargin)
+function ok = is_file(name)
 % tests if name is a file on the file system while NOT searching MATLAB path
 %
 % Optional support for a cell array of file extensions which name must also match.
@@ -19,27 +19,15 @@ function ok = is_file(varargin)
 %  >> is_file('test.par', {'.txt', '.m'}); % False (extensions don't match
 %
 
-    p = inputParser;
-    addRequired(p,'name', @is_string);
-    addOptional(p,'extensions',{},@iscellstr);
-    parse(p, varargin{:});
-
     % Remove searching MATLAB path with explicit path
-    [path,~,ext] = fileparts(strtrim(p.Results.name));
-    extensions = p.Results.extensions;
-
     if ~verLessThan('matlab', '9.1') % R2016b
-        ok = isfile(p.Results.name);
+        ok = isfile(name);
     else
         if isempty(path)
             path = pwd();
         end
-        name = fullfile(path, p.Results.name);
+        name = fullfile(path, name);
 
         ok = exist(name, 'file') == 2;
-    end
-
-    if ~isempty(extensions)
-        ok = ok && any(strcmp(ext, extensions));
     end
 end
