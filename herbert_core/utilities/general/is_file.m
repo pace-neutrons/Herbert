@@ -36,7 +36,7 @@ function ok = is_file(varargin)
         end
         name = fullfile(path, p.Results.name);
 
-        ok = exist(p.Results.name, 'file') == 2;
+        ok = exist(name, 'file') == 2;
     end
 
     if ~isempty(extensions)
