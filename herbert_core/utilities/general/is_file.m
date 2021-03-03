@@ -15,8 +15,6 @@ function ok = is_file(name)
 % ------
 %  >> is_file('/home/user/test.m');        % True if file exists
 %  >> is_file('test.m');                   % True if file exists in current dir
-%  >> is_file('test.m', {'.txt', '.m'});   % True if file exists in current dir
-%  >> is_file('test.par', {'.txt', '.m'}); % False (extensions don't match
 %
 
     % Remove searching MATLAB path with explicit path

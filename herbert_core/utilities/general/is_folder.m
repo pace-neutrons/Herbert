@@ -21,7 +21,7 @@ function ok = is_folder(name)
          if isempty(path)
              path = pwd();
          end
-         name = fullfile(path, p.Results.name);
+         name = fullfile(path, name);
 
         ok = exist(name, 'dir') == 7;
      end
