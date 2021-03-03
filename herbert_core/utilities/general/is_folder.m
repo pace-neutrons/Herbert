@@ -17,11 +17,11 @@ function ok = is_folder(name)
      if ~verLessThan('matlab', '9.1') % R2016b
          ok = isfolder(name);
      else
-         [path,~,~] = fileparts(strtrim(name));
-         if isempty(path)
-             path = pwd();
+         currpath = fileparts(strtrim(name));
+         if isempty(currpath)
+             currpath = pwd();
+             name = fullfile(currpath, name);
          end
-         name = fullfile(path, name);
 
         ok = exist(name, 'dir') == 7;
      end

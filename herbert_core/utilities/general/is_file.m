@@ -21,11 +21,11 @@ function ok = is_file(name)
     if ~verLessThan('matlab', '9.1') % R2016b
         ok = isfile(name);
     else
-        [currpath, ~, ~] = fileparts(name);
+        currpath = fileparts(name);
         if isempty(currpath)
             currpath = pwd();
+            name = fullfile(currpath, name);
         end
-        name = fullfile(currpath, name);
 
         ok = exist(name, 'file') == 2;
     end
