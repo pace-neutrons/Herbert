@@ -26,7 +26,7 @@
 #>
 param (
   # Run the Herbert configuration commands.
-  [switch][Alias("c")]$configure,
+  [switch]$configure,
   # Run the Herbert build commands.
   [switch][Alias("b")]$build,
   # Run all Herbert tests.

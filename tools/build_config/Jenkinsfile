@@ -225,7 +225,7 @@ pipeline {
           ./tools/build_config/build.sh \
             --cmake_flags \"-DHorace_RELEASE_TYPE=\$RELEASE_TYPE\" \
             --matlab_release \$MATLAB_VERSION \
-            --print_versions
+            --print_versions \
             --configure
           '''
           } else {
