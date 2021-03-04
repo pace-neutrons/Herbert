@@ -25,7 +25,7 @@
   https://github.com/pace-neutrons/Herbert
 #>
 param (
-  # Run the Herbert build commands.
+  # Run the Herbert configuration commands.
   [switch][Alias("c")]$configure,
   # Run the Herbert build commands.
   [switch][Alias("b")]$build,
