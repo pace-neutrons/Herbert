@@ -71,7 +71,7 @@ try
     % Initialize the frameworks, responsible for communications within the
     % cluster and between the cluster and the headnode.
     % initiate file-based framework to exchange messages between head node and
-    % the pool of workers    
+    % the pool of workers
     [fbMPI,intercomm] = JobExecutor.init_frameworks(control_struct);
     %--------------------------------------------------------------------------
     % step 1 the initialization has been completed providing the
@@ -91,11 +91,18 @@ try
     end
     % inform the control node that the cluster have been started and ready
     % to accept jobs
-
+    
     JobExecutor.report_cluster_ready(fbMPI,intercomm);
 catch ME0 %unhandled exception during init procedure
     ok = false;
     err_mess = ME0;
+    if ~isempty(fbMPI) && isa(fbMPI,'MessagesFilebased') && fbMPI.labIndex>0
+        % we still can provide some information about the issue, though the
+        % framework is busted
+        fbMPI.send_message(0,...
+            FailedMessage(sprintf('Unhandled error from node %d during framework initialization'...
+            ,fbMPI.labIndex),ME0));
+    end
     return;
 end
 %%
@@ -184,8 +191,8 @@ while keep_worker_running
         % something wrong with the code. We can not process interrupt
         % properly, but filebased framework should still be
         % available.
-
-        if ~strcmp(ME.identifier,'MESSAGE_FRAMEWORK:canceled')  
+        
+        if ~strcmp(ME.identifier,'MESSAGE_FRAMEWORK:canceled')
             % if job is canceled, we can recover further, as it will throw
             % below at first call to log progress. Any other exception is unhandled one
             if DO_LOGGING; log_input_message_exception_caught();  end
@@ -296,7 +303,7 @@ while keep_worker_running
                 continue;
             else
                 % useful for testing only
-                je=je.migrate_job_folder(false);                
+                je=je.migrate_job_folder(false);
                 break;
             end
         catch ME1 % the only exception happen is due to error in JE system
@@ -354,7 +361,7 @@ end
         fprintf(fh,'      LabNum         : %d:\n',fbMPI.labIndex);
         fprintf(fh,'      NumLabs        : %d:\n',fbMPI.numLabs);
         fprintf(fh,'Real MPI settings:\n');
-        fprintf(fh,'      Communicator:  : %s:\n',class(intercomm));        
+        fprintf(fh,'      Communicator:  : %s:\n',class(intercomm));
         fprintf(fh,'      Job ID         : %s:\n',intercomm.job_id);
         fprintf(fh,'      LabNum         : %d:\n',intercomm.labIndex);
         fprintf(fh,'      NumLabs        : %d:\n',intercomm.numLabs);
