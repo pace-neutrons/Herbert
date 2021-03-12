@@ -11,7 +11,7 @@ classdef test_cluster_wrapper < TestCase
             end
             obj = obj@TestCase(name);
         end
-        function test_init_failed_canceled(~)
+        function test_init_failed_cancelled(~)
             fii = iMessagesFramework.build_worker_init(tmp_dir, ...
                 'test_init_failed_timeout', 'MessagesFilebased', 0, 3,'test_mode');
 
@@ -23,12 +23,12 @@ classdef test_cluster_wrapper < TestCase
             cs = mf.get_worker_init('MessagesParpool',1,3);
             css = mf.deserialize_par(cs);
             meR1 = MessagesFilebased(css);
-            mc  = CanceledMessage('Test cancellation',...
-                MException('MESSAGES_FRAMEWORK:canceled','test cancellation'));
+            mc  = CancelledMessage('Test cancellation',...
+                MException('MESSAGES_FRAMEWORK:cancelled','test cancellation'));
             meR1.send_message(0,mc );
 
             cluster = cluster.wait_started_and_report(1);
-            assertEqual(cluster.status_name,'canceled');
+            assertEqual(cluster.status_name,'cancelled');
         end
 
         function test_init_failed_timeout(~)

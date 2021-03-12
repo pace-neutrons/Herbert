@@ -386,24 +386,24 @@ classdef test_job_executor< MPI_Test_Common
 
             % test log progress
             je3.log_progress(1,10,1,[]);
-            % on error, the framework would send canceled messages
-            je2.mess_framework.send_message(1,'canceled');
-            je2.mess_framework.send_message(3,'canceled');
+            % on error, the framework would send cancelled messages
+            je2.mess_framework.send_message(1,'cancelled');
+            je2.mess_framework.send_message(3,'cancelled');
             % and then finish task with failure
             je2.finish_task(FailedMessage('simulated fail'),'-asynch');
             try
                 je1.log_progress(1,9,1.3,[]); %throws as no point to continue the execution after
             catch ME
-                assertEqual(ME.identifier,'JOB_EXECUTOR:canceled')
+                assertEqual(ME.identifier,'JOB_EXECUTOR:cancelled')
             end
             try
                 je3.log_progress(2,9,1.3,[]); %throws as no point to continue the execution after
             catch ME
-                assertEqual(ME.identifier,'JOB_EXECUTOR:canceled')
+                assertEqual(ME.identifier,'JOB_EXECUTOR:cancelled')
             end
-            je3.finish_task(FailedMessage('job canceled'),'-asynch');
+            je3.finish_task(FailedMessage('job cancelled'),'-asynch');
 
-            je1.finish_task(FailedMessage('job canceled',ME),'-asynch');
+            je1.finish_task(FailedMessage('job cancelled',ME),'-asynch');
             %
             % Server expects  to receive "running" message
             [ok,err,mess] = serverfbMPI.receive_message(1,'log');
@@ -437,13 +437,13 @@ classdef test_job_executor< MPI_Test_Common
 
             je3.log_progress(9,10,1,[]);
             je2.finish_task(FailedMessage('simulated fail wk2'),'-asynch');
-            je2.mess_framework.send_message(3,'canceled');
+            je2.mess_framework.send_message(3,'cancelled');
             try
                 je3.log_progress(10,10,1.3,[]); %throws as no point to contiunue the execution after
             catch ME
-                assertEqual(ME.identifier,'JOB_EXECUTOR:canceled')
+                assertEqual(ME.identifier,'JOB_EXECUTOR:cancelled')
             end
-            je3.finish_task(FailedMessage('Job Canceled',ME),'-asynch');
+            je3.finish_task(FailedMessage('Job Cancelled',ME),'-asynch');
 
             je1.finish_task(FailedMessage('simulated fail wk1'),'-asynch');
 
@@ -725,7 +725,7 @@ classdef test_job_executor< MPI_Test_Common
             assertEqual(ok,MESS_CODES.ok,err);
             assertEqual(mess.mess_name,'started');
             %--------------------------------------------------------------
-            % check job canceled
+            % check job cancelled
             errm = MException('JOB_EXECUTOR:failed','fake error generated');
             err_mess = je2.process_fail_state(errm);
             [ok,err_mess]=je2.finish_task(err_mess);
@@ -736,7 +736,7 @@ classdef test_job_executor< MPI_Test_Common
             try
                 je1.log_progress(2,10,3,[]);
             catch ERRm
-                assertTrue(strcmpi(ERRm.identifier,'JOB_EXECUTOR:canceled'));
+                assertTrue(strcmpi(ERRm.identifier,'JOB_EXECUTOR:cancelled'));
             end
             err_mess=je1.process_fail_state(ERRm);
             [ok,err_mess]=je1.finish_task(err_mess);
@@ -781,14 +781,14 @@ classdef test_job_executor< MPI_Test_Common
             try
                 je2.log_progress(2,10,3,[]);
             catch ERRm
-                assertTrue(strcmpi(ERRm.identifier,'JOB_EXECUTOR:canceled'));
+                assertTrue(strcmpi(ERRm.identifier,'JOB_EXECUTOR:cancelled'));
                 % under normal execution je1 will wait until cancel message
                 % from second lab is received, but in the tests it executed
                 % asynchronously so the message to lab2 will come later
-                [ok,err,message]=fbMPIs{2}.receive_message(1,'canceled');
+                [ok,err,message]=fbMPIs{2}.receive_message(1,'cancelled');
                 assertEqual(MESS_CODES.ok,ok);
                 assertTrue(isempty(err));
-                assertEqual(message.mess_name,'canceled');
+                assertEqual(message.mess_name,'cancelled');
             end
             % asked for running, got failed from je1
             [ok,err,mess] = serverfbMPI.receive_message(1,'log');

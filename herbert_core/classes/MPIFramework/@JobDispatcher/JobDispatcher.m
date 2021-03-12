@@ -121,7 +121,7 @@ classdef JobDispatcher
             if ~isempty(pc.shared_folder_on_local)
                 mf.mess_exchange_folder = pc.shared_folder_on_local;
             end
-            jd.mess_framework_  = mf;
+            jd.mess_framework_ = mf;
         end
         %
         function [outputs,n_failed,task_ids,this]=start_job(this,...

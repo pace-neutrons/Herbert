@@ -322,7 +322,7 @@ classdef JobExecutor
             %             empty.
             % Outputs:
             % Sends message of type LogMessage to the job dispatcher.
-            % Throws JOB_EXECUTOR:canceled error in case the job has
+            % Throws JOB_EXECUTOR:cancelled error in case the job has
             %
             log_progress_(this,step,n_steps,time_per_step,add_info);
         end
@@ -332,13 +332,13 @@ classdef JobExecutor
             [ok,err] = obj.mess_framework_.labBarrier(nothrow);
         end
         %
-        function [is,reas] = is_job_canceled(obj)
+        function [is,reas] = is_job_cancelled(obj)
             % check all available framework for the job cancellation state.
             %
             % Returns true if job folder has been deleted
             is =~is_folder(obj.control_node_exch_.mess_exchange_folder);
             if ~is
-                [mess,tids] = obj.mess_framework_.probe_all('all','canceled');
+                [mess,tids] = obj.mess_framework_.probe_all('all','cancelled');
                 if ~isempty(mess)
                     if nargout > 1
                         reas = sprintf(' Received %d cancellation messages: ',numel(mess));
@@ -397,8 +397,8 @@ classdef JobExecutor
             % fh        -- if present, means logging mode -- received
             %              opened file handle to write log information into it
             %Performs:
-            % If exception is any except 'canceled', sends 'canceled'
-            % message to all neighboring nodes. If 'canceled', just returns
+            % If exception is any except 'cancelled', sends 'cancelled'
+            % message to all neighboring nodes. If 'cancelled', just returns
             % synchronize worker according to the state of the parallel job
             % execution.
             %

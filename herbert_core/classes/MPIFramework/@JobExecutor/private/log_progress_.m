@@ -10,16 +10,16 @@ function  log_progress_(obj,step,n_steps,time_per_step,add_info)
 %              job log
 % Outputs:
 % Sends message of type LogMessage to the job dispatcher.
-% Throws JOB_EXECUTOR:canceled error in case the job has been canceled.
-% Throws JOB_EXECUTOR:canceled error in case the reduce_messages returned
+% Throws JOB_EXECUTOR:cancelled error in case the job has been cancelled.
+% Throws JOB_EXECUTOR:cancelled error in case the reduce_messages returned
 % Failed message.
 %
 %
 
-[is_canceled,reason] = obj.is_job_canceled();
-if is_canceled % will go to process_fail_state, which will collect failure information from other nodes.
-    error('JOB_EXECUTOR:canceled',...
-        'Task %d has been canceled at step %d#%d. Reason: %s',...
+[is_cancelled,reason] = obj.is_job_cancelled();
+if is_cancelled % will go to process_fail_state, which will collect failure information from other nodes.
+    error('JOB_EXECUTOR:cancelled',...
+        'Task %d has been cancelled at step %d#%d. Reason: %s',...
         obj.labIndex,step,n_steps,reason)
 end
 
@@ -70,9 +70,9 @@ if obj.labIndex == 1
     
 end
 if strcmp(fin_mess.mess_name,'failed') % happens when reduce_messages received unexpected
-    %(normally 'canceled') message from other nodes instead of receiving 'log' or nothing message.
+    %(normally 'cancelled') message from other nodes instead of receiving 'log' or nothing message.
     % In this case, should finish execution
-    error('JOB_EXECUTOR:canceled',...
+    error('JOB_EXECUTOR:cancelled',...
         'Task N%d has been interrupted at log point at step %d#%d as other worker(s) reported failure.\n Info: %s',...
         obj.labIndex,step,n_steps,evalc('disp(fin_mess.payload)'));
     

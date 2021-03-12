@@ -37,10 +37,10 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
             assertTrue(isempty(all_messages_names));
             assertTrue(isempty(task_ids));
             %
-            ok = mf.is_job_canceled();
+            ok = mf.is_job_cancelled();
             assertFalse(ok);
             mf.finalize_all();
-            ok = mf.is_job_canceled();
+            ok = mf.is_job_cancelled();
             assertTrue(ok);
         end
         %
@@ -504,7 +504,7 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
             assertEqual(mess.mess_name, 'barrier');
         end
 
-        function test_barrier_ignores_canceled(this)
+        function test_barrier_ignores_cancelled(this)
             mf = MessagesFilebased('test_barrier_fail');
             mf.mess_exchange_folder = this.working_dir;
             clob = onCleanup(@()mf.finalize_all());
@@ -527,7 +527,7 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
             fbMPI3 = MessagesFilebased(cs3);
             fbMPI3.set_is_tested(false); % ensure test mode is disabled
 
-            [ok, err] = fbMPI2.send_message(1, 'canceled');
+            [ok, err] = fbMPI2.send_message(1, 'cancelled');
             assertEqual(ok, MESS_CODES.ok, err)
 
             t0 = fbMPI3.time_to_fail;
@@ -561,16 +561,16 @@ classdef test_exchange_FileBasedMPI < exchange_common_tests
             % clear up the barrier messages
             [ok, err, mess] = fbMPI1.receive_message(2, 'barrier');
             assertEqual(ok, MESS_CODES.ok, err)
-            assertEqual(mess.mess_name, 'canceled');
+            assertEqual(mess.mess_name, 'cancelled');
 
             [ok, err, mess] = fbMPI1.receive_message(3, 'barrier');
             assertEqual(ok, MESS_CODES.ok, err)
             assertEqual(mess.mess_name, 'barrier');
 
-            % canceled is still there
+            % cancelled is still there
             [ok, err, mess] = fbMPI1.receive_message(2, 'barrier');
             assertEqual(ok, MESS_CODES.ok, err)
-            assertEqual(mess.mess_name, 'canceled');
+            assertEqual(mess.mess_name, 'cancelled');
         end
         %
         function test_data_queue(obj)
