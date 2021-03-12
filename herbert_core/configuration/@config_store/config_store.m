@@ -35,7 +35,7 @@ classdef config_store < handle
             if is_virtual
                 [~,build_name] = fileparts(build_name); % remove all possible folder path's of the build name
                 % to be able to create valid file name.
-                newStore.config_folder_name_ = fullpath(workspace,build_name);
+                newStore.config_folder_name_ = fullfile(workspace,build_name);
             end
 
             if nargin>0

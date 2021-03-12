@@ -7,8 +7,8 @@ function [is_jenkins_pc,job_name,workspace] = is_jenkins()
 % is_jenkins -- true if the progam is running on Jenkins
 % job_name   -- the value of the Jenkins variable "JOB_NAME",
 jenkins_env_vars = {'JENKINS_URL', 'JOB_URL', 'JENKINS_HOME'};
-job_name ='';
-
+job_name = '';
+workspace = '';
 for i = 1:length(jenkins_env_vars)
     if isempty(getenv(jenkins_env_vars{i}))
         is_jenkins_pc = false;
