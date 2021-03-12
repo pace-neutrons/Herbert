@@ -20,7 +20,7 @@ classdef config_store < handle
         saveable_;
         config_folder_name_ = 'mprogs_config';
     end
-    
+
     methods(Access=private)
         % Guard the constructor against external invocation.  We only want
         % to allow a single instance of this class.  See description in
@@ -31,13 +31,13 @@ classdef config_store < handle
             if is_virtual
                 newStore.config_folder_name_ = ['mprogs_config_',type];
             end
-            [is_virtual,build_name] = is_jenkins();
+            [is_virtual,build_name,workspace] = is_jenkins();
             if is_virtual
-                [~,build_name] = fileparts(build_name); % remove all possible folder path's of the build name 
+                [~,build_name] = fileparts(build_name); % remove all possible folder path's of the build name
                 % to be able to create valid file name.
-                newStore.config_folder_name_ = ['mprogs_config_',build_name];
+                newStore.config_folder_name_ = fullpath(workspace,build_name);
             end
-            
+
             if nargin>0
                 [fp,fn] = fileparts(varargin{1});
                 cfn = config_store.instance().config_folder_name;
@@ -55,7 +55,7 @@ classdef config_store < handle
             newStore.saveable_ = containers.Map();
         end
     end
-    
+
     methods(Static)
         function obj = instance(varargin)
             % Get instance of unique config_store implementation.
@@ -100,7 +100,7 @@ classdef config_store < handle
             end
             config_store.instance(config_folder_name);
         end
-        
+
     end
     methods
         function store_config(this,config_class,varargin)
@@ -111,7 +111,7 @@ classdef config_store < handle
             %
             % if option -forcesave (or -force is provided) file is saved
             % into disc regardless of its status in memory
-            
+
             options={'-forcesave'};
             [ok,mess,force_save,other_options]=parse_char_options(varargin,options);
             if ~ok
@@ -144,13 +144,13 @@ classdef config_store < handle
                 error('CONFIG_STORE:invalid_argument',...
                     'Config class has to be a child of the config_base class or the name of such class');
             end
-            
+
             if isfield(this.config_storage_,class_name)
                 config_data = this.config_storage_.(class_name);
             else
                 config_data = this.get_config(class_to_restore);
             end
-            
+
             if numel(varargin) < nargout
                 error('CONFIG_STORE:runtime_error',...
                     ' some output values are not set by this function call');
@@ -174,7 +174,7 @@ classdef config_store < handle
                     varargout{i-1} = class_to_restore.get_internal_field(varargin{i});
                 end
             end
-            
+
         end
         %------------------------------------------------------------------
         % Two methods responsible for the class to be configured savable
@@ -215,7 +215,7 @@ classdef config_store < handle
             % to set and the variable to_save is true if the class should be
             % made savable and false otherwise.
             %
-            
+
             if is_it > 0
                 is_saveable=true;
             else
@@ -226,7 +226,7 @@ classdef config_store < handle
             else
                 class_name = class_instance.class_name;
             end
-            
+
             this.saveable_(class_name)=is_saveable;
         end
         %------------------------------------------------------------------
@@ -245,7 +245,7 @@ classdef config_store < handle
             for i=1:nout
                 varargout{i} = out{i};
             end
-            
+
         end
         %
         function   config_data=get_config(this,class_to_restore)
@@ -258,7 +258,7 @@ classdef config_store < handle
             %
             % if class_to_restore has option returns_defaults==true,
             % default class configuration is returned
-            
+
             %Usage:
             %
             % obj = conifg_store.instance().restore_config(herbert_config)
@@ -269,10 +269,10 @@ classdef config_store < handle
             %                     'use_mex','log_level')
             %                      returns current Herbert config settings for fields
             %                      'use_mex' and 'log_level'
-            
+
             config_data=this.get_config_(class_to_restore);
             % execute class setters.
-            
+
             % Important!!!
             % Despite we are not returning the resulting configuration,
             % executing this allows to set up global dependent fields (e.g.
@@ -330,7 +330,7 @@ classdef config_store < handle
             %
             % if option -in_mem provided, it checks only if such configuration
             % is loaded in the memory
-            
+
             options={'-in_mem'};
             [ok,mess,check_mem_only]=parse_char_options(varargin,options);
             if ~ok
@@ -355,13 +355,11 @@ classdef config_store < handle
             % Should be used with care and necessary mainly for MPI workers
             obj.instance(new_path);
         end
-        
+
         %
         function storage = get.config_classes(this)
             storage = fieldnames(this.config_storage_);
         end
-        
+
     end
 end
-
-
