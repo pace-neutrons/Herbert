@@ -4,19 +4,19 @@ classdef InitMessage < aMessage
     %
     % is_blocking = true for this message
     properties(Dependent)
-        %        
+        %
         n_first_step
         n_steps
-        
+
         common_data
         loop_data
         % if the task needs to return results
         return_results
     end
+
     properties(Access = protected)
     end
-    
-    
+
     methods
         function obj = InitMessage(common_data,loop_data,return_results,n_first_step)
             % Construct the intialization message
@@ -53,7 +53,8 @@ classdef InitMessage < aMessage
             if ~exist('n_first_step', 'var')
                 n_first_step = 1;
             end
-            if iscell(loop_data)
+
+            if ~isscalar(loop_data)
                 obj.payload.loopData = loop_data;
                 obj.payload.n_steps   = numel(loop_data);
                 obj.payload.n_first_step  = 1;
@@ -68,30 +69,34 @@ classdef InitMessage < aMessage
                 obj.payload.n_first_step  = n_first_step;
             end
         end
-        
+
         function n_steps = get.n_steps(obj)
             n_steps =obj.payload.n_steps;
         end
+
         function cd = get.common_data(obj)
             cd = obj.payload.common_data;
         end
+
         function cd = get.loop_data(obj)
             cd = obj.payload.loopData;
         end
+
         function yesno = get.return_results(obj)
             yesno  = obj.payload.return_results;
         end
+
         function nfs = get.n_first_step(obj)
             nfs = obj.payload.n_first_step;
         end
-        %
+
     end
+
     methods(Static,Access=protected)
         function isblocking = get_blocking_state()
             % return the blocking state of a message
             isblocking = true;
         end
     end
-    
-end
 
+end

@@ -46,18 +46,18 @@ function [outputs,n_failed,task_ids,obj]=...
 
     mf = obj.mess_framework_;
 
-% if loop param defines less loop parameters then there are workers requested,
-% the number of workers will be decreased.
+    % if loop param defines less loop parameters then there are workers requested,
+    % the number of workers will be decreased.
     n_workers = check_loop_param(loop_params,n_workers);
 
-% indicate new cluster created
+    % indicate new cluster created
     obj.job_is_starting_ = true;
-% initialize cluster, defined by current configuration
+    % initialize cluster, defined by current configuration
     par_fc = MPI_clusters_factory.instance();
 
     cluster_wrp = par_fc.get_initialized_cluster(n_workers,mf);
 
-% verify if the cluster have started and report it was.
+    % verify if the cluster have started and report it was.
     [cluster_wrp,ok] = cluster_wrp.wait_started_and_report(obj.task_check_time);
     if ~ok
         n_restart_attempts = 5;
@@ -70,14 +70,14 @@ function [outputs,n_failed,task_ids,obj]=...
 
             job_info = mf.initial_framework_info;
             cluster_wrp.finalize_all(); % will destroy current mf
-% Reinitialize mf and create job folder
+            % Reinitialize mf and create job folder
             mf = MessagesFilebased(job_info);
             if ~isempty(pc.shared_folder_on_local)
                 mf.mess_exchange_folder = pc.shared_folder_on_local;
             end
 
             obj.mess_framework_ = mf;
-            %
+
             cluster_wrp = par_fc.get_initialized_cluster(n_workers,mf);
             [cluster_wrp,ok] = cluster_wrp.wait_started_and_report(obj.task_check_time);
             ic= ic+1;
@@ -106,7 +106,9 @@ function [outputs,n_failed,task_ids,obj]=...
 end
 
 function n_wk = check_loop_param(loop_param,n_workers)
+    % Available number of workers
     n_wk = n_workers;
+
     if ~isscalar(loop_param)
         n_jobs = numel(loop_param);
     elseif isscalar(loop_param) && isnumeric(loop_param)
@@ -121,10 +123,12 @@ function n_wk = check_loop_param(loop_param,n_workers)
         end
     else
         error('JOB_DISPATCHER:invalid_argument',...
-              'Unknown type of loop_param variable');
+              'Unknown type of loop_param variable: %s', class(loop_param));
     end
+
+    % Clip workers to number of jobs
     if n_wk > n_jobs
-        n_wk  = n_jobs;
+        n_wk = n_jobs;
     end
 
 end

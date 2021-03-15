@@ -39,13 +39,17 @@ function [worker_par_list,init_messages]=split_tasks_(...
 end
 
 function struct_par = split_struct(cell_data,field_names,array_cur)
+
     n_fields = numel(field_names);
     struct_par  = cell(n_fields,1);
+
     for i=1:n_fields
-        celd =  cell_data{i};
-        if size(celd,1)>    size(celd,2)
+        celd = cell_data{i};
+
+        if size(celd,1) > size(celd,2)
             celd = celd';
         end
+
         if iscell(celd)
             struct_par{i} = celd(array_cur);
         elseif array_cur == 1
@@ -55,16 +59,19 @@ function struct_par = split_struct(cell_data,field_names,array_cur)
                   'unsupported combination of cell data and cell indices');
         end
     end
+
     struct_par = cell2struct(struct_par,field_names);
 end
 
 function [n_workers,worker_par_list,is_list] = tasks_indices(job_param_list,n_workers)
 % get subtasks indices, dividing input parameter list between defined number of workers.
 %
-    if ~isscalar(job_param_list) % the tasks are described by cellarray
+    if ~isscalar(job_param_list) % the tasks are described by array
         n_tasks = numel(job_param_list);
         is_list = true;
+
     elseif isstruct(job_param_list) % array of structures
+
         fn = fieldnames(job_param_list);
         if ~isempty(fn)
             n_tasks = numel(job_param_list.(fn{1}));
@@ -73,10 +80,13 @@ function [n_workers,worker_par_list,is_list] = tasks_indices(job_param_list,n_wo
             error('JOB_DISPATCHER:invalid_argument',...
                   ' job loop parameters contains empty structure');
         end
+
     elseif isscalar(job_param_list) && isnumeric(job_param_list)
+
         n_tasks = job_param_list;
         is_list = false;
     end
+
     if n_workers> n_tasks
         n_workers = n_tasks;
     end
