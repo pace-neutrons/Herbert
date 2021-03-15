@@ -18,7 +18,7 @@ classdef InitMessage < aMessage
     end
 
     methods
-        function obj = InitMessage(common_data, loop_data, return_results, n_first_step)
+        function obj = InitMessage(varargin)
             % Construct the intialization message
             %
             % Inputs:
@@ -38,12 +38,13 @@ classdef InitMessage < aMessage
             %
             obj = obj@aMessage('init');
             p = inputParser();
-            addOptional('common_data', [])
-            addOptional('loop_data', 1)
-            addOptional('return_results', false, @isboolean)
-            addOptional('n_first_step', 1, @(x)(validateattributes(x, {'numeric'}, {'scalar', 'nonempty'})))
-            parse(p, common_data, loop_data, return_results, n_first_step);
-
+            p.StructExpand = false
+            addOptional(p, 'common_data', [])
+            addOptional(p, 'loop_data', 1)
+            addOptional(p, 'return_results', false)
+            addOptional(p, 'n_first_step', 1, @(x)(validateattributes(x, {'numeric'}, {'scalar', 'nonempty'})))
+            parse(p, varargin{:});
+            loop_data = p.Results.loop_data;
             obj.payload = struct('common_data', p.Results.common_data, ...
                 'loopData', p.Results.loop_data, 'n_first_step', p.Results.n_first_step, 'n_steps', 0, ...
                 'return_results', p.Results.return_results);
@@ -59,8 +60,7 @@ classdef InitMessage < aMessage
                 obj.payload.n_steps   = numel(loop_data.(fn{1}));
                 obj.payload.n_first_step  = 1;
             else
-                obj.payload.n_steps  = loop_data;
-                obj.payload.n_first_step  = n_first_step;
+                % Already set up
             end
         end
 
