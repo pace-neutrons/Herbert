@@ -41,7 +41,7 @@ classdef InitMessage < aMessage
             p.StructExpand = false
             addOptional(p, 'common_data', [])
             addOptional(p, 'loop_data', 1)
-            addOptional(p, 'return_results', false)
+            addOptional(p, 'return_results', false, @islognumscalar)
             addOptional(p, 'n_first_step', 1, @(x)(validateattributes(x, {'numeric'}, {'scalar', 'nonempty'})))
             parse(p, varargin{:});
             loop_data = p.Results.loop_data;
