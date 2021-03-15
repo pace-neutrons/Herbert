@@ -18,7 +18,7 @@ classdef InitMessage < aMessage
     end
 
     methods
-        function obj = InitMessage(common_data,loop_data,return_results,n_first_step)
+        function obj = InitMessage(common_data, loop_data, return_results, n_first_step)
             % Construct the intialization message
             %
             % Inputs:
@@ -26,7 +26,7 @@ classdef InitMessage < aMessage
             %                loop iteration
             % loop_data   -- either cellarray of data, with each cell
             %                specific to a single loop iteration or
-            %                number of iteration (n_steps) to perform over
+            %                number of iterations (n_steps) to perform over
             %                common data
             % return_results --if task needs to return its results
             %              if true, task will return its results
@@ -37,22 +37,16 @@ classdef InitMessage < aMessage
             %                 a cellarray it assumed to be 1
             %
             obj = obj@aMessage('init');
-            if ~exist('common_data', 'var')
-                common_data = [];
-                loop_data = 1;
-            end
-            if ~exist('loop_data', 'var')
-                loop_data = 1;
-            end
-            if ~exist('return_results', 'var')
-                return_results = false;
-            end
-            obj.payload = struct('common_data',common_data,...
-                'loopData',[],'n_first_step',1,'n_steps',0,...
-                'return_results',return_results );
-            if ~exist('n_first_step', 'var')
-                n_first_step = 1;
-            end
+            p = inputParser();
+            addOptional('common_data', [])
+            addOptional('loop_data', 1)
+            addOptional('return_results', false, @isboolean)
+            addOptional('n_first_step', 1, @(x)(validateattributes(x, {'numeric'}, {'scalar', 'nonempty'})))
+            parse(p, common_data, loop_data, return_results, n_first_step);
+
+            obj.payload = struct('common_data', p.Results.common_data, ...
+                'loopData', p.Results.loop_data, 'n_first_step', p.Results.n_first_step, 'n_steps', 0, ...
+                'return_results', p.Results.return_results);
 
             if ~isscalar(loop_data)
                 obj.payload.loopData = loop_data;
@@ -92,7 +86,7 @@ classdef InitMessage < aMessage
 
     end
 
-    methods(Static,Access=protected)
+    methods(Static, Access=protected)
         function isblocking = get_blocking_state()
             % return the blocking state of a message
             isblocking = true;
