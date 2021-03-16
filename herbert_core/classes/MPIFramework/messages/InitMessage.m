@@ -38,7 +38,7 @@ classdef InitMessage < aMessage
             %
             obj = obj@aMessage('init');
             p = inputParser();
-            p.StructExpand = false
+            p.StructExpand = false;
             addOptional(p, 'common_data', [])
             addOptional(p, 'loop_data', 1)
             addOptional(p, 'return_results', false, @islognumscalar)
