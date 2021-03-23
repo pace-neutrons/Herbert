@@ -61,17 +61,6 @@ function [data_out, fitdata] = fit (obj, varargin)
 %                      If more than one function: a row cell array of row vector
 %                                                 cell arrays
 %
-%           If there was a problem i.e. ok==false, then fitdata=[].
-%
-%   ok      True: A fit coould be performed. This includes the cases of
-%                 both convergence and failure to converge
-%           False: Fundamental problem with the input arguments e.g. the
-%                 number of free parameters equals or exceeds the number
-%                 of data points
-%
-%   mess    Message if ok==false; Empty string if ok==true.
-%
-% If ok is not a return argument, then if ok is false an error will be thrown.
 
 %-------------------------------------------------------------------------------
 % <#doc_def:>
@@ -103,18 +92,18 @@ if ok
         elseif sum(lopt)==1
             output_type = flagnames{lopt};
         else
-            error("Herbert:mfclass:badargs", 'Check the value of output option')
+            error("Herbert:mfclass:invalid_argument", 'Check the value of output option')
         end
     else
-        error("Herbert:mfclass:badargs", 'Check number of input arguments')
+        error("Herbert:mfclass:invalid_argument", 'Check number of input arguments')
     end
 else
-    error("Herbert:mfclass:badargs", mess)
+    error("Herbert:mfclass:invalid_argument", mess)
 end
 
 % Check that there is data present
 if obj.ndatatot_ == 0
-    error("Herbert:mfclass:badargs", 'No data has been provided for fitting')
+    error("Herbert:mfclass:invalid_argument", 'No data has been provided for fitting')
 end
 
 % Check that all functions are present
@@ -122,7 +111,7 @@ foreground_present = ~all(cellfun(@isempty,obj.fun_));
 background_present = ~all(cellfun(@isempty,obj.bfun_));
 
 if ~foreground_present && ~background_present
-    error("Herbert:mfclass:badargs", 'No fit functions have been provided')
+    error("Herbert:mfclass:invalid_argument", 'No fit functions have been provided')
 end
 
 % Mask the data
@@ -131,7 +120,7 @@ end
 % Check that there are parameters and unmasked data to be fitted
 [~, ok, mess, pfin, p_info] = ptrans_initialise_(obj);
 if ~ok
-    error("Herbert:mfclass:badtransinit", mess)
+    error("Herbert:mfclass:bad_ptrans_init", mess)
 end
 
 % Allow for the case of input argument over-riding initial parameter values for fit

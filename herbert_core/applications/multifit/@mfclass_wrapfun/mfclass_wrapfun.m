@@ -407,9 +407,9 @@ f_init_args={};
 if ~isempty(func_init) && any(f_present(:))
     [ok,mess,f_init_args]=func_init(w);
     if ~ok
-        error("Herbert:mfclass_wrapfun:badargs", [str,' preprocessor function: ',mess]);
+        error("Herbert:mfclass_wrapfun:invalid_argument", [str,' preprocessor function: ',mess]);
     elseif ~iscell(f_init_args) || isempty(f_init_args) || ~isrowvector(f_init_args)
-        error("Herbert:mfclass_wrapfun:badargs", [str,' preprocessor function must return the '...
+        error("Herbert:mfclass_wrapfun:invalid_argument", [str,' preprocessor function must return the '...
             'initialiation arguments in a single, non-empty, row cell array']);
     end
 end
