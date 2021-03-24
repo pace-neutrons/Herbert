@@ -23,7 +23,6 @@ function [wmask,msk_out] = mask_data_for_fit (w,msk_in)
 % Objects need a method sigvar_getx or mask_points. See elsewhere for required syntax.
 
 
-
 % Original author: T.G.Perring
 %
 % $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
@@ -34,7 +33,7 @@ function [wmask,msk_out] = mask_data_for_fit (w,msk_in)
     msk_out = cell(size(w));
 
     for i = 1:numel(w)
-% Accumulate bad points (y = NaN, zero error bars etc.) to the mask array
+        % Accumulate bad points (y = NaN, zero error bars etc.) to the mask array
         if isstruct(w{i})    % xye triple
             [msk_out{i}, mess_tmp] = mask_points_for_fit_xye(w{i}.x,w{i}.y,w{i}.e,msk_in{i});
         else % a different data object
@@ -45,7 +44,7 @@ function [wmask,msk_out] = mask_data_for_fit (w,msk_in)
             warning("Herbert:mfclass:mask_issue", accumulate_message(mess,[data_id_mess(sz,i),mess_tmp]));
         end
 
-% Mask data - only if there is some to be masked (don't want to change array sizes otherwise)
+        % Mask data - only if there is some to be masked (don't want to change array sizes otherwise)
         if ~all(msk_out{i}(:))
             if isstruct(w{i})    % xye triple
                 wmask{i}.x = cellfun(@(x)x(msk_out{i}),w{i}.x,'UniformOutput',false);
@@ -61,7 +60,7 @@ end
 %--------------------------------------------------------------------------------------------------
 
 function mess = data_id_mess(sz,i)
-% Dataset identifier string
+    % Dataset identifier string
     if prod(sz) == 1
         mess = 'Dataset:';
     else

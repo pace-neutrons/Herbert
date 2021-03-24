@@ -44,7 +44,7 @@ function [pf,p,bp]=ptrans_par_inverse(S, p_info)
     pf = pp_in(p_info.free);
     [p,bp]=ptrans_par(pf,p_info);
 
-% Check that the parameters generated fromt the free parameters are consistent with input
+    % Check that the parameters generated fromt the free parameters are consistent with input
     pp = [zeros(0,1); cell2mat(cellfun(@(x)x(:),p,'UniformOutput',false));...
           cell2mat(cellfun(@(x)x(:),bp,'UniformOutput',false))];
     tol = 1e-12;
@@ -56,7 +56,7 @@ end
 
 %--------------------------------------------------------------------------------------------------
 function [pp0] = extract_parameters (S,is_fore,p_info)
-% Extraact the input parameters, checking for consistency of lengths of arrays with object
+    % Extraact the input parameters, checking for consistency of lengths of arrays with object
 
     if is_fore
         str = 'fore';
@@ -70,7 +70,7 @@ function [pp0] = extract_parameters (S,is_fore,p_info)
         np = p_info.nbp;
     end
 
-% Check that the required fields are present
+    % Check that the required fields are present
     if nptot > 0     % there are foreground function parameters
         if isfield(S,nam)
             if isnumeric(S.(nam))
@@ -102,13 +102,4 @@ function [pp0] = extract_parameters (S,is_fore,p_info)
             pp0 = zeros(0,1);
         end
     end
-end
-
-%--------------------------------------------------------------------------------------------------
-function [pf,p,bp] = error_return(p_info)
-% Error return values - NaNs with same size as arrays held in p_info
-    pf = NaN(1,numel(find(p_info.free)));
-    p = cellfun(@(x)NaN(size(x)),p_info.p,'UniformOutput',false);
-    bp = cellfun(@(x)NaN(size(x)),p_info.p,'UniformOutput',false);
-
 end
