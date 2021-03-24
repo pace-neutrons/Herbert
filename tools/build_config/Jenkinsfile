@@ -150,25 +150,31 @@ properties([
       trim: true
     ),
     string(
+      defaultValue: '',
       description: 'The release number of the Matlab to load e.g. R2019b.',
-      name: 'MATLAB_VERSION', trim: true
+      name: 'MATLAB_VERSION',
+      trim: true
     ),
     string(
+      defaultValue: '',
       description: 'The version of CMake to run the build with. Affects Linux builds only.',
       name: 'CMAKE_VERSION',
       trim: true
     ),
     string(
+      defaultValue: '',
       description: 'The version of GCC to build with. Affects Linux builds only.',
       name: 'GCC_VERSION',
       trim: true
     ),
     string(
+      defaultValue: '',
       description: 'The year of the version of Visual Studio to build with. Affects Windows builds only.',
       name: 'VS_VERSION',
       trim: true
     ),
     string(
+      defaultValue: '',
       description: 'The version of CppCheck tooling to load to provide the code-style checks.',
       name: 'CPPCHECK_VERSION',
       trim: true
@@ -218,20 +224,20 @@ pipeline {
         script {
           if (isUnix()) {
             sh '''
-          module load cmake/\$CMAKE_VERSION &&
-          module load matlab/\$MATLAB_VERSION &&
-          module load gcc/\$GCC_VERSION &&
-          module load cppcheck/\$CPPCHECK_VERSION &&
-          ./tools/build_config/build.sh \
-            --cmake_flags \"-DHorace_RELEASE_TYPE=\$RELEASE_TYPE\" \
-            --matlab_release \$MATLAB_VERSION \
-            --print_versions \
-            --configure
-          '''
+              module load cmake/\$CMAKE_VERSION &&
+              module load matlab/\$MATLAB_VERSION &&
+              module load gcc/\$GCC_VERSION &&
+              module load cppcheck/\$CPPCHECK_VERSION &&
+              ./tools/build_config/build.sh \
+                --cmake_flags \"-DHerbert_RELEASE_TYPE=\$RELEASE_TYPE\" \
+                --matlab_release \$MATLAB_VERSION \
+                --print_versions \
+                --configure
+              '''
           } else {
             powershell '''
-           ./tools/build_config/build.ps1 \
-                -cmake_flags \"-DHorace_RELEASE_TYPE=\$env:RELEASE_TYPE\" \
+              ./tools/build_config/build.ps1 \
+                -cmake_flags \"-DHerbert_RELEASE_TYPE=\$env:RELEASE_TYPE\" \
                 -matlab_release \$env:MATLAB_VERSION \
                 -vs_version \$env:VS_VERSION \
                 -print_versions \
