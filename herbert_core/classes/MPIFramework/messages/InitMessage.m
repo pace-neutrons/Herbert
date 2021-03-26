@@ -36,32 +36,37 @@ classdef InitMessage < aMessage
             %                 do n_steps, if absent or loop data provided as
             %                 a cellarray it assumed to be 1
             %
+            % is_list      -- the object was originally from a list or array
             obj = obj@aMessage('init');
             p = inputParser();
             p.StructExpand = false;
-            addOptional(p, 'common_data', [])
-            addOptional(p, 'loop_data', 1)
+            addOptional(p, 'common_data', [], @(x)(true)) % Accept any data (necessary because it might be a string)
+            addOptional(p, 'loop_data', 1, @(x)(true))
             addOptional(p, 'return_results', false, @islognumscalar)
             addOptional(p, 'n_first_step', 1, @(x)(validateattributes(x, {'numeric'}, {'scalar', 'nonempty'})))
+            addOptional(p, 'is_list', false, @islognumscalar)
             parse(p, varargin{:});
+
             loop_data = p.Results.loop_data;
             obj.payload = struct('common_data', p.Results.common_data, ...
-                'loopData', p.Results.loop_data, 'n_first_step', p.Results.n_first_step, 'n_steps', 0, ...
+                'n_first_step', p.Results.n_first_step, 'n_steps', 0, ...
                 'return_results', p.Results.return_results);
 
-            if ~isscalar(loop_data)
-                obj.payload.loopData = loop_data;
-                obj.payload.n_steps   = numel(loop_data);
-                obj.payload.n_first_step  = 1;
-            elseif isstruct(loop_data)
+            if isstruct(loop_data)
                 fn = fieldnames(loop_data);
                 obj.payload.loopData = loop_data;
                 % would not work correctly if the first field was string
                 obj.payload.n_steps   = numel(loop_data.(fn{1}));
                 obj.payload.n_first_step  = 1;
+            elseif p.Results.is_list
+                obj.payload.loopData = loop_data;
+                obj.payload.n_steps = numel(loop_data);
+                obj.payload.n_first_step  = 1;
             else
-                % Already set up
+                obj.payload.loopData = [];
+                obj.payload.n_steps = loop_data;
             end
+
         end
 
         function n_steps = get.n_steps(obj)

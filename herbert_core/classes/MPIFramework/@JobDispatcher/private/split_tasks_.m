@@ -25,15 +25,15 @@ function [worker_par_list,init_messages]=split_tasks_(...
             if is_struct
                 param = split_struct(cell_data,field_names,worker_par_list{i});
                 init_messages{i} = InitMessage(common_par,...
-                                               param,return_outputs,1);
+                                               param,return_outputs,1, is_list);
             else
                 init_messages{i} = InitMessage(common_par,...
-                                               loop_par(worker_par_list{i}),return_outputs,1);
+                                               loop_par(worker_par_list{i}),return_outputs,1, is_list);
             end
         else
             ind = worker_par_list{i};
             init_messages{i} = InitMessage(common_par,...
-                                           ind(2),return_outputs,ind(1));
+                                           ind(2),return_outputs,ind(1), is_list);
         end
     end
 end
@@ -55,7 +55,7 @@ function struct_par = split_struct(cell_data,field_names,array_cur)
         elseif array_cur == 1
             struct_par{i} = celd;
         else
-            error('JOB_DISPATCHER:invalid_argument',...
+            error('HERBERT:JobDispatcher:invalid_argument',...
                   'unsupported combination of cell data and cell indices');
         end
     end
@@ -66,9 +66,9 @@ end
 function [n_workers,worker_par_list,is_list] = tasks_indices(job_param_list,n_workers)
 % get subtasks indices, dividing input parameter list between defined number of workers.
 %
-    if ~isscalar(job_param_list) % the tasks are described by array
-        n_tasks = numel(job_param_list);
-        is_list = true;
+    if isscalar(job_param_list) && isnumeric(job_param_list)
+        n_tasks = job_param_list;
+        is_list = false;
 
     elseif isstruct(job_param_list) % array of structures
 
@@ -77,14 +77,13 @@ function [n_workers,worker_par_list,is_list] = tasks_indices(job_param_list,n_wo
             n_tasks = numel(job_param_list.(fn{1}));
             is_list = true;
         else
-            error('JOB_DISPATCHER:invalid_argument',...
+            error('HERBERT:JobDispatcher:invalid_argument',...
                   ' job loop parameters contains empty structure');
         end
 
-    elseif isscalar(job_param_list) && isnumeric(job_param_list)
-
-        n_tasks = job_param_list;
-        is_list = false;
+    else
+        n_tasks = numel(job_param_list);
+        is_list = true;
     end
 
     if n_workers> n_tasks
