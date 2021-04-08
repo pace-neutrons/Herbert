@@ -1,3 +1,5 @@
 function ok = isindex(vec)
-    ok = isvector(vec) && (islogical(vec) || (all(vec > 0 & all(floor(vec) == vec))));
+    ok = isvector(vec) && ...
+         (islogical(vec) || ...
+          (isnumeric(vec) && all(vec > 0 & all(mod(vec, 1) == 0))));
 end
