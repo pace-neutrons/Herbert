@@ -1,25 +1,26 @@
 #!groovy
 
 @Library('PACE-shared-lib') _
+import PACE.Common.PipeLineInfo
 
-
+def pli = PipeLineInfo.new(env.JOB_BASE_NAME)
 
 properties([
   parameters([
     string(
-      defaultValue: pipelineFunctions.get_branch_name(env.JOB_BASE_NAME),
+      defaultValue: pli.branch_name
       description: 'The name of the branch to build. Affects non-PR builds only. *',
       name: 'BRANCH_NAME',
       trim: true
     ),
     string(
-      defaultValue: pipelineFunctions.get_release_type(env.JOB_BASE_NAME),
+      defaultValue: pli.release_type
       description: 'The type of the build e.g. "nightly", "release", "pull_request". *',
       name: 'RELEASE_TYPE',
       trim: true
     ),
     string(
-      defaultValue: pipelineFunctions.get_agent(env.JOB_BASE_NAME),
+      defaultValue: pli.agent
       description: 'The agent to execute the pipeline on. *',
       name: 'AGENT',
       trim: true
@@ -73,8 +74,7 @@ pipeline {
   }
 
   environment {
-    MATLAB_VERSION = utilities.get_param('MATLAB_VERSION',
-                               pipelineFunctions.get_matlab_release(env.JOB_BASE_NAME))
+    MATLAB_VERSION = utilities.get_param('MATLAB_VERSION', pli.matlab_release)
     CMAKE_VERSION = utilities.get_param('CMAKE_VERSION', '3.19')
     GCC_VERSION = utilities.get_param('GCC_VERSION', '6.3.0')
     VS_VERSION = utilities.get_param('VS_VERSION', '2017')
@@ -213,7 +213,7 @@ pipeline {
           // Archive a file containing the git revision being built. This
           // enables the Deploy pipelines to validate against this SHA, and
           // ensure the correct revision is tagged in Git.
-          if (get_build_type(env.JOB_BASE_NAME) == 'Release') {
+          if (pli.build_type == 'Release') {
             def git_rev_file_name = "${env.JOB_BASE_NAME}-git-revision.sha"
             utilities.write_git_revision_to_file(git_rev_file_name)
             archiveArtifacts(artifacts: git_rev_file_name, fingerprint: true)
