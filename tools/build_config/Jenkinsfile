@@ -91,7 +91,7 @@ pipeline {
             echo "Found PR labels: ${env.PR_LABELS}"
           }
         }
-        utilities.post_github_status("pending", "The build is running")
+        post_github_status("pending", "The build is running")
       }
     }
 
@@ -271,11 +271,11 @@ pipeline {
     }
 
     success {
-      utilities.post_github_status("success", "The build succeeded")
+      post_github_status("success", "The build succeeded")
     }
 
     unsuccessful {
-      utilities.post_github_status("failure", "The build failed")
+      post_github_status("failure", "The build failed")
     }
 
     cleanup {
