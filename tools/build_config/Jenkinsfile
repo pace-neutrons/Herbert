@@ -1,9 +1,8 @@
 #!groovy
 
-@Library('PACE-shared-lib') _
-import PACE.Common.PipeLineInfo
+@Library('PACE-shared-lib') import pace.common.PipeLineInfo
 
-pli = PipeLineInfo.new(env.JOB_BASE_NAME)
+pli = new PipeLineInfo(env.JOB_BASE_NAME)
 
 properties([
   parameters([
@@ -20,7 +19,7 @@ properties([
       trim: true
     ),
     string(
-      defaultValue: pli.agent,
+      defaultValue: get_agent(pli.os),
       description: 'The agent to execute the pipeline on. *',
       name: 'AGENT',
       trim: true
