@@ -8,19 +8,19 @@ def pli = PipeLineInfo.new(env.JOB_BASE_NAME)
 properties([
   parameters([
     string(
-      defaultValue: pli.branch_name
+      defaultValue: pli.branch_name,
       description: 'The name of the branch to build. Affects non-PR builds only. *',
       name: 'BRANCH_NAME',
       trim: true
     ),
     string(
-      defaultValue: pli.release_type
+      defaultValue: pli.release_type,
       description: 'The type of the build e.g. "nightly", "release", "pull_request". *',
       name: 'RELEASE_TYPE',
       trim: true
     ),
     string(
-      defaultValue: pli.agent
+      defaultValue: pli.agent,
       description: 'The agent to execute the pipeline on. *',
       name: 'AGENT',
       trim: true
