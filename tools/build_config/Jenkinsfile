@@ -19,7 +19,7 @@ properties([
       trim: true
     ),
     string(
-      defaultValue: get_agent(pli.os),
+      defaultValue: utilities.get_agent(pli.os),
       description: 'The agent to execute the pipeline on. *',
       name: 'AGENT',
       trim: true
