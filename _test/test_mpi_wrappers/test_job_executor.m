@@ -50,11 +50,7 @@ classdef test_job_executor< MPI_Test_Common
             common_job_param = 'dummy_not_used';
             % should be n_workers different init messages for all n_workers
             %  but as we do not test do_job, 1 message would be ok
-            try
-                initMess = InitMessage(common_job_param,3,true,1);
-            catch ME
-                disp(ME)
-            end
+            initMess = InitMessage(common_job_param,3,true,1);
         end
 
         function send_init_messages(obj,serverfbMPI,je_common_init,je_worker_init)
