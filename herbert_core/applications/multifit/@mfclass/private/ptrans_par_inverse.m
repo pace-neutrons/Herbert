@@ -34,7 +34,7 @@ function [pf,p,bp]=ptrans_par_inverse(S, p_info)
 % $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
 
     if ~isstruct(S)
-        error('Herbert:mfclass:invalid_argument', 'Input argument is not a structure')
+        error('HERBERT:mfclass:invalid_argument', 'Input argument is not a structure')
     end
 
     [p_in] = extract_parameters (S, true, p_info);
@@ -50,7 +50,7 @@ function [pf,p,bp]=ptrans_par_inverse(S, p_info)
     tol = 1e-12;
     min_denominator = 1;
     if ~equal_to_relerr(pp_in,pp,tol,min_denominator)
-        error('Herbert:mfclass:bad_binding', 'The fixed and/or binding ratios of input argument parameters are inconsistent with those of the object');
+        error('HERBERT:mfclass:bad_binding', 'The fixed and/or binding ratios of input argument parameters are inconsistent with those of the object');
     end
 end
 
@@ -77,26 +77,26 @@ function [pp0] = extract_parameters (S,is_fore,p_info)
                 if numel(np) == 1 && numel(S.(nam)) == nptot
                     pp0 = S.(nam)(:);
                 else
-                    error('Herbert:mfclass:invalid_argument', ['Input argument ',str,'ground parameter array length is inconsistent with object']);
+                    error('HERBERT:mfclass:invalid_argument', ['Input argument ',str,'ground parameter array length is inconsistent with object']);
                 end
             elseif iscell(S.(nam)) && all(cellfun(@isnumeric,S.(nam)))
                 if numel(S.(nam)) == numel(np) && all(cellfun(@numel,S.(nam)) == np)
                     pp0 = [zeros(0,1);cell2mat(cellfun(@(x)x(:),S.(nam),'UniformOutput',false)')];     % enforce [0,1] if empty
                 else
-                    error('Herbert:mfclass:invalid_argument', ['Input argument ',str,'ground parameter cell array or element lengths are inconsistent with object'])
+                    error('HERBERT:mfclass:invalid_argument', ['Input argument ',str,'ground parameter cell array or element lengths are inconsistent with object'])
                 end
             else
-                error('Herbert:mfclass:invalid_argument', ['Input argument ',str,'ground parameter field is not a single numeric array or a cell array of numeric arrays']);
+                error('HERBERT:mfclass:invalid_argument', ['Input argument ',str,'ground parameter field is not a single numeric array or a cell array of numeric arrays']);
             end
         else
-            error('Herbert:mfclass:invalid_argument', ['Input argument does not contain any ',str,'ground parameter values']);
+            error('HERBERT:mfclass:invalid_argument', ['Input argument does not contain any ',str,'ground parameter values']);
         end
     else
         if isfield(S,nam)
             if iscell(S.(nam)) && numel(S.(nam)) == numel(np) && all(cellfun(@isempty,S.(nam)))
                 pp0 = zeros(0,1);
             else
-                error('Herbert:mfclass:invalid_argument', ['Input argument ',str,'ground parameter cell array or element lengths are inconsistent with object']);
+                error('HERBERT:mfclass:invalid_argument', ['Input argument ',str,'ground parameter cell array or element lengths are inconsistent with object']);
             end
         else
             pp0 = zeros(0,1);

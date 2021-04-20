@@ -255,7 +255,7 @@ nval=numel(yval);
 npfree=numel(pfin);
 nnorm=max(nval-npfree,1);   % we allow for the case nval=npfree
 if nval<npfree
-    error("Herbert:mfclass:multifit_lsqr",'Number of data points must be greater than or equal to the number of free parameters')
+    error("HERBERT:mfclass:multifit_lsqr",'Number of data points must be greater than or equal to the number of free parameters')
 end
 
 % Set the extent of listing to screen
@@ -296,10 +296,10 @@ else
     niter=fcp(2);   % maximum number of iterations
     tol=fcp(3);     % convergence criterion
     if abs(dp)<1e-12
-        error("Herbert:mfclass:multifit_lsqr",'Derivative step length must be greater or equal to 10^-12')
+        error("HERBERT:mfclass:multifit_lsqr",'Derivative step length must be greater or equal to 10^-12')
     end
     if niter<0
-        error("Herbert:mfclass:multifit_lsqr",'Number of iterations must be >=0')
+        error("HERBERT:mfclass:multifit_lsqr",'Number of iterations must be >=0')
     end
 
     % Output to command window
@@ -433,8 +433,7 @@ else
         if listing~=0, fit_listing_final(listing, p_best, sig, cor, p_info); end
     else
         chisqr_red = c_best/nnorm;
-        ok=true;
-        warning("Herbert:mfclass:multifit_lsqr",'WARNING: Convergence not achieved')
+        warning("HERBERT:mfclass:multifit_lsqr",'WARNING: Convergence not achieved')
     end
 
 end

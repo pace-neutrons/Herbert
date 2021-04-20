@@ -92,18 +92,18 @@ if ok
         elseif sum(lopt)==1
             output_type = flagnames{lopt};
         else
-            error("Herbert:mfclass:invalid_argument", 'Check the value of output option')
+            error("HERBERT:mfclass:invalid_argument", 'Check the value of output option')
         end
     else
-        error("Herbert:mfclass:invalid_argument", 'Check number of input arguments')
+        error("HERBERT:mfclass:invalid_argument", 'Check number of input arguments')
     end
 else
-    error("Herbert:mfclass:invalid_argument", mess)
+    error("HERBERT:mfclass:invalid_argument", mess)
 end
 
 % Check that there is data present
 if obj.ndatatot_ == 0
-    error("Herbert:mfclass:invalid_argument", 'No data has been provided for fitting')
+    error("HERBERT:mfclass:invalid_argument", 'No data has been provided for fitting')
 end
 
 % Check that all functions are present
@@ -111,7 +111,7 @@ foreground_present = ~all(cellfun(@isempty,obj.fun_));
 background_present = ~all(cellfun(@isempty,obj.bfun_));
 
 if ~foreground_present && ~background_present
-    error("Herbert:mfclass:invalid_argument", 'No fit functions have been provided')
+    error("HERBERT:mfclass:invalid_argument", 'No fit functions have been provided')
 end
 
 % Mask the data
@@ -120,7 +120,7 @@ end
 % Check that there are parameters and unmasked data to be fitted
 [~, ok, mess, pfin, p_info] = ptrans_initialise_(obj);
 if ~ok
-    error("Herbert:mfclass:bad_ptrans_init", mess)
+    error("HERBERT:mfclass:bad_ptrans_init", mess)
 end
 
 % Allow for the case of input argument over-riding initial parameter values for fit
