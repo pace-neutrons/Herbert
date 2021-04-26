@@ -53,7 +53,7 @@ function lint_json(varargin)
     for i = 1:numel(raw)
         for j = 1:numel(raw{i})
             curr = wng_compat(raw{i}(j), files{i});
-            issuesList.issues = [issuesList.issues{:}, {curr}];
+            issuesList.issues = {issuesList.issues{:}, curr};
         end
     end
 
