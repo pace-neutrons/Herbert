@@ -171,11 +171,10 @@ classdef ClusterHerbert < ClusterWrapper
     methods(Access = protected)
         function [ok,failed,mess] = is_running(obj)
             % Method checks if java framework is running
-
             for i=1:numel(obj.tasks_handles_)
-                [ok,failed,message] = is_java_process_running(obj,obj.tasks_handles_{i});
+                [ok,failed,mess] = is_java_process_running(obj,obj.tasks_handles_{i});
                 if ~ok
-                    mess = ['Process: ',num2str(i),' ',message];
+                    mess = ['Process: ',num2str(i),' ',mess];
                     return;
                 end
             end
