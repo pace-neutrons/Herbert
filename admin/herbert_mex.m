@@ -157,7 +157,7 @@ if ~(configure_cpp)
 
 end
 if user_choice=='e'
-    disp('!  canceled                                                        !')
+    disp('!  cancelled                                                       !')
     disp('!==================================================================!')
     build_c = false;
     return;
