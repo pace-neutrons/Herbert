@@ -1,8 +1,9 @@
-classdef test_job_dispatcher_common_methods < TestCase
-
+classdef test_job_dispatcher_common_methods < TestCase & FakeJenkins4Tests
+    
     properties
         working_dir
         current_config
+        fjenkins_herbert_cobnfig = 'defaults';
     end
 
     properties (Constant)
@@ -29,6 +30,29 @@ classdef test_job_dispatcher_common_methods < TestCase
 
         end
 
+        function clear_jenkins_var(obj)
+            % clear fake Jenkins configuration, for is_jenkins routine
+            % returning false
+            clear_jenkins_var@FakeJenkins4Tests(obj);
+            
+            config_store.instance().clear_all();
+            hc= herbert_config;
+            set(hc,obj.fjenkins_herbert_cobnfig);
+            hc.init_tests = true;
+            
+            obj.working_dir = tmp_dir();
+        end
+        
+        function set_up_fake_jenkins(obj)
+            % set up fake Jenkins configuration, for is_jenkins routine
+            % returning true
+            set_up_fake_jenkins@FakeJenkins4Tests(obj,'test_jenkins_dispatcher_common');
+            
+            hrc = herbert_config;
+            obj.fjenkins_herbert_cobnfig = hrc.get_data_to_store();
+            obj.working_dir = tmp_dir();
+        end
+        
         function tearDown(obj)
             % Here we restore the initial configuration as the previous
             % configuration may be restored on remote machine
@@ -302,10 +326,36 @@ classdef test_job_dispatcher_common_methods < TestCase
             assertEqual(init_mess{4}.n_steps,1)
         end
 
+        function test_transfer_init_and_config_on_fake_jenkins(obj)
+            if is_jenkins() % do not run it on real Jenkins, it may mess
+                % the whole Jenkins enviroment
+                return;
+            end
+            obj.set_up_fake_jenkins();
+            clearJenkinsSignature = onCleanup(@()clear_jenkins_var(obj));
+            %
+            assertTrue(is_jenkins);
+            % clear configuration from memory to ensure the configuration
+            % will be rebuild as Jenkins configuration
+            config_store.instance().clear_all();
+            %
+            %
+            obj.test_transfer_init_and_config()
+            %
+            clear clearJenkinsSignature;
+            assertFalse(is_jenkins);
+            
+        end
+
         function test_transfer_init_and_config(obj, varargin)
             % testing the transfer of the initial information for a Herbert
             % job through a data exchange folder
             %
+            
+            % ensure tests are enabled
+            hc = herbert_config;
+            hc.init_tests= true;
+            
             % Prepare current configuration to be able to restore it after
             % the test finishes
 
