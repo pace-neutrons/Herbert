@@ -96,7 +96,6 @@ function [data_out, calcdata] = simulate (obj, varargin)
 
 % Default return values if there is an error
 data_out = [];
-calcdata = [];
 
 % Check option
 opt_default = struct('sum',false,'foreground',false,'background',false,...
