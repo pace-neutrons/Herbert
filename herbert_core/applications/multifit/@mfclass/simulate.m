@@ -144,7 +144,7 @@ if ~foreground_present && ~background_present
 end
 
 % Mask the data
-[wmask, msk_out, ok, mess] = mask_data_for_fit (obj.w_, obj.msk_);
+[wmask, msk_out] = mask_data_for_fit (obj.w_, obj.msk_);
 if ~ok
     if throw_error, error_message(mess), else, return, end
 end
