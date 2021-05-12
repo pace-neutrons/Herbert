@@ -91,10 +91,6 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pi
 %
 %   converged   True if fit converged; false if not.
 %
-<<<<<<< HEAD
-=======
-
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
 % Note that for the final fit parameters to be reliable, test that
 % (ok && converged) is true.
 %
@@ -233,7 +229,6 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pi
 p_best=pfin;
 sig=zeros(1,numel(pfin));
 cor=zeros(numel(pfin));
-chisqr_red=0;
 converged=false;
 
 % Package data values and weights (i.e. 1/error_bar) each into a single column vector
@@ -336,13 +331,13 @@ else
         jac=multifit_dfdpf(w,xye,func,bfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,p_best,p_info,f_best,dp,S,Store,listing);
         nrm=zeros(npfree,1);
-        for j=1:npfree
-            jac(:,j)=wt.*jac(:,j);
-            nrm(j)=jac(:,j)'*jac(:,j);
-            if nrm(j)>0
-                nrm(j)=1/sqrt(nrm(j));
+        for k=1:npfree
+            jac(:,k)=wt.*jac(:,k);
+            nrm(k)=jac(:,k)'*jac(:,k);
+            if nrm(k)>0
+                nrm(k)=1/sqrt(nrm(k));
             end
-            jac(:,j)=nrm(j)*jac(:,j);
+            jac(:,k)=nrm(k)*jac(:,k);
         end
         [jac,s,v]=svd(jac,0);
         s=diag(s);
@@ -424,8 +419,8 @@ else
         % Now get Jacobian matrix
         jac=multifit_dfdpf(w,xye,func,bfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,p_best,p_info,f_best,dp,S,Store,listing);
-        for j=1:npfree
-            jac(:,j)=wt.*jac(:,j);
+        for k=1:npfree
+            jac(:,k)=wt.*jac(:,k);
         end
         [~,s,v]=svd(jac,0);
         s=repmat((1./diag(s))',[npfree,1]);
@@ -434,14 +429,17 @@ else
         sig=sqrt(diag(cov));
         tmp=repmat(1./sqrt(diag(cov)),[1,npfree]);
         cor=tmp.*cov.*tmp';
-        if listing~=0, fit_listing_final(listing, p_best, sig, cor, p_info); end
+        if listing~=0
+            fit_listing_final(listing, p_best, sig, cor, p_info);
+        end
     else
         chisqr_red = c_best/nnorm;
-        warning("'WARNING: Convergence not achieved')
+        warning('WARNING: Convergence not achieved')
     end
 
 end
 
+end
 
 %------------------------------------------------------------------------------------------
 function jac=multifit_dfdpf(w,xye,func,bkdfunc,pin,bpin,...
@@ -486,7 +484,9 @@ function jac=multifit_dfdpf(w,xye,func,bkdfunc,pin,bpin,...
 % for changes to parameters in the calculation of partial derivatives, and
 % so are not returned.
 
-if listing>2, disp(' Calculating partial derivatives:'), end
+if listing>2
+    disp(' Calculating partial derivatives:')
+end
 
 jac=zeros(length(f),length(p)); % initialise Jacobian to zero
 min_abs_del=1e-12;
@@ -514,23 +514,26 @@ for j=1:length(p)
     end
 end
 
+end
 
 %------------------------------------------------------------------------------------------
 % Functions for listing to screen (separated to keep main code tidy)
 
 function fit_listing_header(listing,niter)
-if listing==1
-    disp('--------------------------------------')
-    fprintf('Beginning fit (max %d iterations)',niter);
-    disp('--------------------------------------')
-    disp('Iteration  Time(s)  Reduced Chi^2');
-else
-    disp('--------------------------------------------------------------------------------')
-    fprintf('Beginning fit (max %d iterations)',niter);
+    if listing==1
+        disp('--------------------------------------')
+        fprintf('Beginning fit (max %d iterations)',niter);
+        disp('--------------------------------------')
+        disp('Iteration  Time(s)  Reduced Chi^2');
+    else
+        disp('--------------------------------------------------------------------------------')
+        fprintf('Beginning fit (max %d iterations)',niter);
+    end
+    tic
 end
-tic
 
 %-------------------------------
+
 function fit_listing_iteration_header(listing,iter)
 if listing>1
     disp('--------------------------------------------------------------------------------')
@@ -543,6 +546,8 @@ if listing>1
     end
 end
 
+end
+
 %-------------------------------
 function fit_listing_iteration(listing,iter,chisqr_red,lambda,pvary)
 if listing==1
@@ -550,7 +555,7 @@ if listing==1
 else
     if ~isempty(lambda)
         disp([' Total time = ',num2str(toc),'s    Reduced Chi^2 = ',num2str(chisqr_red),...
-            '      Levenberg-Marquardt = ', num2str(lambda)])
+              '      Levenberg-Marquardt = ', num2str(lambda)])
     else
         disp([' Total time = ',num2str(toc),'s    Reduced Chi^2 = ',num2str(chisqr_red)])
     end
@@ -560,6 +565,8 @@ else
         fprintf('%14.4g %14.4g %14.4g %14.4g %14.4g',pvary(5*irow-4:min(5*irow,np)));
     end
     disp(' ')
+end
+
 end
 
 %-------------------------------
@@ -592,6 +599,8 @@ else
     disp(cor);
 end
 
+end
+
 %-------------------------------
 function fit_listing_final_parameters(p,sig,foreparams,this,that,np,nbp)
 nptot=numel(np);
@@ -605,15 +614,7 @@ for i=1:numel(p)
         sigma=sig{i}(ip);
         if this.pfree{i}(ip)
             % Free parameter
-<<<<<<< HEAD
-<<<<<<< HEAD
-            fprintf('%5d %14.4g %s %-14.4g', ip, value,'  +/-  ', sigma);
-=======
             fprintf('%5d %14.4g %s %-14.4g\n', ip, value,'  +/-  ', sigma)
->>>>>>> master
-=======
-            fprintf('%5d %14.4g %s %-14.4g', ip, value,'  +/-  ', sigma);
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
 
         elseif this.pbound{i}(ip)
             % Bound parameter
@@ -629,23 +630,10 @@ for i=1:numel(p)
             if fboundto==i && sametypebound
                 % Bound to a parameter within the same function
                 if floating
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
-                    fprintf('%5d %14.4g %s %-14.4g %s', ip, value,'  +/-  ', sigma,...
-                        ['    bound to parameter ',num2str(pboundto)])
-                else
-                    fprintf('%5d %14.4g %s %s', ip, value, '                      ',...
-<<<<<<< HEAD
-=======
                     fprintf('%5d %14.4g %s %-14.4g %s\n', ip, value,'  +/-  ', sigma,...
                         ['    bound to parameter ',num2str(pboundto)])
                 else
                     fprintf('%5d %14.4g %s %s\n', ip, value, '                      ',...
->>>>>>> master
-=======
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                         ['    bound to parameter ',num2str(pboundto)])
                 end
 
@@ -657,23 +645,10 @@ for i=1:numel(p)
                     functype_str='background';
                 end
                 if floating
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
-                    fprintf('%5d %14.4g %s %-14.4g %s', ip, value,'  +/-  ',sigma,...
-                        ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
-                else
-                    fprintf('%5d %14.4g %s %s', ip, value, '                      ',...
-<<<<<<< HEAD
-=======
                     fprintf('%5d %14.4g %s %-14.4g %s\n', ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 else
                     fprintf('%5d %14.4g %s %s\n', ip, value, '                      ',...
->>>>>>> master
-=======
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 end
 
@@ -687,40 +662,20 @@ for i=1:numel(p)
                     funcind_str =arraystr(size(nbp),fboundto);
                 end
                 if floating
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
-                    fprintf('%5d %14.4g %s %-14.4g %s',ip, value,'  +/-  ',sigma,...
-                        ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
-                else
-                    fprintf('%5d %14.4g %s %s',ip, value, '                      ',...
-<<<<<<< HEAD
-=======
                     fprintf('%5d %14.4g %s %-14.4g %s\n',ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 else
                     fprintf('%5d %14.4g %s %s\n',ip, value, '                      ',...
->>>>>>> master
-=======
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 end
 
             end
         else
             % Fixed parameter
-<<<<<<< HEAD
-<<<<<<< HEAD
-            fprintf('%5d %14.4g',ip,value)
-=======
             fprintf('%5d %14.4g\n',ip,value)
->>>>>>> master
         end
-=======
-            fprintf('%5d %14.4g',ip,value)
-       end
->>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
     end
     disp(' ')
+end
+
 end
