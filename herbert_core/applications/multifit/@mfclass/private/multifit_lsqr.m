@@ -1,14 +1,14 @@
-function [p_best,sig,cor,chisqr_red,converged,ok,mess]=multifit_lsqr(w,xye,func,bfunc,pin,bpin,...
+function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pin,bpin,...
     f_pass_caller_info,bf_pass_caller_info,pfin,p_info,listing,fcp,perform_fit)
 % Perform least-squares minimisation
 %
-%   >> [p_best,sig,cor,chisqr_red,converged,ok,mess]=...
+%   >> [p_best,sig,cor,chisqr_red,converged]=...
 %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing)
 %
-%   >> [p_best,sig,cor,chisqr_red,converged,ok,mess]=...
+%   >> [p_best,sig,cor,chisqr_red,converged]=...
 %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp)
 %
-%   >> [p_best,sig,cor,chisqr_red,converged,ok,mess]=...
+%   >> [p_best,sig,cor,chisqr_red,converged]=...
 %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp,perform_fit)
 %
 % Input:
@@ -90,14 +90,6 @@ function [p_best,sig,cor,chisqr_red,converged,ok,mess]=multifit_lsqr(w,xye,func,
 %   chisqr_red  Reduced chi-squared at final fit parameters
 %
 %   converged   True if fit converged; false if not.
-%
-%   ok          True: A fit could be performed. This includes the cases of
-%                 both convergence and failure to converge
-%               False: Fundamental problem with the input arguments e.g.
-%                 the number of free parameters equals or exceeds the number
-%                 of data points
-%
-%   mess        Error message if ok==false; Empty string if ok==true.
 %
 % Note that for the final fit parameters to be reliable, test that
 % (ok && converged) is true.
@@ -239,8 +231,6 @@ sig=zeros(1,numel(pfin));
 cor=zeros(numel(pfin));
 chisqr_red=0;
 converged=false;
-ok=true;
-mess='';
 
 % Package data values and weights (i.e. 1/error_bar) each into a single column vector
 yval=cell(size(w));
@@ -265,7 +255,7 @@ nval=numel(yval);
 npfree=numel(pfin);
 nnorm=max(nval-npfree,1);   % we allow for the case nval=npfree
 if nval<npfree
-    ok=false; mess='Number of data points must be greater than or equal to the number of free parameters'; return
+    error("HERBERT:mfclass:multifit_lsqr",'Number of data points must be greater than or equal to the number of free parameters')
 end
 
 % Set the extent of listing to screen
@@ -306,10 +296,10 @@ else
     niter=fcp(2);   % maximum number of iterations
     tol=fcp(3);     % convergence criterion
     if abs(dp)<1e-12
-        ok=false; mess='Derivative step length must be greater or equal to 10^-12'; return
+        error("HERBERT:mfclass:multifit_lsqr",'Derivative step length must be greater or equal to 10^-12')
     end
     if niter<0
-        ok=false; mess='Number of iterations must be >=0'; return
+        error("HERBERT:mfclass:multifit_lsqr",'Number of iterations must be >=0')
     end
 
     % Output to command window
@@ -443,9 +433,7 @@ else
         if listing~=0, fit_listing_final(listing, p_best, sig, cor, p_info); end
     else
         chisqr_red = c_best/nnorm;
-        ok=true;
-        mess='WARNING: Convergence not achieved';
-        disp (mess)
+        warning("HERBERT:mfclass:multifit_lsqr",'WARNING: Convergence not achieved')
     end
 
 end
@@ -613,7 +601,11 @@ for i=1:numel(p)
         sigma=sig{i}(ip);
         if this.pfree{i}(ip)
             % Free parameter
+<<<<<<< HEAD
             fprintf('%5d %14.4g %s %-14.4g', ip, value,'  +/-  ', sigma);
+=======
+            fprintf('%5d %14.4g %s %-14.4g\n', ip, value,'  +/-  ', sigma)
+>>>>>>> master
 
         elseif this.pbound{i}(ip)
             % Bound parameter
@@ -629,10 +621,17 @@ for i=1:numel(p)
             if fboundto==i && sametypebound
                 % Bound to a parameter within the same function
                 if floating
+<<<<<<< HEAD
                     fprintf('%5d %14.4g %s %-14.4g %s', ip, value,'  +/-  ', sigma,...
                         ['    bound to parameter ',num2str(pboundto)])
                 else
                     fprintf('%5d %14.4g %s %s', ip, value, '                      ',...
+=======
+                    fprintf('%5d %14.4g %s %-14.4g %s\n', ip, value,'  +/-  ', sigma,...
+                        ['    bound to parameter ',num2str(pboundto)])
+                else
+                    fprintf('%5d %14.4g %s %s\n', ip, value, '                      ',...
+>>>>>>> master
                         ['    bound to parameter ',num2str(pboundto)])
                 end
 
@@ -644,10 +643,17 @@ for i=1:numel(p)
                     functype_str='background';
                 end
                 if floating
+<<<<<<< HEAD
                     fprintf('%5d %14.4g %s %-14.4g %s', ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 else
                     fprintf('%5d %14.4g %s %s', ip, value, '                      ',...
+=======
+                    fprintf('%5d %14.4g %s %-14.4g %s\n', ip, value,'  +/-  ',sigma,...
+                        ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
+                else
+                    fprintf('%5d %14.4g %s %s\n', ip, value, '                      ',...
+>>>>>>> master
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 end
 
@@ -661,17 +667,28 @@ for i=1:numel(p)
                     funcind_str =arraystr(size(nbp),fboundto);
                 end
                 if floating
+<<<<<<< HEAD
                     fprintf('%5d %14.4g %s %-14.4g %s',ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 else
                     fprintf('%5d %14.4g %s %s',ip, value, '                      ',...
+=======
+                    fprintf('%5d %14.4g %s %-14.4g %s\n',ip, value,'  +/-  ',sigma,...
+                        ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
+                else
+                    fprintf('%5d %14.4g %s %s\n',ip, value, '                      ',...
+>>>>>>> master
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 end
 
             end
         else
             % Fixed parameter
+<<<<<<< HEAD
             fprintf('%5d %14.4g',ip,value)
+=======
+            fprintf('%5d %14.4g\n',ip,value)
+>>>>>>> master
         end
     end
     disp(' ')
