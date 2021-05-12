@@ -91,6 +91,10 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pi
 %
 %   converged   True if fit converged; false if not.
 %
+<<<<<<< HEAD
+=======
+
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
 % Note that for the final fit parameters to be reliable, test that
 % (ok && converged) is true.
 %
@@ -433,7 +437,7 @@ else
         if listing~=0, fit_listing_final(listing, p_best, sig, cor, p_info); end
     else
         chisqr_red = c_best/nnorm;
-        warning("HERBERT:mfclass:multifit_lsqr",'WARNING: Convergence not achieved')
+        warning("'WARNING: Convergence not achieved')
     end
 
 end
@@ -602,10 +606,14 @@ for i=1:numel(p)
         if this.pfree{i}(ip)
             % Free parameter
 <<<<<<< HEAD
+<<<<<<< HEAD
             fprintf('%5d %14.4g %s %-14.4g', ip, value,'  +/-  ', sigma);
 =======
             fprintf('%5d %14.4g %s %-14.4g\n', ip, value,'  +/-  ', sigma)
 >>>>>>> master
+=======
+            fprintf('%5d %14.4g %s %-14.4g', ip, value,'  +/-  ', sigma);
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
 
         elseif this.pbound{i}(ip)
             % Bound parameter
@@ -622,16 +630,22 @@ for i=1:numel(p)
                 % Bound to a parameter within the same function
                 if floating
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                     fprintf('%5d %14.4g %s %-14.4g %s', ip, value,'  +/-  ', sigma,...
                         ['    bound to parameter ',num2str(pboundto)])
                 else
                     fprintf('%5d %14.4g %s %s', ip, value, '                      ',...
+<<<<<<< HEAD
 =======
                     fprintf('%5d %14.4g %s %-14.4g %s\n', ip, value,'  +/-  ', sigma,...
                         ['    bound to parameter ',num2str(pboundto)])
                 else
                     fprintf('%5d %14.4g %s %s\n', ip, value, '                      ',...
 >>>>>>> master
+=======
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                         ['    bound to parameter ',num2str(pboundto)])
                 end
 
@@ -644,16 +658,22 @@ for i=1:numel(p)
                 end
                 if floating
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                     fprintf('%5d %14.4g %s %-14.4g %s', ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 else
                     fprintf('%5d %14.4g %s %s', ip, value, '                      ',...
+<<<<<<< HEAD
 =======
                     fprintf('%5d %14.4g %s %-14.4g %s\n', ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 else
                     fprintf('%5d %14.4g %s %s\n', ip, value, '                      ',...
 >>>>>>> master
+=======
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' function'])
                 end
 
@@ -668,16 +688,22 @@ for i=1:numel(p)
                 end
                 if floating
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                     fprintf('%5d %14.4g %s %-14.4g %s',ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 else
                     fprintf('%5d %14.4g %s %s',ip, value, '                      ',...
+<<<<<<< HEAD
 =======
                     fprintf('%5d %14.4g %s %-14.4g %s\n',ip, value,'  +/-  ',sigma,...
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 else
                     fprintf('%5d %14.4g %s %s\n',ip, value, '                      ',...
 >>>>>>> master
+=======
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
                         ['    bound to parameter ',num2str(pboundto),' of ',functype_str,' ',funcind_str])
                 end
 
@@ -685,11 +711,16 @@ for i=1:numel(p)
         else
             % Fixed parameter
 <<<<<<< HEAD
+<<<<<<< HEAD
             fprintf('%5d %14.4g',ip,value)
 =======
             fprintf('%5d %14.4g\n',ip,value)
 >>>>>>> master
         end
+=======
+            fprintf('%5d %14.4g',ip,value)
+       end
+>>>>>>> b63a2d63ba76a3006873764804c1b83e105b63db
     end
     disp(' ')
 end
