@@ -378,37 +378,37 @@ classdef mfclass
             %                  the fitting function
             %
             % See also set_data mfclass_wrapfun
-            try
-                [ok,mess,nopt,ind_dataset_class,ind_wrapfun] = strip_trailing_opts;
-                if ok
-                    obj = set_data(obj,varargin{1:end-nopt});
-                    if ~isempty(ind_dataset_class)
-                        obj.dataset_class_ = varargin{ind_dataset_class};
-                    end
-                    if ~isempty(ind_wrapfun)
-                        obj.wrapfun_ = varargin{ind_wrapfun};
-                    end
-                else
-                    error(mess)
-                end
-                obj = set_options(obj,'-default');
-            catch ME
-                error(ME.message)
+            [nopt,ind_dataset_class,ind_wrapfun] = strip_trailing_opts;
+
+            obj = set_data(obj,varargin{1:end-nopt});
+            if ~isempty(ind_dataset_class)
+                obj.dataset_class_ = varargin{ind_dataset_class};
             end
+            if ~isempty(ind_wrapfun)
+                obj.wrapfun_ = varargin{ind_wrapfun};
+            end
+
+            obj = set_options(obj,'-default');
+
             %--------------------------------------------------------------------------------------
-            function [ok,mess,nopt,ind_dataset_class,ind_wrapfun] = strip_trailing_opts
+            function [nopt,ind_dataset_class,ind_wrapfun] = strip_trailing_opts(varargin)
                 % Allow one or both of dataset_class and wrapfun at the tail of an argument list
 
-                ok = true; mess = ''; nopt = 0; ind_dataset_class=[]; ind_wrapfun = [];
+                nopt = 0;
+                ind_dataset_class=[];
+                ind_wrapfun = [];
+
                 is_wrapfun = @(x)isa(x,'mfclass_wrapfun');
                 is_dataset_class = @(x)(isa(x,'char') && is_string(x) && ~isempty(x));
 
                 narg = numel(varargin);
                 if narg>=1
                     if is_wrapfun(varargin{end})
-                        nopt=1; ind_wrapfun = narg;
+                        nopt=1;
+                        ind_wrapfun = narg;
                     elseif is_dataset_class(varargin{end})
-                        nopt=1; ind_dataset_class = narg;
+                        nopt=1;
+                        ind_dataset_class = narg;
                     else
                         return
                     end
@@ -417,15 +417,17 @@ classdef mfclass
                 if narg>=2
                     if is_wrapfun(varargin{end-1})
                         if isempty(ind_wrapfun)
-                            nopt=2; ind_wrapfun = narg-1;
+                            nopt=2;
+                            ind_wrapfun = narg-1;
                         else
-                            ok=false; mess='Optional function wrapper given twice';
+                            error('HERBERT:mfclass:invalid_argument', 'Optional function wrapper given twice')
                         end
                     elseif is_dataset_class(varargin{end-1})
                         if isempty(ind_dataset_class)
-                            nopt=2; ind_dataset_class = narg-1;
+                            nopt=2;
+                            ind_dataset_class = narg-1;
                         else
-                            ok=false; mess='Optional dataset class name given twice';
+                            error('HERBERT:mfclass:invalid_argument', 'Optional dataset class name given twice')
                         end
                     else
                         return
@@ -715,4 +717,3 @@ classdef mfclass
     end
 
 end
-

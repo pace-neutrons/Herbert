@@ -262,7 +262,6 @@ if ~exist('listing', 'var') || isempty(listing)
     listing=0;
 end
 
-
 % -----------------------------------------------------------------------------------
 % Perform fit (or evaulation of chisqr
 % -----------------------------------------------------------------------------------
@@ -289,7 +288,7 @@ else
 
     % Set fit control parameters
     if ~exist('fcp', 'var')
-        fcp=[0.0001 20 0.001];
+        fcp=[0.0001, 20, 0.001];
     end
     dp=fcp(1);      % derivative step length
     niter=fcp(2);   % maximum number of iterations
