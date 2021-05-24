@@ -301,10 +301,16 @@ else
     end
 
     % Output to command window
-    if listing~=0, fit_listing_header(listing,niter); end
+    if listing~=0
+        fit_listing_header(listing,niter);
+    end
 
     % Starting values of parameters and function values
-    if listing>2, disp(' '), disp(' Function evaluation at starting parameter values:'), end
+    if listing>2
+        disp(' ')
+        disp(' Function evaluation at starting parameter values:')
+    end
+
     [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
         f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
     resid=wt.*(yval-f);
@@ -313,8 +319,10 @@ else
     f_best=f;    % Function values at start
     c_best=resid'*resid; % Un-normalised chi-squared
 
-    if listing~=0, fit_listing_iteration_header(listing,0); end
-    if listing~=0, fit_listing_iteration(listing, 0, c_best/nnorm, [], p_best); end
+    if listing~=0
+        fit_listing_iteration_header(listing,0);
+        fit_listing_iteration(listing, 0, c_best/nnorm, [], p_best);
+    end
 
     lambda=1;
     lambda_table=[1e1 1e1 1e2 1e2 1e2 1e2];
@@ -323,7 +331,9 @@ else
     converged=false;
     max_rescale_lambda=false;
     for iter=1:niter
-        if listing~=0, fit_listing_iteration_header(listing,iter); end
+        if listing~=0
+            fit_listing_iteration_header(listing,iter);
+        end
 
         % Compute Jacobian matrix
         resid=wt.*(yval-f_best);
@@ -351,6 +361,7 @@ else
         else
             c_goal=c_best-abs(tol);
         end
+
         lambda=lambda/10;
         for itable=1:numel(lambda_table)
             se=sqrt((s.*s)+lambda);
@@ -358,7 +369,11 @@ else
             p_chg=((v*gse).*nrm);   % compute change in parameter values
             if (any(abs(p_chg)>0))  % there is a change in (at least one of) the parameters
                 p=p_best+p_chg;
-                if listing>2, disp(' Function evaluation after stepping parmeters:'), end
+
+                if listing>2
+                    disp(' Function evaluation after stepping parmeters:')
+                end
+
                 [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
                     f_pass_caller_info,bf_pass_caller_info,p,p_info,true,S,Store,listing);
                 resid=wt.*(yval-f);
@@ -369,7 +384,10 @@ else
                     c_best=c;
                     break;
                 end
-                if listing~=0, fit_listing_iteration(listing, iter, c/nnorm, lambda, p); end
+
+                if listing~=0
+                    fit_listing_iteration(listing, iter, c/nnorm, lambda, p);
+                end
             end
             if itable==numel(lambda_table) % Gone to end of table without improving chisqr
                 max_rescale_lambda=true;
@@ -398,7 +416,7 @@ else
         % If multipled lambda to limit of the table, give up
         if max_rescale_lambda
             converged=false;
-            break
+            break;
         end
 
     end
@@ -407,12 +425,18 @@ else
     if converged
         chisqr_red = c_best/nnorm;
         % Calculate covariance matrix
-        if listing>2, disp(' '), disp(' Fit converged; estimate errors and covariance matrix'), end
+        if listing>2
+            disp(' ')
+            disp(' Fit converged; estimate errors and covariance matrix')
+        end
         % Recompute and store functions values at best parameters. (The stored values may not be
         % those for best parameters which will otherwise dramatically slow down the calculation
         % of the covariance matrix. If the stored values are for the best parameters, then this
         % is a low cost function call, so there is little penalty.)
-        if listing>2, disp(' '), disp(' Function evaluation at best fit parameters:'), end
+        if listing>2
+            disp(' ')
+            disp(' Function evaluation at best fit parameters:')
+        end
         [~,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
             f_pass_caller_info,bf_pass_caller_info,p_best,p_info,true,S,Store,listing);
         % Now get Jacobian matrix
@@ -421,6 +445,7 @@ else
         for k=1:npfree
             jac(:,k)=wt.*jac(:,k);
         end
+
         [~,s,v]=svd(jac,0);
         s=repmat((1./diag(s))',[npfree,1]);
         v=v.*s;
@@ -428,6 +453,7 @@ else
         sig=sqrt(diag(cov));
         tmp=repmat(1./sqrt(diag(cov)),[1,npfree]);
         cor=tmp.*cov.*tmp';
+
         if listing~=0
             fit_listing_final(listing, p_best, sig, cor, p_info);
         end
@@ -490,8 +516,12 @@ end
 jac=zeros(length(f),length(p)); % initialise Jacobian to zero
 min_abs_del=1e-12;
 for j=1:length(p)
-    if listing>2, disp(['    Parameter ',num2str(j),':']), end
+    if listing>2
+        disp(['    Parameter ',num2str(j),':'])
+    end
+
     del=dp*p(j);                % dp is fractional change in parameter
+
     if abs(del)<=min_abs_del    % Ensure del non-zero
         if p(j)>=0
             del=min_abs_del;
@@ -499,6 +529,7 @@ for j=1:length(p)
             del=-min_abs_del;
         end
     end
+
     if dp>=0
         ppos=p; ppos(j)=p(j)+del;
         jac(:,j)=(multifit_lsqr_func_eval(w,xye,func,bkdfunc,pin,bpin,...
@@ -519,18 +550,17 @@ end
 % Functions for listing to screen (separated to keep main code tidy)
 
 function fit_listing_header(listing,niter)
-    if listing==1
-        disp('--------------------------------------')
-        fprintf('Beginning fit (max %d iterations)',niter);
-        disp('--------------------------------------')
-        disp('Iteration  Time(s)  Reduced Chi^2');
-    else
-        disp('--------------------------------------------------------------------------------')
-        fprintf('Beginning fit (max %d iterations)',niter);
-    end
-    tic
+if listing==1
+    disp('--------------------------------------')
+    fprintf('Beginning fit (max %d iterations)',niter);
+    disp('--------------------------------------')
+    disp('Iteration  Time(s)  Reduced Chi^2');
+else
+    disp('--------------------------------------------------------------------------------')
+    fprintf('Beginning fit (max %d iterations)',niter);
 end
 
+end
 %-------------------------------
 
 function fit_listing_iteration_header(listing,iter)
