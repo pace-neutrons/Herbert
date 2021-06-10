@@ -26,7 +26,7 @@ classdef ClusterWrapper
         % info. If one wants to run e.g. mpi job using mpiexec, the cluster
         % configuration should refer to the appropriate hosts file
         cluster_config
-        
+
         % the current cluster status, usually defined by status message,
         % e.g. The string which describes the current status
         status;
@@ -56,6 +56,7 @@ classdef ClusterWrapper
         % if the worker is compiled Matlab application or Matlab script
         is_compiled_script_ = false;
         %------------------------------------------------------------------
+
         % number of workers in the pool
         n_workers_   = 0;
         % the holder for class, responsible for the communications between
@@ -64,7 +65,7 @@ classdef ClusterWrapper
         % The name of the class, responsible for message exchange
         % between the workers within the pool (cluster)
         pool_exchange_frmwk_name_ = '';
-        
+
         % the holder for the string, which describes the current pool
         % status.
         log_value_ = '';
@@ -109,6 +110,10 @@ classdef ClusterWrapper
         LOG_MESSAGE_WRAP_LENGTH =10;
         % total length of the string with log message to display (redefined in constructor)
         LOG_MESSAGE_LENGHT=40;
+        % messages to display if corresponding cluster is starting.
+        starting_info_message_ ='';
+        started_info_message_ ='';
+
         %
         % running process Java exception message contents, used to identify
         % if java process report it has been completed
@@ -119,7 +124,7 @@ classdef ClusterWrapper
         % helper property to print nicely aligned log messages
         log_wrap_length;
     end
-    
+
     methods
         function obj = ClusterWrapper(n_workers,mess_exchange_framework,log_level)
             % Constructor, which initiates Parallel clusters wrapper, to
@@ -140,19 +145,20 @@ classdef ClusterWrapper
             %              which started and controls the job.
             % log_level    if present, defines the verbosity of the
             %              operations over the framework
-            
+
             if ispc()
                 obj.running_mess_contents_= 'process has not exited';
             else
                 obj.running_mess_contents_= 'process hasn''t exited';
             end
+
             if nargin < 2
                 return;
             end
             if ~exist('log_level', 'var')
                 log_level = -1;
             end
-            
+
             obj = obj.init(n_workers,mess_exchange_framework,log_level);
         end
         %
@@ -185,15 +191,15 @@ classdef ClusterWrapper
                 fprintf(2,obj.starting_info_message_,n_workers);
             end
             obj = obj.set_mess_exchange(mess_exchange_framework);
-            
+
             obj.n_workers_   = n_workers;
-            
-            
+
+
             obj.LOG_MESSAGE_WRAP_LENGTH = ...
                 numel(mess_exchange_framework.job_id)+numel('***Job :   state: ');
             obj.LOG_MESSAGE_LENGHT = numel('***Job :  : state:  started |')+...
                 numel(mess_exchange_framework.job_id) -numel('****  ****');
-            
+
             % get worker defined in parallel config
             pc = parallel_config();
             obj.worker_name_ = pc.worker;
@@ -236,7 +242,7 @@ classdef ClusterWrapper
             else
                 obj.common_env_var_('DO_PARALLEL_MATLAB_LOGGING') = 'false';
             end
-            
+
         end
         %
         function obj = start_job(obj,je_init_message,task_init_mess,log_message_prefix)
@@ -262,7 +268,7 @@ classdef ClusterWrapper
             %                     'continuing'
             %
             %
-            obj = obj.init_workers(je_init_message,task_init_mess,log_message_prefix);
+                obj = obj.init_workers(je_init_message,task_init_mess,log_message_prefix);
         end
         %
         function obj = init_workers(obj,je_init_message,task_init_mess,log_message_prefix)
@@ -290,8 +296,8 @@ classdef ClusterWrapper
             if ~exist('log_message_prefix', 'var')
                 log_message_prefix = 'starting';
             end
-            
-            
+
+
             obj = init_workers_(obj,je_init_message,task_init_mess,log_message_prefix );
         end
         %
@@ -367,14 +373,14 @@ classdef ClusterWrapper
                     if ~(failedC && ~isempty(messC))
                         fm = FailedMessage(...
                             'Cluster reports job completed but the final completeon messages has not been received');
-                        
+
                         obj.status  = fm;
                     end
                     failed = true;
                 end
             end
-            
-            
+
+
             if ~completed && (failed || failedC)
                 % failure. The reason should be in mess.
                 completed = true;
@@ -388,7 +394,7 @@ classdef ClusterWrapper
             options = {'-force_display'};
             [ok,mess,force_display,argi] = parse_char_options(varargin,options);
             if ~ok;error('CLUSTER_WRAPPER:invalid_argument',mess); end
-            
+
             obj = obj.generate_log(argi{:});
             if force_display
                 display_log = true;
@@ -474,7 +480,7 @@ classdef ClusterWrapper
             % default configuration.
             config = {obj.cluster_config_};
         end
-        
+
         %------------------------------------------------------------------
         % SETTERS, GETTERS:
         %------------------------------------------------------------------
@@ -523,7 +529,7 @@ classdef ClusterWrapper
             % cluster.
             % overload set_cluster_config_ to check and accept such
             % configuration, used by the particular cluster.
-            
+
             % only 'local' (or missing) configuration is used by default.
             obj = set_cluster_config_(obj,val);
         end
@@ -545,7 +551,7 @@ classdef ClusterWrapper
             [completed,failed,mess] = check_progress_from_messages_(obj,varargin{:});
         end
     end
-    
+
     methods(Access=protected)
         function env = set_env(obj,env)
             % helper function to set enviroment for a java process.
@@ -592,7 +598,7 @@ classdef ClusterWrapper
                 %
                 error('HERBERT:ClusterWrapper:runtime_error',format,...
                     obj.starting_cluster_name_,jobid,stat_name,info);
-                
+
             end
         end
         %
@@ -608,18 +614,27 @@ classdef ClusterWrapper
                     'This type of cluster wrapper accepts only %s configuration. Changed to %s',...
                     obj.cluster_config_,obj.cluster_config_)
             end
+
         end
         %
         function obj = set_cluster_status(obj,mess)
             % Setter for status property
             % defined as function and protected to be able to
             % overload set.status method.
-            %
-            % Does substiturions for messages
-            % running -> log
-            % finished-> completed
-            %
-            obj = set_cluster_status_(obj,mess);
+            if isa(mess,'aMessage')
+                stat_mess = mess;
+            elseif ischar(mess)
+                stat_mess = aMessage(mess);
+            else
+                error('CLUSTER_WRAPPER:invalid_argument',...
+                    'status is defined by aMessage class only or a message name')
+            end
+            obj.prev_status_ = obj.current_status_;
+            obj.current_status_ = stat_mess;
+            if obj.prev_status_ ~= obj.current_status_
+                obj.status_changed_ = true;
+            end
+
         end
         %
         function ex = exit_worker_when_job_ends_(~)
@@ -644,34 +659,13 @@ classdef ClusterWrapper
                 mess = 'process has not been started';
                 return;
             end
-            % Should redirect process error but does not. Why?
-            %err_stream_scan = java.util.Scanner(task_handle.getErrorStream());
-            %err_stream_scan.useDelimiter("\r\n");
-            %if err_stream_scan.hasNext
-            %    ok      = false;
-            %    failed  = true;
-            %    err_text = cell(1,1);
-            %    err_text{end}='Java error output reported\n';
-            %    while(err_stream_scan.hasNext)
-            %        err_text{end+1} = err_stream_scan.next();
-            %    end
-            %    mess = strjoin(err_text,' ');
-            %    return;
-            %else
-            mess = 'running';
-            %end
-            %err_stream_scan.close();
-            if isunix()
-                is_alive = task_handle.isAlive();
-                if is_alive
-                    running = true;
-                    failed  = false;
-                    return;
-                end
-            else %isAlive does not work on Windows Its thread class method, where task may or may not be implemented as thread
-                is_alive = true;
-            end
-            
+
+            mess = '';
+            is_alive = task_handle.isAlive;
+            %             if is_alive
+            %                 ok      = true;
+            %                 failed  = false;
+            %             else
             try
                 term = task_handle.exitValue();
                 if term == 0
@@ -705,15 +699,7 @@ classdef ClusterWrapper
                 end
             end
         end
-    end
-    %----------------------------------------------------------------------
-    methods(Abstract,Access=protected)
-        % get the state of running job by requesting reply from the job
-        % control mechanism.
-        [ok,failed,paused,mess] = get_state_from_job_control(~)
-    end
-    methods(Abstract)
-        % returns true, if the cluster wrapper is running a cluster job
-        ok = is_job_initiated(obj)
+
+
     end
 end
