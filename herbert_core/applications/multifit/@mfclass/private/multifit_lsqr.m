@@ -330,6 +330,21 @@ else
     % Iterate to find best solution
     converged=false;
     max_rescale_lambda=false;
+
+    % Set up parallel
+    jd = JobDispatcher('ParallelMF');
+    nWorkers = 3;
+    loop_data = split_data(w, xye, S, Store, nWorkers);
+    common_data = struct('func', {func}, ...
+                         'bfunc', {bfunc}, ...
+                         'pin', {pin}, ...
+                         'bpin', {bpin}, ...
+                         'f_pass_caller_info', {f_pass_caller_info}, ...
+                         'bf_pass_caller_info', {bf_pass_caller_info}, ...
+                         ... 'p', p_best, ...
+                         'pinfo', {p_info}, ...
+                         'listing', listing);
+
     for iter=1:niter
         if listing~=0
             fit_listing_iteration_header(listing,iter);
@@ -374,8 +389,23 @@ else
                     disp(' Function evaluation after stepping parmeters:')
                 end
 
-                [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-                    f_pass_caller_info,bf_pass_caller_info,p,p_info,true,S,Store,listing);
+                % Need P here, because it's changing.
+                common_data.p = p;
+% $$$
+% $$$                 common_data
+% $$$                 loop_data
+% $$$                 for i=1:nWorkers
+% $$$                     loop_data{i}
+% $$$                 end
+% $$$                 nWorkers
+
+% $$$                 results = jd.start_job('mfparallel', common_data, loop_data, true, nWorkers);
+
+                results = jd.start_job('mfparallel', common_data, loop_data, true, nWorkers);
+                results
+                loop_data{:}.S = results{:}.S;
+                loop_data{:}.Store = results{:}.Store;
+                f = results.f;
                 resid=wt.*(yval-f);
                 c=resid'*resid;
                 if c<c_best || c==0
@@ -707,4 +737,33 @@ for i=1:numel(p)
     disp(' ')
 end
 
+end
+
+function [loop_data] = split_data(w, xye, S, Store, nWorkers)
+     % Split up sqws and divvy xyes in w
+
+    loop_data = cell(nWorkers, 1);
+    for i=1:nWorkers
+        loop_data{i} = struct('w', {cell(numel(w),1)}, 'xye', xye, 'S', S, 'Store', Store);
+    end
+
+    for i=1:numel(w)
+        if xye(i)
+            n = numel(w.x);
+            nPer = repmat(n / nWorkers, nWorkers, 1);
+            nPer(1:mod(n, nWorkers)) = nPer(1:mod(n, nWorkers)) + 1;
+            data = mat2cell(w(i), nper, 1);
+        else
+            data = split_sqw.distribute(w{i}, 'nWorkers', nWorkers);
+        end
+
+        for j=1:nWorkers
+            loop_data{j}.S = S;
+            loop_data{j}.Store = Store;
+            data{j}.header.instrument = 1;
+            data{j}.header.sample = 1;
+            loop_data{j}.w{i} = data(j);
+
+        end
+    end
 end

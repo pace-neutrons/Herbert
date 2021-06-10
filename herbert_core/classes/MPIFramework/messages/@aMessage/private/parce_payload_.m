@@ -11,9 +11,6 @@ function payload_p = parce_payload_(payload)
 % -------
 %   payload_p  -- modified input, containing all serializable classes
 
-
-
-
 if iscell(payload)
     payload_p  = cellfun(@(c)parce_payload_(c),payload,...
         'UniformOutput',false);
@@ -31,7 +28,7 @@ elseif isstruct(payload)
         end
     end
 elseif isobject(payload)
-    
+
     if isa(payload,'MException')
         payload   = MException_her(payload);
     end
@@ -48,4 +45,3 @@ elseif isobject(payload)
 else
     payload_p = payload;
 end
-
