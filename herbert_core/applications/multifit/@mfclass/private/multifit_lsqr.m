@@ -752,7 +752,7 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
             n = numel(w{i}.x);
             nPer = repmat(n / nWorkers, nWorkers, 1);
             nPer(1:mod(n, nWorkers)) = nPer(1:mod(n, nWorkers)) + 1;
-            data = mat2cell(w{i}, nper, 1);
+            data = mat2cell(w{i}, nPer, 1);
         else
             data = split_sqw.distribute(w{i}, 'nWorkers', nWorkers);
         end
