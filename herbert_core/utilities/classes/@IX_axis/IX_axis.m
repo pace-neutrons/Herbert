@@ -1,103 +1,167 @@
 classdef IX_axis
-    %  IX_axis object contains the elements below.
-    %  The elements can be set from constructor and also
-    %  accessed/modified from the object properties:
-    %
-    % 	caption		char        Caption for axis
-    %            or cellstr    (Caption can be multiline input in the form of a
-    %                           cell array or a character array)
-    %   units       char        Units for axis e.g. 'meV'
-    %   code        char        Code for units (see documentation for built-in units;
-    %                           can also be user-defined unit code)
-    %
-    %   vals        numeric     Array of tick positions
-    %   labels      char        Character array or cellstr of tick labels
-    %               or cellstr
-    %   ticks       structure   Tick information with two fields
-    %                               positions    tick positions (numeric array)
-    %                               labels       cell array of tick labels
-    %
-    % $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
-    %
-    properties(Dependent)
-        caption
-        units
-        code         % Not properly implemented?
-        ticks
-    end
-    properties(Access=protected)
+    %  IX_axis object contains information to construct axis annotation and ticks
+
+    properties(Access=private)
+        % Private properties. Do not set these except via the public set methods
+        % as there may be interdependencies (e.g. the number of tick positions and
+        % labels must match, and the public set methods explicitly check this)
+        
+        % Caption: cell array of strings (column vector). Single element for
+        % single line, vector if multi-line caption.
         caption_ = {};
+        
+        % Units: character vector (row)
         units_ = '';
+
+        % Units code: character vector (row). This is an optional tag for
+        % the user to interpret as they wish.
         code_ = '';
+        
+        % Ticks: structure with specified positions of tick marks (row vector)
+        % and labels (cellstr, row vector)
+        % If positions is [], then labels will be empty {}, and default
+        % positions and labels will be used by any plotting function
+        % If positions are given, then labels is either filled or is {},
+        % when default tick labels will be plotted
         ticks_ = struct('positions',[],'labels',{{}});
     end
+    
+    properties(Dependent)
+        % Publicly visible properties
+        
+        caption     % Axis caption (cellstr)
+        units       % Axis units e.g. 'meV' (character string)
+        code        % Custom user units code e.g. '$w' (character string)
+        positions   % Positions of tick marks if explicit values set
+        labels      % Tick labels if explicit values set
+        ticks       % Structure with tick positions and labels
+    end
+    
+    methods
+        %------------------------------------------------------------------
+        % Constructor
+        %------------------------------------------------------------------
+        function obj = IX_axis(varargin)
+            % Create IX_axis object
+            %
+            %   >> w = IX_axis (caption)
+            %   >> w = IX_axis (caption, units)
+            %   >> w = IX_axis (caption, units, code)   % tag with a units code
+            %
+            % Setting custom tick positions and labels
+            %   >> w = IX_axis (..., positions)         % positions
+            %   >> w = IX_axis (..., positions, labels) % positions and labels
+            %   >> w = IX_axis (..., ticks)             % structure with fields
+            %                                           % 'position' and 'labels'
+            %
+            % Input:
+            % ------
+            % 	caption		Axis caption (character string, 2D character array, or
+            %               cell array of strings)
+            %
+            %   units       Units for axis e.g. 'meV' (character string)
+            %
+            %   code        Custom user units code e.g. '$w' (character string)
+            %
+            %   positions   Tick mark positions (numeric vector)
+            %               If not given, then default positions will be used in
+            %               any plotting functions
+            %
+            %   labels      Character array or cellstr of tick labels
+            %               If not given, then default values will be used in
+            %               any plotting functions
+            %
+            %   ticks       Alternative to giving positions and labels separately
+            %               Structure with fields
+            %                   positions   Tick mark positions (numeric vector)
+            %                   labels      Character or cell array of tick labels
+            
+            
+            if nargin==1 && isa(varargin{1},'IX_axis')
+                % Already an IX_axis object, so return
+                obj = varargin{1};
+
+            elseif nargin==1 && isstruct(varargin{1})
+                % Structure input
+                obj = IX_axis.loadobj(varargin{1});
+
+            else
+                % Build from other arguments
+                if nargin > 0
+                    obj = build_IX_axis_(obj, varargin{:});
+                end
+            end
+        end
+        
+        %------------------------------------------------------------------
+        % Set methods for dependent properties
+        
+        function obj = set.caption(obj, caption)
+            obj = check_and_set_caption_(obj, caption);
+        end
+        
+        function obj = set.units(obj, units)
+            obj = check_and_set_units_(obj, units);
+        end
+        
+        function obj = set.code(obj, code)
+            obj = check_and_set_code_(obj, code);
+        end
+        
+        function obj = set.positions(obj, positions)
+            obj = check_and_set_positions_(obj, positions);
+        end
+        
+        function obj = set.labels(obj, labels)
+            obj = check_and_set_labels_(obj, labels);
+        end
+        
+        function obj = set.ticks(obj,ticks)
+            obj = check_and_set_ticks_(obj, ticks);
+        end
+        
+        %------------------------------------------------------------------
+        % Get methods for dependent properties
+        
+        function val = get.caption(obj)
+            val = obj.caption_;
+        end
+        
+        function val = get.units(obj)
+            val = obj.units_;
+        end
+        
+        function val = get.code(obj)
+            val = obj.code_;
+        end
+        
+        function val = get.positions(obj)
+            val = obj.ticks_.positions;
+        end        
+        
+        function val = get.labels(obj)
+            val = obj.ticks_.labels;
+        end
+        
+        function val = get.ticks(obj)
+            val = obj.ticks_;
+        end        
+        
+        %------------------------------------------------------------------
+    end
+    
+    %------------------------------------------------------------------
     methods(Static)
        function obj = loadobj(data)
-            % function to support loading of outdated versions of the class
-            % from mat files on hdd
+            % Function to support loading of outdated versions of the class
+            % from mat files
             if isa(data,'IX_axis')
                 obj = data;
             else
                 obj = IX_axis();
                 obj = obj.init_from_structure(data);
             end
-        end    end
-    methods
-        function axis = IX_axis(varargin)
-            % Create IX_axis object
-            %   >> w = IX_axis (caption)
-            %   >> w = IX_axis (caption, units)
-            %   >> w = IX_axis (code)           % set cation and units via a standard units code
-            %   >> w = IX_axis (...,code)       % override caption and/or units from the defined code
-            %
-            % Setting custom tick positions and labels
-            %   >> w = IX_axis (...,vals)           % positions
-            %   >> w = IX_axis (...,vals,labels)    % positions and labels
-            %   >> w = IX_axis (...,ticks)          % strucutre with position and tick labels
-            %
-            if nargin > 0
-                axis = buildIX_axis_(axis,varargin{:});
-            end
-        end
-        % init object or array of objects from a structure with appropriate
-        % fields
-        obj = init_from_structure(axis,in)
-        %------------------------------------------------------------------
-        function cap = get.caption(obj)
-            cap = obj.caption_;
-        end
-        function obj = set.caption(obj,cap)
-            obj = check_and_set_caption_(obj,cap);
-        end
-        %
-        function un = get.units(obj)
-            un = obj.units_;
-        end
-        function obj = set.units(obj,un)
-            obj = check_and_set_units_(obj,un);
-        end
-        %
-        function un = get.code(obj)
-            % Not properly implemented?
-            un = obj.code_;
-        end
-        function obj = set.code(obj,code)
-            % Not properly implemented?
-            obj = check_and_set_code_(obj,code);
-        end
-        %
-        function un = get.ticks(obj)
-            un = obj.ticks_;
-        end
-        function obj = set.ticks(obj,ticks)
-            % ticks should be a structure with fields 'positions' and
-            % 'labels', containing array of ticks and cellarray of labels
-            % correspondingly.
-            %
-            % TODO: easy to modify to set these values separately, without
-            % combining them into a structure.
-            obj = check_and_set_ticks_(obj,ticks);
-        end
-        %------------------------------------------------------------------
+        end    
     end
+    %------------------------------------------------------------------
 end

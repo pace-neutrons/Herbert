@@ -6,11 +6,11 @@ function create_testdata_IX_datasets_ref
 % The objects are different every time this is run, as a random number generator is used.
 % Objects created are:
 %
-%   p1 p2 p3            IX_dataset_1d point objects;
+%   p1 p2 p3            IX_dataset_1d point objects; distribution==false
 %                      All have same x axes, but different signals and errors
-%   h1 h2 h3            IX_dataset_1d histogram objects;
+%   h1 h2 h3            IX_dataset_1d histogram objects; distribution==true
 %                      All have same x axes, but different signal and errors
-%                      Signal and errors match corresponding p1, p2, p3
+%                      Signal and errors numerically match corresponding p1, p2, p3
 %
 %   pp1 hp1 ph1 hh1     IX_datset_2d objects, variously point or histogram along x,y axes
 %                      x-axes match those of the point or histogram 1D objects
@@ -21,7 +21,7 @@ function create_testdata_IX_datasets_ref
 %   pp2_1 pp2_2 pp2_3   IX_datset_2d point objects with different x,y,signal,error arrays
 %
 %   hp_1d_big           Array of 500 IX_dataset_1d objects, all with different x, signal error
-%                      arrays, mixed histogram and point datasets
+%                      arrays, mixed histogram and point datasets; distribution==true
 %   pp_1d_big           The above converted to all point datasets using hist2point
 %   hh_1d_big           The above converted to all histogram datasets using point2hist
 %
@@ -120,7 +120,12 @@ for i=1:nw
     y=10*exp(-0.5*(((x-nx0/2)/(nx0/4)).^2 + ((i-nw/2)/(nw/4)).^2));
     e=0.5+rand(1,nx(i));
     dn=round(rand(1));
-    hp_1d_big(i)=IX_dataset_1d(x,y(1:end-dn),e(1:end-dn),'Point data, distribution',IX_axis('Energy transfer','meV','$w'),'Counts',true);
+    if dn==0
+        type = 'Point data';
+    else
+        type = 'Histogram data';
+    end
+    hp_1d_big(i)=IX_dataset_1d(x,y(1:end-dn),e(1:end-dn),[type,', distribution'],IX_axis('Energy transfer','meV','$w'),'Counts',true);
 end
 toc
 

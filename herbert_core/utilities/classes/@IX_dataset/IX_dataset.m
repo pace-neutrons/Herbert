@@ -1,8 +1,8 @@
 classdef IX_dataset
     % Abstract parent class for IX_datasets_Nd;
     properties(Dependent)
-        %title:  dataset title (will be plotted on a grapth)
-        title;
+        % title:  dataset title (will be plotted on a grapth)
+        title
         % signal -- array of signal...
         signal
         % error  -- array of errors
@@ -13,12 +13,13 @@ classdef IX_dataset
     
     
     properties(Access=protected)
+        % Class independent properties
         title_={};
-        % emtpy signal
+        % Signal array
         signal_=zeros(0,1);
-        % empty error
+        % Variance array
         error_=zeros(0,1);
-        % has empty signals-IX_axis
+        % Signal axis 
         s_axis_=IX_axis('Counts');
         %
         % generic n-D binning data;

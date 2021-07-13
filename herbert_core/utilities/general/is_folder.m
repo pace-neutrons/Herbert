@@ -1,29 +1,35 @@
 function ok = is_folder(name)
-% tests if name is a folder on the file system while NOT searching MATLAB path
+% Tests if name is a folder on the file system without searching MATLAB path
 %
-% On older versions of matlab this is done through ensuring the path is an explicit path
-% and using exist. More recent versions simply call the MATLAB built-in isfile.
+%   >> ok = is_folder(name)
+%
+% On older versions of MATLAB this is done through ensuring the path is an
+% explicit path and using exist. More recent versions simply call the
+% MATLAB built-in isfolder.
 %
 % Input:
 % ------
-%   name                The name of the file you want to check;
+%   name    The name of the folder you want to check
+%
+% Output:
+% -------
+%   ok      Logical true (is a folder) or false (is not)
 %
 % Usage:
 % ------
-%  >> is_file('/home/user/test');        % True if folder exists
-%  >> is_file('test');                   % True if folder exists in current dir
+%  >> is_folder('/home/user/');    % True if folder exists
+%  >> is_folder('test');           % True if folder exists in current folder
 %
 
-     if ~verLessThan('matlab', '9.1') % R2016b
-         ok = isfolder(name);
-     else
-         currpath = fileparts(strtrim(name));
-         if isempty(currpath)
-             currpath = pwd();
-             name = fullfile(currpath, name);
-         end
 
-        ok = exist(name, 'dir') == 7;
-     end
-
+% Remove searching MATLAB path with explicit path
+if ~verLessThan('matlab', '9.3')    % R2017b
+    ok = isfolder(name);
+else
+    folder = fileparts(strtrim(name));
+    if isempty(folder)
+        folder = pwd();
+        name = fullfile(folder, name);
+    end
+    ok = exist(name, 'dir') == 7;
 end

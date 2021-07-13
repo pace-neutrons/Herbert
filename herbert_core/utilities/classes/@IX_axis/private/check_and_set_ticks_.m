@@ -1,65 +1,18 @@
-function obj = check_and_set_ticks_(obj,ticks)
-% Method verifies axis ticks and sets axis ticks if the value is valid
-%
-% Throws IX_axis:invalid_argument if ticks are invalid
-%
-%
-% $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
-%
-%
+function obj = check_and_set_ticks_(obj, ticks)
+% Method verifies axis ticks properties and sets axis ticks if valid
+
 if isempty(ticks)
-    obj.ticks_ = '';
-    return
-end
-
-if ~isstruct(ticks)
-    error('IX_axis:invalid_argument',...
-        'ticks information must be a structure with fields ''positions'' and ''labels''');
-end
-
-if ~(numel(fieldnames(ticks))==2 && all(isfield(ticks,{'positions','labels'})))
-    error('IX_axis:invalid_argument',...
-        'ticks information must be a structure with fields ''positions'' and ''labels''');
-end
-
-if ~isempty(ticks.labels) && numel(ticks.labels)~=numel(ticks.positions)
-    error('IX_axis:invalid_argument',...
-        'If tick labels are provided, the number of labels must match the number of tick positions');
-end
-
-
-if isempty(ticks.positions)
-    obj.ticks_.positions=[];
-elseif isnumeric(ticks.positions)
-    if ~isrowvector(ticks.positions)
-        obj.ticks_.positions=ticks.positions(:)';
-    else
-        obj.ticks_.positions=ticks.positions;
+    obj = check_and_set_positions_(obj, []);
+    obj = check_and_set_labels_(obj, {});
+    
+elseif isstruct(ticks) && all(isfield(ticks,{'positions','labels'}))
+    try
+        obj = check_and_set_positions_(obj, ticks.positions);
+        obj = check_and_set_labels_(obj, ticks.labels);
+    catch ME
+        rethrow(ME)
     end
 else
-    error('IX_axis:invalid_argument',...
-        'tick positions must be a numeric vector')
+    error('HERBERT:check_and_set_ticks_:invalid_argument',...
+        'Ticks structure must have fields ''positions'' and ''labels''');
 end
-
-if isempty(ticks.labels)
-    if ~isempty(ticks.positions)
-        obj.ticks_.labels=cell(1,numel(ticks.positions));        
-    else
-        obj.ticks_.labels={};
-    end
-elseif iscellstr(ticks.labels)
-    if ~isrowvector(ticks.labels)
-        obj.ticks_.labels=ticks.labels(:)';
-    else
-        obj.ticks_.labels=ticks.labels(:);
-    end
-elseif ischar(ticks.labels) && numel(size(ticks.labels))==2
-    obj.ticks_.labels=cellstr(ticks.labels)';
-else
-    error('IX_axis:invalid_argument',...
-        'tick labels must be a cellstr or character array');
-end
-
-obj.ticks_=orderfields(obj.ticks_,{'positions','labels'});
-
-

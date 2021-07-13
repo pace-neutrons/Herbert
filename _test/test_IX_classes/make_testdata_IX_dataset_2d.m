@@ -12,11 +12,14 @@ function [hh_gau,hp_gau,pp_gau] = make_testdata_IX_dataset_2d (nx, ny)
 %
 % Output:
 % -------
-%   hh_gau      hist-hist 2D Gaussian with range x=c. 0-10 and y=c. 0-6
+%   hh_gau      hist-hist 2D Gaussian with range x= approx 0-10 and y= approx 0-6
+%               Non-distribution in both directions
 %   hp_gau      hist-point (different x,y,signal and errors)
 %   pp_gau      point-point (different x,y,signal and errors)
-%
+
+
 % Author: T.G.Perring
+
 
 xrange=10;
 yrange=6;
