@@ -1,5 +1,6 @@
 classdef IX_dataset
     % Abstract parent class for IX_datasets_Nd;
+    
     properties(Dependent)
         % title:  dataset title (will be plotted on a grapth)
         title
@@ -11,40 +12,74 @@ classdef IX_dataset
         s_axis
     end
     
-    
     properties(Access=protected)
         % Class independent properties
-        title_={};
-        % Signal array
-        signal_=zeros(0,1);
-        % Variance array
-        error_=zeros(0,1);
-        % Signal axis 
-        s_axis_=IX_axis('Counts');
-        %
-        % generic n-D binning data;
-        xyz_;
-        % generic n-D  axis array
-        xyz_axis_
-        % generig n-D distribution sign
-        xyz_distribution_;
-        %
-        % empty object is valid
-        valid_ = true;
-        % error message to report
-        error_mess_ = '';
-    end
-    %======================================================================
-    methods(Static)
-        % Read object or array of objects of an IX_dataset type from
-        % a binary matlab file. Inverse of save.
-        obj = read(filename);
-        % Access internal function for testing purposes
-        function [x_out, ok, mess] = bin_boundaries_from_descriptor(xbounds, x_in)
-            [x_out, ok, mess] = bin_boundaries_from_descriptor_(xbounds, x_in);
-        end
+        % Need to be protected (not private) because this class is inherited
+        % by IX_data_1d, IX_data_2d etc.
         
+%         % Title. Cell array (column) of character strings
+%         title_
+%         
+%         % Signal array. Array 
+%         signal_
+%         
+%         % Variance array
+%         error_
+%         
+%         % Signal axis information
+%         s_axis_
+% 
+%         % Bin boundaries or centres. Cell array (row) of numeric column
+%         % vectors, one per dimension
+%         xyz_
+%         
+%         % Axis information for each dimensions: Cell array (row) of IX_axis
+%         % objects
+%         xyz_axis_
+%         
+%         % Description of whether or not the signal along the axis is a 
+%         % distribution (true) i.e. signal per unit measure, or not (false).
+%         % Logical row vector.
+%         xyz_distribution_
+%         
+%         % Status of empty object - logical flag
+%         valid_
+%         
+%         % Error message to report if not valid
+%         error_mess_
+
+        % Title. Cell array (column) of character strings
+        title_ = cell(0,1)
+        
+        % Signal array. Array 
+        signal_ = zeros(0,1)
+        
+        % Variance array
+        error_ = zeros(0,1)
+        
+        % Signal axis information
+        s_axis_ = IX_axis()
+
+        % Bin boundaries or centres. Cell array (row) of numeric column
+        % vectors, one per dimension
+        xyz_ = cell(1,0)
+        
+        % Axis information for each dimensions: Cell array (row) of IX_axis
+        % objects
+        xyz_axis_ = cell(1,0)
+        
+        % Description of whether or not the signal along the axis is a 
+        % distribution (true) i.e. signal per unit measure, or not (false).
+        % Logical row vector.
+        xyz_distribution_ = true(1,0)
+        
+        % Status of empty object - logical flag
+        valid_ = true
+        
+        % Error message to report if not valid
+        error_mess_ = ''
     end
+    
     %======================================================================
     methods
         %------------------------------------------------------------------
@@ -91,17 +126,11 @@ classdef IX_dataset
         w = sigvar_set(w,sigvarobj)
         %Matlab size of signal array
         sz = sigvar_size(w)
+        
         %------------------------------------------------------------------
         % accessors, whcih do not use properties
         %------------------------------------------------------------------
-        function xyz = get_xyz(obj,nd)
-            % get x (y,z) values without checking for their validity
-            if ~exist('nd', 'var')
-                xyz  = obj.xyz_;
-            else
-                xyz  = obj.xyz_{nd};
-            end
-        end
+
         %
         function sig = get_signal(obj)
             % get signal without checking for its validity
@@ -112,11 +141,26 @@ classdef IX_dataset
             % get error without checking for its validity
             sig = obj.error_;
         end
+        
+        
+        %------------------------------------------------------------------
+        % *** ONLY USED BY rebin_IX_dataset_nd:
+        function xyz = get_xyz(obj,nd)
+            % get x (y,z) values without checking for their validity
+            if ~exist('nd', 'var')
+                xyz  = obj.xyz_;
+            else
+                xyz  = obj.xyz_{nd};
+            end
+        end
+        
         function dis = get_isdistribution(obj)
+            % *** ONLY USED BY rebin_IX_dataset_nd
             % get boolean array informing if the state of distribution
             % along all axis
             dis= obj.xyz_distribution_;
         end
+        %------------------------------------------------------------------
         
         %
         function ok = get_isvalid(obj)
@@ -196,9 +240,22 @@ classdef IX_dataset
     methods(Access=protected)
         % common auxiliary service methods, which can be overloaded if
         % requested
+        
+        % Build object
+        obj = build_IX_dataset(obj, varargin)
+        
+        
+        %------------------------------------------------------------------
+        % USED IN GET METHODS FOR AXIS ARRAYS BY IX_DATA_1D etc
+        % get x, y or z axis data
         xyz = get_xyz_data(obj,nax)
+
+        %------------------------------------------------------------------
         % set x, y or z axis data
         obj = set_xyz_data(obj,nax,val)
+        %------------------------------------------------------------------
+        
+        
         % Integrate an IX_dataset object or array of IX_dataset
         % objects along the axes, defined by direction
         wout = integrate_xyz(win,array_is_descriptor, dir, varargin)
@@ -209,6 +266,19 @@ classdef IX_dataset
         % along the axes, defined by direction
         wout = rebin_xyz(win, array_is_descriptor,dir,varargin)
     end
+    
+    %======================================================================
+    methods(Static)
+        % Read object or array of objects of an IX_dataset type from
+        % a binary matlab file. Inverse of save.
+        obj = read(filename);
+        % Access internal function for testing purposes
+        function [x_out, ok, mess] = bin_boundaries_from_descriptor(xbounds, x_in)
+            [x_out, ok, mess] = bin_boundaries_from_descriptor_(xbounds, x_in);
+        end
+        
+    end
+    
     %======================================================================
     methods(Static,Access=protected)
         % verify if x,y,z field data are correct

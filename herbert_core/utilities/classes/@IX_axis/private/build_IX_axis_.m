@@ -39,6 +39,7 @@ elseif narg>1 && narg<=5 && isnumeric(varargin{end-1})
     obj.labels = varargin{end};
     
 elseif narg<=3
+    % Leading arguments from (obj, caption, units, code)
     nch = narg;
     if nch>=1, obj.caption = varargin{1};end
     if nch>=2, obj.units = varargin{2};  end

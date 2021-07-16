@@ -1,11 +1,12 @@
-function [ok,cout,all_non_empty]=str_make_cellstr_trim(varargin)
-% Take a set of arguments and try to make a cellstr of non-empty strings from the contents
+function [ok, cout, all_non_empty] = str_make_cellstr_trim(varargin)
+% Try to make a cellstr of strings from a set of input arguments
 %
 %   >> [ok,cout,all_non_empty] = str_make_cellstr(c1,c2,c3,...)
 %
 % Input:
 % ------
-%   c1,c2,c3,...    Two-dimensional character arrays or cell arrays of strings
+%   c1,c2,c3,...    Two-dimensional character arrays, cell arrays of strings,
+%                  or string array (Matlab release R2016b onwards)
 %
 % Output:
 % -------

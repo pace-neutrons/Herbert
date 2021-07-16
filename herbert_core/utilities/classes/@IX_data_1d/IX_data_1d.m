@@ -59,7 +59,8 @@ classdef IX_data_1d < IX_dataset
                 obj.xyz_{1} = zeros(1,0);
                 return;
             end
-            obj = build_IXdataset_1d_(obj,varargin{:});
+            % obj = build_IXdataset_1d_(obj,varargin{:});
+            obj = build_IX_dataset(obj,varargin{:});
         end
         function obj = init(obj,varargin)
             % efficiently (re)initialize object using constructor's code

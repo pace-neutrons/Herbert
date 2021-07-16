@@ -1,21 +1,31 @@
-function obj=check_and_set_title_(obj,val)
-% check if title is acceptable and set it
+function obj = check_and_set_title_(obj, val)
+% Set title, converting to column cellstr if needed
 %
-% Throws IX_dataset_1d:invalid_argument if the titile is invalid
+%   >> obj = check_and_set_title_(obj, val)
 %
+% Input:
+% ------
+%   obj     IX_dataset object
+%   val     Title for plot. One of:
+%           - cellstr
+%           - character string or 2D character array
+%           - string array
+%
+% Output:
+% -------
+%   obj     Updated object
 
-if ischar(val)||iscellstr(val)
-    if ischar(val)
-        obj.title_=cellstr(val);
+
+if ~isempty(val)
+    % Set title
+    [ok, cout] = str_make_cellstr(val);
+    if ok
+        obj.title_ = cout;
     else
-        obj.title_ = val(:);
+        error('HERBERT:check_and_set_title_:invalid_argument',...
+            'Title must be character, string array or cell array of strings');
     end
-elseif isnumeric(val)
-    obj.title_ = num2str(val);
+    
 else
-    error('IX_dataset_1d:invalid_argument',...
-        'Title must be character array or cell array of strings or numeric value')
+    obj.title_ = cell(0,1);
 end
-%
-
-

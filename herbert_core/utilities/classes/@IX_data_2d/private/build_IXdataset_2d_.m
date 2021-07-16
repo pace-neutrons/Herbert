@@ -31,25 +31,25 @@ function obj=build_IXdataset_2d_(obj,varargin)
 
 
 
+narg = numel(varargin);
 
 % Various input options
-if nargin==2 && isa(varargin{1},'IX_dataset_2d')  % if already IX_dataset_2d object, return
+if narg==1 && isa(varargin{1},'IX_dataset_2d')  % if already IX_dataset_2d object, return
     obj=varargin{1};
     return;
 end
-if nargin == 2 && isa(varargin{1},'IX_dataset_1d')
+
+if narg==1 && isa(varargin{1},'IX_dataset_1d')
     obj = build_from_IX_dataset_1d_(obj,varargin{:});
     return;
 end
 
-if nargin==2 && isstruct(varargin{1})   % structure input
+if narg==1 && isstruct(varargin{1})   % structure input
     obj = obj.init_from_structure(varargin{1});
     return;
 end
-%     [ok,mess,w]=checkfields(varargin{1});   % Make checkfields the ultimate arbiter of the validity of a structure
-%     if ok, w=class(w,'IX_dataset_2d'); return, else error(mess); end
 
-if nargin>=3 && nargin<=5
+if narg>=2 && narg<=4
     obj.xyz_{1}        = obj.check_xyz(varargin{1});
     obj.xyz_distribution_(1)= true;
     obj.xyz_{2}        =  obj.check_xyz(varargin{2});
@@ -65,7 +65,8 @@ if nargin>=3 && nargin<=5
     else
         obj = check_and_set_sig_err_(obj,'error',zeros(size(obj.signal_)));
     end
-elseif nargin ==7
+    
+elseif narg==6
     obj.xyz_{1}        = obj.check_xyz(varargin{1});
     obj.xyz_{2}        =  obj.check_xyz(varargin{2});
     obj = check_and_set_sig_err_(obj,'signal',varargin{3});
@@ -74,7 +75,7 @@ elseif nargin ==7
     obj.xyz_distribution_(1)= logical(varargin{5});
     obj.xyz_distribution_(2)= logical(varargin{6});
     
-elseif nargin==9 || (nargin==11 && isnumeric(varargin{1}))
+elseif narg==8 || (narg==10 && isnumeric(varargin{1}))
     obj.xyz_{1}        = obj.check_xyz(varargin{1});
     obj.xyz_{2}        = obj.check_xyz(varargin{2});
     
@@ -95,7 +96,7 @@ elseif nargin==9 || (nargin==11 && isnumeric(varargin{1}))
         obj.xyz_distribution_(2)=true;
     end
     
-elseif nargin==11
+elseif narg==10
     obj.title=varargin{1};
     obj = check_and_set_sig_err(obj,'signal',varargin{2});
     obj = check_and_set_sig_err(obj,'error',varargin{3});
@@ -108,6 +109,7 @@ elseif nargin==11
     obj.x_distribution=varargin{7};
     obj.y_axis=varargin{9};
     obj.y_distribution=varargin{10};
+    
 else
     error('IX_dataset_2d:invalid_argument',...
         'Invalid number or type of arguments')
@@ -119,5 +121,3 @@ if ok
 else
     error('IX_dataset_2d:invalid_argument',mess);
 end
-
-
