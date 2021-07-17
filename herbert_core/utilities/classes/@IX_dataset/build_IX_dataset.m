@@ -46,14 +46,40 @@ obj.xyz_ = cell(1, nd);
 obj.xyz_distribution_ = true(1, nd);
 obj.xyz_axis_ = cell(1, nd);
 
-if narg>=nd && narg<=nd+2
-    % Construct with default captioning and distribution flags
+if  narg==0
+    % Default object
+    % --------------
+    % Axis values
+    sz = ones(1, max(nd,2));    % size of default signal and error arrays if point data
+    for iax = 1:nd
+        obj = obj.check_and_set_x_([], iax);
+        sz(iax) = numel(obj.xyz_{iax});
+    end
     
+    % Signal and errors
+    obj = obj.check_and_set_signal_(zeros(sz));
+    obj = obj.check_and_set_error_(zeros(sz));
+    
+    % Distributions
+    for iax = 1:nd
+        obj = obj.check_and_set_x_distribution_([], iax);
+    end
+    
+    % Title and captions
+    obj = obj.check_and_set_title_([]);
+    obj = obj.check_and_set_s_axis_([]);
+    for iax = 1:nd
+        obj = obj.check_and_set_x_axis_([], iax);
+    end
+    
+elseif narg>=nd && narg<=nd+2
+    % Construct with default captioning and distribution flags
+    % --------------------------------------------------------
     % Axis values
     sz = ones(1, max(nd,2));    % size of default signal and error arrays if point data
     for iax = 1:nd
         obj = obj.check_and_set_x_(varargin{iax}, iax);
-        sz(iax) = numel(varargin{iax});
+        sz(iax) = numel(obj.xyz_{iax});
     end
     
     % Signal and errors
@@ -83,7 +109,7 @@ if narg>=nd && narg<=nd+2
     
 elseif narg==(2*nd+2)
     % Construct with default captioning and custom distribution flags
-    
+    % ---------------------------------------------------------------
     % Axis values
     for iax = 1:nd
         obj = obj.check_and_set_x_(varargin{iax}, iax);
@@ -107,7 +133,7 @@ elseif narg==(2*nd+2)
     
 elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
     % Construct with custom captioning and default/custom distribution flags
-    
+    % ----------------------------------------------------------------------
     % Axis values
     for iax = 1:nd
         obj = obj.check_and_set_x_(varargin{iax}, iax);
@@ -137,7 +163,7 @@ elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
     
 elseif narg==(3*nd+4)
     % Construct with custom captioning and distribution flags
-    
+    % -------------------------------------------------------
     % Title
     obj = obj.check_and_set_title_(varargin{1});
     
@@ -163,4 +189,3 @@ obj = check_properties_consistency_(obj);
 
 obj.valid_  = true;
 obj.error_mess_ = '';
-

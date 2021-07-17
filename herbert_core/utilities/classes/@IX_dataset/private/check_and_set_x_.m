@@ -42,5 +42,5 @@ if ~isempty(val)
     end
     
 else
-    obj.xyz_(iax) = zeros(0,1);     % default: length zero
+    obj.xyz_{iax} = zeros(0,1);     % default: length zero
 end

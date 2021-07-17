@@ -51,6 +51,7 @@ elseif nd==1 && numel(sz)==2 && sz(1)==1 && sz(2)~=1
     % can be accepted as valid input. Transpose the signal and error vectors
     obj.signal_ = obj.signal_';
     obj.error_ = obj.error_';
+    sz = fliplr(sz);
 end
 
 

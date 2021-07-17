@@ -57,15 +57,7 @@ classdef IX_data_2d < IX_dataset
             %   y_axis              IX_axis          |- same as above but for y-axis
             %   y_distribution      logical         -|
             
-%             obj.xyz_ = cell(2,1);
-%             obj.xyz_axis_ = repmat(IX_axis(),2,1);
-%             obj.xyz_distribution_ = true(2,1);
-%             if nargin==0
-%                 obj.xyz_{1} = zeros(1,0);
-%                 obj.xyz_{2} = zeros(1,0);
-%                 return;
-%             end
-% %            obj = build_IXdataset_2d_(obj,varargin{:});
+
             obj = build_IX_dataset(obj, varargin{:});
         end
         
@@ -105,29 +97,29 @@ classdef IX_data_2d < IX_dataset
         %------------------------------------------------------------------
         % Set methods for dependent properties
         
-        function obj = set.x(obj,val)
+        function obj = set.x(obj, val)
             obj = set_xyz_data(obj,1,val);
         end
         
-        function obj = set.y(obj,val)
+        function obj = set.y(obj, val)
             obj = set_xyz_data(obj,2,val);
         end
         
-        function obj = set.x_axis(obj,val)
+        function obj = set.x_axis(obj, val)
             obj.xyz_axis_(1) = obj.check_and_build_axis(val);
         end
         
-        function obj = set.y_axis(obj,val)
+        function obj = set.y_axis(obj, val)
             obj.xyz_axis_(2) = obj.check_and_build_axis(val);
         end
         
-        function obj = set.x_distribution(obj,val)
+        function obj = set.x_distribution(obj, val)
             % TODO: should setting it to true/false involve chaning x from
             % disrtibution to bin centers and v.v.?
             obj.xyz_distribution_(1) = logical(val);
         end
         
-        function obj = set.y_distribution(obj,val)
+        function obj = set.y_distribution(obj, val)
             % TODO: should setting it to true/false involve chaning y from
             % disrtibution to bin centers and v.v.? + signal changes
             obj.xyz_distribution_(2) = logical(val);
