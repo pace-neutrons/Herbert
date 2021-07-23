@@ -329,7 +329,7 @@ else
 
     [f, v, loop_data, Store, S] = merge_data(outputs, loop_data);
 
-% $$$     [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
+% $$$     [faca,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
 % $$$         f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
 
     resid=wt.*(yval-f);
@@ -747,7 +747,6 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
     for i=1:nWorkers
         loop_data{i} = struct('w', {cell(numel(w),1)}, 'xye', xye, 'S', S, 'Store', Store);
     end
-
     for i=1:numel(w)
         if xye(i)
             n = numel(w{i}.x);

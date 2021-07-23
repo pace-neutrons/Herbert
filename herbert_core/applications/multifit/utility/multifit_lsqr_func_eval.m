@@ -340,6 +340,8 @@ function [calc, var, calc_filled, calculated, calc_store, var_store] = ...
 
         [calc{iw},var{iw},msk]=sigvar_get(wcalc);
 
+        psidisp('~/dump/calc', calc{iw})
+        psidisp('~/dump/msk', msk)
         calc{iw}=calc{iw}(msk);       % remove the points that we are told to ignore
         var{iw}=var{iw}(msk);
         calc{iw}=calc{iw}(:); % make column vector
