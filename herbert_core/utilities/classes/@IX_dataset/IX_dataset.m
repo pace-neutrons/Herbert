@@ -1,5 +1,5 @@
 classdef (Abstract) IX_dataset
-    % Abstract parent class for IX_datasets_Nd;
+    % Abstract parent class for IX_data_1d, IX_data_2d etc.;
     
     properties(Dependent)
         % These are public properties at all child classes will posess, so
@@ -40,14 +40,14 @@ classdef (Abstract) IX_dataset
         % second dimension etc.
         error_
         
-        % Signal axis information. IN_axis object
+        % Signal axis information. IX_axis object
         s_axis_
         
         % Bin boundaries or centres. Cell array (row) of numeric column
         % vectors, one per dimension
         xyz_
         
-        % Axis information for each dimension. Cell array (row) of IX_axis
+        % Axis information for each dimension. Row vector of IX_axis
         % objects
         xyz_axis_
         
@@ -55,12 +55,6 @@ classdef (Abstract) IX_dataset
         % distribution (true) i.e. signal per unit measure, or not (false).
         % Logical row vector.
         xyz_distribution_
-        
-        % Status of empty object - logical flag
-        valid_
-        
-        % Error message to report if not valid
-        error_mess_
         
     end
     
@@ -71,7 +65,7 @@ classdef (Abstract) IX_dataset
 
         % Set methods for dependent properties
         function obj = set.title(obj, val)
-            obj.title_ = check_and_set_title_(obj, val);
+            obj = check_and_set_title_(obj, val);
         end
         
         function obj = set.signal(obj, val)
@@ -85,7 +79,7 @@ classdef (Abstract) IX_dataset
         end
 
         function obj = set.s_axis(obj, val)
-            obj.s_axis_ = obj.check_and_set_s_axis_(val);
+            obj = obj.check_and_set_s_axis_(val);
         end
         
         %------------------------------------------------------------------
@@ -122,6 +116,9 @@ classdef (Abstract) IX_dataset
         % array.
         %------------------------------------------------------------------
         
+        
+        %--- Not yet verified ---------------------------------------------
+
         % set up object values using object structure. (usually as above)
         obj = init_from_structure(obj,struct)
         
@@ -157,29 +154,8 @@ classdef (Abstract) IX_dataset
         %Matlab size of signal array
         sz = sigvar_size(w)
         
-        
-        %------------------------------------------------------------------
-        % accessors, which do not use properties
-        %------------------------------------------------------------------
-        
-        % *** NOT USED ANYWHERE IN HERBERT OR HORACE:
-        
-        function sig = get_signal(obj)
-            % get signal without checking for its validity
-            sig = obj.signal_;
-        end
-        %
-        function sig = get_error(obj)
-            % get error without checking for its validity
-            sig = obj.error_;
-        end
-        
-        function ok = get_isvalid(obj)
-            % returns the state of the internal valid_ property
-            ok = obj.valid_;
-        end
-        
-        %------------------------------------------------------------------
+
+
         function xyz = get_xyz(obj,nd)
             % *** ONLY USED BY rebin_IX_dataset_nd:
             % get x (y,z) values without checking for their validity
@@ -201,18 +177,15 @@ classdef (Abstract) IX_dataset
         % Set signal, error and selected axes in a single instance of an IX_dataset object
         wout=set_simple_xsigerr(win,iax,x,signal,err,xdistr)
         
-        
-        %------------------------------------------------------------------
-        % *** REMOVED AS PART OF REFACTORING (TGP, JULY 2021)
-        %------------------------------------------------------------------
-        % return class structure - REMOVED AS NOW USE MATLAB INTRINSIC
-        %
-        % public_struct = struct(this)
+
         
     end
     
     %======================================================================
     methods(Static)
+        
+        %--- Not yet verified ---------------------------------------------
+
         % Read object or array of objects of an IX_dataset type from
         % a binary matlab file. Inverse of save.
         obj = read(filename);
@@ -230,21 +203,27 @@ classdef (Abstract) IX_dataset
         % provided if requested.
         
         % Build object
-        obj = build_IX_dataset(obj, varargin)
+        obj = build_IX_dataset_(obj, varargin)
         
-        
-        %------------------------------------------------------------------
-        % USED IN GET METHODS FOR AXIS ARRAYS BY IX_DATA_1D etc
-        % *** I do not see why these need to be potentially overloaded
-        
-        % get x, y or z axis data
-        xyz = get_xyz_data(obj,nax)
-        
-        % set x, y or z axis data
-        obj = set_xyz_data(obj,nax,val)
+        % Set child properties
+        obj = set_xyz_(obj, val, iax)   % set axis data
 
+        obj = set_xyz_axis_(obj, val, iax)  % set axis annotation information
+
+        obj = set_xyz_distribution_(obj, val, iax)  % set axis distribution flag
+
+        % Dimension independent methods used by child methods
+        [nd, sz] = dimensions_(obj)
+
+        status = ishistogram_(obj, iax)
         
-        %------------------------------------------------------------------
+        [ax, hist] = axis_(obj, iax)
+        
+        [x_label, s_label] = make_label_(obj)
+        
+        
+        %--- Not yet verified ---------------------------------------------
+        
         % Make a cut from an IX_dataset object or array of IX_dataset objects along
         % specified axess direction(s).
         wout = cut_xyz(win,dir,varargin)
@@ -258,19 +237,6 @@ classdef (Abstract) IX_dataset
         wout = rebin_xyz(win, array_is_descriptor,dir,varargin)
     end
     
-    %======================================================================
-    methods(Static, Access=protected)
-        %------------------------------------------------------------------
-        % *** REDUNDANT (TGP, JULY 2021)
-        % These have been replaced by the refactored build_IX_dataset_
-        % and its private utility routines
-        
-        % verify if x,y,z field data are correct
-        val = check_xyz(val);
-        % Internal function used to verify and set up an axis
-        obj = check_and_build_axis(val);
-        %------------------------------------------------------------------
-    end
     
     %======================================================================
     % Abstract interface:
@@ -289,43 +255,40 @@ classdef (Abstract) IX_dataset
     
     
     methods(Abstract)
-        % (re)initialize object using constructor' code
-        obj = init(obj,varargin);
-        
-        % Find number of dimensions and extent along each dimension of the signal arrays.
-        [nd,sz] = dimensions(w)
+        % Return dimensionality and extent of signal along dimensions
+        [nd, sz] = dimensions(obj)
         
         % Return array containing true or false depending on dataset being
         % histogram or point;
-        status = ishistogram(w,n)
+        status = ishistogram(obj, iax)
         
         % Get information for one or more axes and if it has histogram data
         % for each axis
-        [ax,hist] = axis(w,n)
+        [ax,hist] = axis(obj, iax)
+
+        %--- Not yet verified ---------------------------------------------
+        % (re)initialize object using constructor' code
+        obj = init(obj, varargin);
+        
     end
     
     %======================================================================
     methods(Abstract,Static)
+        % Get number of class dimensions
+        nd  = ndim()
+
+        %--- Not yet verified ---------------------------------------------
         % used to reload old style objects from mat files on hdd
         obj = loadobj(data)
-        % get number of class dimensions
-        nd  = ndim()
     end
     
-    %======================================================================
-    methods(Abstract,Access=protected)
-        % Generic checks:
-        % Check if various interdependent fields of a class are consistent
-        % between each other.
-        [ok,mess] = check_joint_fields(obj);
-        % verify and set signal or error arrays
-        obj = check_and_set_sig_err(obj,field_name,value);
-    end
     
     %======================================================================
     methods(Abstract, Static, Access=protected)
+        %--- Not yet verified ---------------------------------------------
         % Rebins histogram data along specific axis.
         [wout_s, wout_e] = rebin_hist(iax, wout_x);
+        
         %Integrates point data along along specific axis.
         [wout_s,wout_e] = integrate_points(iax, xbounds_true);
     end

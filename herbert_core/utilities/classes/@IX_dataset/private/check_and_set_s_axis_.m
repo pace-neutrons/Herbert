@@ -23,7 +23,7 @@ if isa(val,'IX_axis') && numel(val)==1
 elseif ~isempty(val)
     [ok, cout] = str_make_cellstr(val);
     if ok
-        obj.s_axis_ = cout;
+        obj.s_axis_ = IX_axis(cout);
     else
         error('HERBERT:check_and_set_s_axis_:invalid_argument',...
             ['Title must be a IX_axis object (type help IX_axis),\n',...

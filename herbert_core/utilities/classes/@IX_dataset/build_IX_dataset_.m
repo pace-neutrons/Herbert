@@ -44,7 +44,7 @@ nd = obj.ndim();
 % Fill default object
 obj.xyz_ = cell(1, nd);
 obj.xyz_distribution_ = true(1, nd);
-obj.xyz_axis_ = cell(1, nd);
+obj.xyz_axis_ = repmat(IX_axis, [1, nd]);
 
 if  narg==0
     % Default object
@@ -67,10 +67,11 @@ if  narg==0
     
     % Title and captions
     obj = obj.check_and_set_title_([]);
-    obj = obj.check_and_set_s_axis_([]);
     for iax = 1:nd
         obj = obj.check_and_set_x_axis_([], iax);
     end
+    obj = obj.check_and_set_s_axis_([]);
+
     
 elseif narg>=nd && narg<=nd+2
     % Construct with default captioning and distribution flags
@@ -102,10 +103,11 @@ elseif narg>=nd && narg<=nd+2
     
     % Title and captions
     obj = obj.check_and_set_title_([]);
-    obj = obj.check_and_set_s_axis_([]);
     for iax = 1:nd
         obj = obj.check_and_set_x_axis_([], iax);
     end
+    obj = obj.check_and_set_s_axis_([]);
+    
     
 elseif narg==(2*nd+2)
     % Construct with default captioning and custom distribution flags
@@ -126,10 +128,11 @@ elseif narg==(2*nd+2)
     
     % Title and captions
     obj = obj.check_and_set_title_([]);
-    obj = obj.check_and_set_s_axis_([]);
     for iax = 1:nd
         obj = obj.check_and_set_x_axis_([], iax);
     end
+    obj = obj.check_and_set_s_axis_([]);
+
     
 elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
     % Construct with custom captioning and default/custom distribution flags
@@ -156,10 +159,11 @@ elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
     
     % Title and captions
     obj = obj.check_and_set_title_(varargin{nd+3});
-    obj = obj.check_and_set_s_axis_(varargin{nd+4});
     for iax = 1:nd
-        obj = obj.check_and_set_x_axis_(varargin{iax+(nd+4)}, iax);
+        obj = obj.check_and_set_x_axis_(varargin{iax+(nd+3)}, iax);
     end
+    obj = obj.check_and_set_s_axis_(varargin{2*nd+4});
+
     
 elseif narg==(3*nd+4)
     % Construct with custom captioning and distribution flags
@@ -186,6 +190,3 @@ end
 
 % Check consistency between fields
 obj = check_properties_consistency_(obj);
-
-obj.valid_  = true;
-obj.error_mess_ = '';

@@ -1,5 +1,5 @@
 classdef IX_data_2d < IX_dataset
-    % IX_data_2d Holds 
+    % IX_data_2d
 
     properties(Dependent)
         % x - vector of bin boundaries for histogram data or bin centres
@@ -23,7 +23,7 @@ classdef IX_data_2d < IX_dataset
     %======================================================================
     methods
         function obj = IX_data_2d(varargin)
-            % Create IX_dataset_2d object
+            % Create IX_data_2d object
             %
             % Construct with default captioning:
             %   >> w = IX_data_2d (x, y)
@@ -58,116 +58,91 @@ classdef IX_data_2d < IX_dataset
             %   y_distribution      logical         -|
             
 
-            obj = build_IX_dataset(obj, varargin{:});
+            obj = build_IX_dataset_(obj, varargin{:});
         end
         
+        %--- Not yet verified ---------------------------------------------
         function obj = init(obj,varargin)
             % efficiently (re)initialize object using constructor's code
             obj = build_IXdataset_2d_(obj,varargin{:});
         end
+        %------------------------------------------------------------------
         
 
         %------------------------------------------------------------------
         % Get methods for dependent properties
         
-        function xx = get.x(obj)
-            xx = obj.get_xyz_data(1);
+        function val = get.x(obj)
+            val = obj.xyz_{1};
         end
         
-        function yy = get.y(obj)
-            yy = obj.get_xyz_data(2);
+        function val = get.y(obj)
+            val = obj.xyz_{2};
         end
         
-        function ax = get.x_axis(obj)
-            ax = obj.xyz_axis_(1);
+        function val = get.x_axis(obj)
+            val = obj.xyz_axis_(1);
         end
         
-        function ax = get.y_axis(obj)
-            ax = obj.xyz_axis_(2);
+        function val = get.y_axis(obj)
+            val = obj.xyz_axis_(2);
         end
         
-        function dist = get.x_distribution(obj)
-            dist = obj.xyz_distribution_(1);
+        function val = get.x_distribution(obj)
+            val = obj.xyz_distribution_(1);
         end
         
-        function dist = get.y_distribution(obj)
-            dist = obj.xyz_distribution_(2);
+        function val = get.y_distribution(obj)
+            val = obj.xyz_distribution_(2);
         end
         
         %------------------------------------------------------------------
         % Set methods for dependent properties
         
         function obj = set.x(obj, val)
-            obj = set_xyz_data(obj,1,val);
+            obj = set_xyz_(obj, val, 1);
         end
         
         function obj = set.y(obj, val)
-            obj = set_xyz_data(obj,2,val);
+            obj = set_xyz_(obj, val, 2);
         end
         
         function obj = set.x_axis(obj, val)
-            obj.xyz_axis_(1) = obj.check_and_build_axis(val);
+            obj = set_xyz_axis_(obj, val, 1);
         end
         
         function obj = set.y_axis(obj, val)
-            obj.xyz_axis_(2) = obj.check_and_build_axis(val);
+            obj = set_xyz_axis_(obj, val, 2);
         end
         
         function obj = set.x_distribution(obj, val)
-            % TODO: should setting it to true/false involve chaning x from
-            % disrtibution to bin centers and v.v.?
-            obj.xyz_distribution_(1) = logical(val);
+            obj = set_xyz_distribution_(obj, val, 1);
         end
         
         function obj = set.y_distribution(obj, val)
-            % TODO: should setting it to true/false involve chaning y from
-            % disrtibution to bin centers and v.v.? + signal changes
-            obj.xyz_distribution_(2) = logical(val);
+            obj = set_xyz_distribution_(obj, val, 2);
         end
         
         %-----------------------------------------------------------------
     end
     
-    
-    %======================================================================
-    methods
-        % *** DO NOT KNOW WHY NEED TO DEFINE THIS INTERFACE
-        %     No methods attributes are set
-        % Get information for one or more axes and if is histogram data for each axis
-        [ax,hist]=axis(w,n)
-    end
-    
     %======================================================================
     methods(Static)
         function nd  = ndim()
-            %return the number of class dimensions
+            % Return the number of class dimensions
             nd = 2;
         end
     end
     
     %======================================================================
-    methods(Access=protected)
-        % *** SHOULD BECOME IRRELEVANT WITH RE_ENGINEERING OF IX_DATASET ?
+    methods(Static, Access = protected)
         
-        function  [ok,mess] = check_joint_fields(obj)
-            % implement class specific check for connected fiedls
-            % consistency
-            [ok,mess] = check_joint_fields_(obj);
-        end
-        
-        function obj = check_and_set_sig_err(obj,field_name,value)
-            % verify and set up signal or error arrays. Throw if
-            % input can not be converted to correct array data.
-            obj = check_and_set_sig_err_(obj,field_name,value);
-        end
-    end
-    
-    %======================================================================
-    methods(Static,Access = protected)
+        %--- Not yet verified ---------------------------------------------
         % Rebins histogram data along specific axis.
         [wout_s, wout_e] = rebin_hist(iax, x, s, e, xout)
-        %Integrates point data along along specific axis.
-        [wout_s,wout_e] = integrate_points(iax, x, s, e, xout)
+        
+        % Integrates point data along along specific axis.
+        [wout_s, wout_e] = integrate_points(iax, x, s, e, xout)
         
     end
     

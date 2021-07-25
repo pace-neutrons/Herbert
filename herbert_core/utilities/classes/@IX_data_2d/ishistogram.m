@@ -1,25 +1,26 @@
-function status=ishistogram(w,n)
-% Return array containing true or false depending on dataset being histogram or point
+function status = ishistogram(obj, varargin)
+% Return logical array indicating axes that are histogram data
 %
-%   >> status=ishistogram(w)    % array [2,size(w)] with true/false for each of the two axes
-%   >> status=ishistogram(w,n)  % array with size of w for the nth axis, n=1 or 2
+%   >> status = ishistogram(obj)
+%   >> status = ishistogram(obj, iax)
+%
+% Input:
+% ------
+%   obj     IX_dataset_2d object or array of objects
+%   iax     [optional] axis index, or array of indicies, in range 1 to ndim
+%           Default: 1:ndim
+%
+% Output:
+% -------
+%   status  Logical with true is axis is histogran, false where point data
+%           - If a single object, size(status) = [1,numel(iax)]
+%           - If a single axis,   size(status) = size(obj)
+%           - If an array of objects and array of axes, then size(status) = 
+%             [numel(iax), size(w)] but with dimensions of length 1 removed
+%           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
+%               ishstogram(obj)         size(status) = [4,3]  (not [4,1,3])
+%
+%           This behaviour is the same as that of the Matlab intrinsic
+%           function squeeze.
 
-% Check axis index
-nd = w.ndim();
-if nargin>1
-    % Just one axis being tested
-    if ~(isnumeric(n) && isscalar(n) && (n>=1||n<=nd))
-        error('IX_dataset:invalid_argument',...
-            'Invalid axis index %d for %d-dimensional object',n,nd);
-    end
-    status  = arrayfun(@(x)(numel(x.xyz_{n}) ~= size(x.signal_,n)),w);
-    status  = status';
-else
-    status  = arrayfun(@elem_comp,w,'UniformOutput',false);
-    status = [status{:}];
-    status = reshape(status,[nd,size(w)]);
-end
-
-
-function comp = elem_comp(x)
-comp = [numel(x.xyz_{1}),numel(x.xyz_{2})] ~= size(x.signal_);
+status = ishistogram_(obj, varargin{:});

@@ -7,7 +7,7 @@ function obj = check_and_set_x_distribution_(obj, val, iax)
 % ------
 %   obj     IX_dataset object
 %   val     Distribution flag: logical true or false (or 0 or 1) 
-%   iax     Axis index 1,2,... ndim()
+%   iax     Axis index, assumed to be a scalar in range 1,2,... ndim()
 %
 % Output:
 % -------
@@ -18,7 +18,7 @@ if ~isempty(val)
         obj.xyz_distribution_(iax) = logical(val);
     else
         error('HERBERT:check_and_set_x_distribution_:invalid_argument',...
-            ['Axis', num2str(iax), ': distribution flag must be a logical scalar']);
+            ['Axis ', num2str(iax), ': distribution flag must be a logical scalar']);
     end
     
 else

@@ -10,7 +10,7 @@ function obj = check_and_set_x_axis_(obj, val, iax)
 %           - cellstr
 %           - character string or 2D character array
 %           - string array
-%   iax     Axis index 1,2,... ndim()
+%   iax     Axis index, assumed to be a scalar in range 1,2,... ndim()
 %
 % Output:
 % -------
@@ -18,18 +18,18 @@ function obj = check_and_set_x_axis_(obj, val, iax)
 
 
 if isa(val,'IX_axis') && numel(val)==1
-    obj.xyz_axis_{iax} = val;
+    obj.xyz_axis_(iax) = val;
     
 elseif ~isempty(val)
     [ok, cout] = str_make_cellstr(val);
     if ok
-        obj.xyz_axis_{iax} = cout;
+        obj.xyz_axis_(iax) = IX_axis(cout);
     else
         error('HERBERT:check_and_set_x_axis_:invalid_argument',...
-            ['Axis caption must be a IX_axis object (type help IX_axis),\n',...
-            'or character, string array or cell array of strings']);
+            ['Axis ', num2str(iax), ': axis caption must be a IX_axis object (type help IX_axis),\n',...
+            'or character string, string array or cell array of strings']);
     end
     
 else
-    obj.xyz_axis_{iax} = IX_axis();
+    obj.xyz_axis_(iax) = IX_axis();
 end

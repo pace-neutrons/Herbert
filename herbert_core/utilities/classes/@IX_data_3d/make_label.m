@@ -1,34 +1,23 @@
-function [xlabel,ylabel,zlabel,slabel]=make_label(w)
-% Create axis annotations from IX_dataset_3d object. All outputs are cellstr.
+function [x_label, y_label, z_label, s_label] = make_label(obj)
+% Create axis annotations
 %
-%   >> [xlabel,ylabel,zlabel,slabel]=make_label(w)
+%   >> [x_label, y_label, z_label, s_label] = make_label(obj)
+%
+% If given array of objects, get labels for the first object
+%
+% Input:
+% ------
+%   obj         IX_dataset_3d object
+%
+% Output:
+% -------
+%   x_label     x-axis axis caption (column cellstr)
+%   y_label     y-axis axis caption (column cellstr)
+%   z_label     z-axis axis caption (column cellstr)
+%   s_label     Signal axis caption (column cellstr)
 
-% If given array of objects, get labels for the first element
 
-xlabel=make_label(w(1).x_axis);
-ylabel=make_label(w(1).y_axis);
-zlabel=make_label(w(1).z_axis);
-slabel=make_label(w(1).s_axis);
-
-% Now address any distributions
-str='';
-if w(1).x_distribution && ~isempty(w(1).x_axis.units)
-    str=[str,' / ',w(1).x_axis.units];
-end
-if w(1).y_distribution && ~isempty(w(1).y_axis.units)
-    str=[str,' / ',w(1).y_axis.units];
-end
-if w(1).z_distribution && ~isempty(w(1).z_axis.units)
-    str=[str,' / ',w(1).z_axis.units];
-end
-if ~isempty(str)
-    if ~isempty(slabel)
-        if units_appended
-            slabel{end}=[slabel{end}(1:end-1),str,')'];
-        else
-            slabel{end}=[slabel{end},' (1',str,')'];
-        end
-    else
-        slabel={['(1',str,')']};
-    end
-end
+[x_labels, s_label] = make_label_(obj);
+x_label = x_labels(1);
+y_label = x_labels(2);
+z_label = x_labels(3);

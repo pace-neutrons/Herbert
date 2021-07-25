@@ -1,59 +1,35 @@
-function [ax,hist]=axis(w,n)
-% Get information for one or more axes and if is histogram data for each axis
+function [ax, hist] = axis (obj, varargin)
+% Return all information about an axis or set of axes from a dataset
 %
-%   >> [ax,hist]=axis(w)
-%   >> [ax,hist]=axis(w,n)
+%   >> [ax, hist] = axis(obj)
+%   >> [ax, hist] = axis(obj, iax)
 %
 % Input:
 % -------
-%   w       Single IX_datset_2d object
-%   n       Axis index or array of indicies. Can only have elements equal
-%          to 1 or 2 for IX_datset_2d object. (Default: [1,2])
+%   obj     IX_dataset_2d object or array of objects
+%   iax     [optional] axis index, or array of indicies, in range 1 to ndim
+%           Default: 1:ndim
 %
 % Output:
 % -------
 %   ax      Structure or array structure with fields:
-%             values          double    Values of bin boundaries (if histogram data)
-%                                       Values of data point positions (if point data)
-%             axis            IX_axis   x-axis object containing caption and units codes
-%             distribution    logical   Distribution data flag (true is a distribution; false otherwise)
+%             values        Values of bin boundaries (if histogram data)
+%                           Values of data point positions (if point data)
+%             axis          IX_axis object containing caption and units codes
+%             distribution  Logical scalar: true if a distribution; false otherwise)
 %
-%   hist    Logical array with true for axes that are histogram data, false for point data
+%   hist    Logical with true is axis is histogran, false where point data
+%
+%   The sizes of the output arguments are the same, and are determined as
+%   follows:
+%           - If a single object, size(status) = [1,numel(iax)]
+%           - If a single axis,   size(status) = size(obj)
+%           - If an array of objects and array of axes, then size(status) = 
+%             [numel(iax), size(w)] but with dimensions of length 1 removed
+%           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
+%               ishstogram(obj)         size(status) = [4,3]  (not [4,1,3])
+%
+%           This behaviour is the same as that of the Matlab intrinsic
+%           function squeeze.
 
-if numel(w)==1
-    if nargin==1
-        n=[1,2];
-    else
-        if any(n)<1 || any(n)>2
-            error('Check axis indicies equal 1 or 2')
-        end
-    end
-    [ax,hist]=axis_n(w,n(1));
-    for i=2:numel(n)
-        ax(i)=axis_n(w,n(i));
-    end
-else
-    error('Can only have scalar input dataset')
-end
-
-%--------------------------------------------------------------------------
-function [ax,hist]=axis_n(w,n)
-if n==1
-    ax.values=w.x;
-    ax.axis=w.x_axis;
-    ax.distribution=w.x_distribution;
-    if numel(w.x)==size(w.signal,1)
-        hist=false;
-    else
-        hist=true;
-    end
-elseif n==2
-    ax.values=w.y;
-    ax.axis=w.y_axis;
-    ax.distribution=w.y_distribution;
-    if numel(w.y)==size(w.signal,2)
-        hist=false;
-    else
-        hist=true;
-    end
-end
+[ax, hist] = axis_ (obj, varargin{:});

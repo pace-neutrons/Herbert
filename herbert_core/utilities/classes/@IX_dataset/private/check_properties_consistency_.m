@@ -29,7 +29,8 @@ function obj = check_properties_consistency_(obj)
 
 
 % Check that the signal and error arrays have the same size
-if ~all(size(obj.signal_)==size(obj.error_))
+if ~(numel(size(obj.signal_))==numel(size(obj.error_))) ||...
+        ~all(size(obj.signal_)==size(obj.error_))
     error('HERBERT:check_properties_consistency_:invalid_argument',...
         'The sizes of signal array (=[%s]) and error array (=[%s]) do not match',...
         str_compress(num2str(size(obj.signal_)),','),...
@@ -47,16 +48,18 @@ if nd==0 && ~isscalar(obj.signal_)
     
 elseif nd==1 && numel(sz)==2 && sz(1)==1 && sz(2)~=1
     % A common error is to give signal as a row vector for a one-dimensional
-    % dataset Because this is can have no ambiguous interpretation, this
+    % dataset. Because this is can have no ambiguous interpretation, this
     % can be accepted as valid input. Transpose the signal and error vectors
     obj.signal_ = obj.signal_';
     obj.error_ = obj.error_';
     sz = fliplr(sz);
 end
 
-
 % Check the signal array size consistent with the object dimensionality
 nd_min = find(sz~=1, 1, 'last');    % trailing singletons not significant
+if isempty(nd_min)
+    nd_min = 0;     % case of signal being scalar
+end
 if nd_min<=nd
     sz = [sz(1:nd_min), ones(1,nd-nd_min)]; % add trailing singletons
 else
@@ -69,7 +72,6 @@ end
 
 % Check that the extent along each dimension of the signal is consistent
 % with the axis values: the same (point data) or one less (histogram data)
-
 sx = cellfun(@numel, obj.xyz_); % size of axis extents - row vector length nd
 del = sx-sz;
 bad = (del~=0 & del~=1);
