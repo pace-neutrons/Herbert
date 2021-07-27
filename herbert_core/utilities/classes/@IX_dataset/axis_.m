@@ -32,6 +32,7 @@ function [ax, hist] = axis_(obj, iax)
 %           This behaviour is the same as that of the Matlab intrinsic
 %           function squeeze.
 
+
 nd = obj(1).ndim();
 
 % Check the validity of the axis indices
@@ -44,7 +45,7 @@ else
         else
             mess = ['Axis indices must be in the range 1 to ', num2str(nd)];
         end
-        error('HERBERT:axis:invalid_argument', mess)
+        error('HERBERT:axis_:invalid_argument', mess)
     end
 end
 

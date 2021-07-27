@@ -47,11 +47,6 @@ classdef test_IX_dataset_1d <  TestCase
             try
                 ds.x = 1:15;
                 error('Failure to throw error due to invalid axes values')
-%                 id.x = 1:10;
-%                 assertFalse(id.get_isvalid())
-%                 val = id.x;
-%                 assertTrue(ischar(val));
-%                 assertEqual('numel(signal)=0, numel(x)=10; numel(signal)  must be equal to numel(x) or numel(x)+1',val);
             catch ME
                 if ~isequal(ME.identifier,...
                     'HERBERT:check_properties_consistency_:invalid_argument')
@@ -62,11 +57,6 @@ classdef test_IX_dataset_1d <  TestCase
             try
                 ds.signal = ones(1,15);
                 error('Failure to throw error due to invalid size of signal array')
-%                 id.signal = ones(1,10);
-%                 val = id.signal;
-%                 assertTrue(ischar(val));
-%                 assertEqual('numel(signal)=10, numel(error)=0; numel(signal)~=numel(error)',val);
-%                 assertFalse(id.get_isvalid())
             catch ME
                 if ~isequal(ME.identifier,...
                         'HERBERT:check_properties_consistency_:invalid_argument')
@@ -81,7 +71,6 @@ classdef test_IX_dataset_1d <  TestCase
         function test_constructor(obj)
             %   >> w = IX_dataset_1d (x)
             ds = IX_dataset_1d(1:10);
-            % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
             assertEqual(ds.x,(1:10)');          % now column
             assertEqual(ds.signal,zeros(10,1));
             assertEqual(ds.error,zeros(10,1));
@@ -89,7 +78,6 @@ classdef test_IX_dataset_1d <  TestCase
             
             %   >> w = IX_dataset_1d (x,signal)
             ds = IX_dataset_1d(1:10,ones(1,9));
-            % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
             assertEqual(ds.x,(1:10)');          % now column
             assertEqual(ds.signal,ones(9,1));
             assertEqual(ds.error,zeros(9,1));
@@ -97,7 +85,6 @@ classdef test_IX_dataset_1d <  TestCase
             
             %   >> w = IX_dataset_1d (x,signal,error)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10));
-            % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
             assertEqual(ds.x,(1:10)');          % now column
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
@@ -114,7 +101,6 @@ classdef test_IX_dataset_1d <  TestCase
             
             %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),'my object','x-axis name','y-axis name');
-            % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
             assertEqual(ds.x,(1:10)');          % now column
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
@@ -126,7 +112,6 @@ classdef test_IX_dataset_1d <  TestCase
             %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis, x_distribution)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
                 'my object','x-axis name','y-axis name',false);
-            % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
             assertEqual(ds.x,(1:10)');          % now column
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
@@ -139,7 +124,6 @@ classdef test_IX_dataset_1d <  TestCase
             %   >> w = IX_dataset_1d (title, signal, error, s_axis, x, x_axis, x_distribution)
             ds = IX_dataset_1d('my object',ones(1,10),ones(1,10),...
                 'y-axis name',1:10,'x-axis name',false);
-            % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
             assertEqual(ds.x,(1:10)');          % now column
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
@@ -150,36 +134,36 @@ classdef test_IX_dataset_1d <  TestCase
         end
         
         
-        %------------------------------------------------------------------
-        function test_methods(obj)
-            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
-                'my object','x-axis name','y-axis name');
-            [ax,hist] = ds.axis;
-            assertFalse(hist);
-            assertEqual(ax.values,1:10);
-            assertTrue(isa(ax.axis,'IX_axis'));
-            assertTrue(ax.distribution);
-            
-            dsa = repmat(ds,2,1);
-            dsa(2).x = 0.5:1:10.5;
-            
-            [ax,hist] = dsa.axis;
-            assertEqual(hist,[false,true]);
-            assertEqual(ax(1).values,1:10);
-            assertEqual(ax(2).values,0.5:1:10.5);
-            
-            is_hist = dsa.ishistogram;
-            is_hist1 = ishistogram(dsa,1);
-            assertEqual(is_hist,is_hist1);
-            assertFalse(is_hist(1));
-            assertTrue(is_hist(2));
-            
-            ids = dsa.cnt2dist();
-            idr = ids.dist2cnt();
-            % Not equal -- bug in old code!
-            %           assertEqual(dsa,idr);
-            
-        end
+%         %------------------------------------------------------------------
+%         function test_methods(obj)
+%             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
+%                 'my object','x-axis name','y-axis name');
+%             [ax,hist] = ds.axis;
+%             assertFalse(hist);
+%             assertEqual(ax.values,1:10);
+%             assertTrue(isa(ax.axis,'IX_axis'));
+%             assertTrue(ax.distribution);
+%             
+%             dsa = repmat(ds,2,1);
+%             dsa(2).x = 0.5:1:10.5;
+%             
+%             [ax,hist] = dsa.axis;
+%             assertEqual(hist,[false,true]);
+%             assertEqual(ax(1).values,1:10);
+%             assertEqual(ax(2).values,0.5:1:10.5);
+%             
+%             is_hist = dsa.ishistogram;
+%             is_hist1 = ishistogram(dsa,1);
+%             assertEqual(is_hist,is_hist1);
+%             assertFalse(is_hist(1));
+%             assertTrue(is_hist(2));
+%             
+%             ids = dsa.cnt2dist();
+%             idr = ids.dist2cnt();
+%             % Not equal -- bug in old code!
+%             %           assertEqual(dsa,idr);
+%             
+%         end
         
         
         %------------------------------------------------------------------

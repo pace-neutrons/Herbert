@@ -37,7 +37,7 @@ else
             mess = ['Axis indices must be in the range 1 to ', num2str(nd),...
                 ' for a 1-dimensional object'];
         end
-        error('HERBERT:axis:invalid_argument', mess)
+        error('HERBERT:ishistogram_:invalid_argument', mess)
     end
 end
 

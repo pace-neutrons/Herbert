@@ -15,7 +15,7 @@ classdef (Abstract) IX_dataset
         % Error array, containing standard deviations.
         error
         
-        % Signal axis information. IN_axis object
+        % Signal axis information. IX_axis object
         s_axis
     end
     
