@@ -311,26 +311,30 @@ else
         disp(' Function evaluation at starting parameter values:')
     end
 
-    % Set up parallel
-    jd = JobDispatcher('ParallelMF');
-    nWorkers = 2;
-    loop_data = split_data(w, xye, [], [], nWorkers);
-    common_data = struct('func', {func}, ...
-                         'bfunc', {bfunc}, ...
-                         'pin', {pin}, ...
-                         'bpin', {bpin}, ...
-                         'f_pass_caller_info', {f_pass_caller_info}, ...
-                         'bf_pass_caller_info', {bf_pass_caller_info}, ...
-                         'p_info', {p_info}, ...
-                         'listing', listing);
-    common_data.p = pfin;
 
-    [outputs, n_failed, task_ids, jd] = jd.start_job('MFParallel_Job', common_data, loop_data, true, nWorkers, true);
+    if ~all(xye) % is_parallel ||
+        % Set up parallel
+        nWorkers = 2;
+        jd = JobDispatcher('ParallelMF');
+        loop_data = split_data(w, xye, [], [], nWorkers);
 
-    [f, v, loop_data, Store, S] = merge_data(outputs, loop_data);
+        common_data = struct('func', {func}, ...
+                             'bfunc', {bfunc}, ...
+                             'pin', {pin}, ...
+                             'bpin', {bpin}, ...
+                             'f_pass_caller_info', {f_pass_caller_info}, ...
+                             'bf_pass_caller_info', {bf_pass_caller_info}, ...
+                             'p_info', {p_info}, ...
+                             'listing', listing);
+        common_data.p = pfin;
 
-% $$$     [faca,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-% $$$         f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
+        [outputs, n_failed, task_ids, jd] = jd.start_job('MFParallel_Job', common_data, loop_data, true, nWorkers, true);
+        [f, v, loop_data, Store, S] = merge_data(outputs, loop_data);
+    else
+
+        [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
+                                              f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
+    end
 
     resid=wt.*(yval-f);
 
@@ -395,14 +399,18 @@ else
                 end
 
                 % Need P here, because it's changing.
-                common_data.p = p;
+                if ~all(xye) % is_parallel ||
+                    common_data.p = p;
 
-% $$$                 [fa,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-% $$$                                                       f_pass_caller_info,bf_pass_caller_info,p,p_info,true,S,Store,listing);
+                    [outputs, n_failed, task_ids, jd] = jd.restart_job('MFParallel_Job', common_data, loop_data, true, true);
 
-                [outputs, n_failed, task_ids, jd] = jd.restart_job('MFParallel_Job', common_data, loop_data, true, true);
+                    [f, ~, loop_data, Store, S] = merge_data(outputs, loop_data);
 
-                [f, ~, loop_data, Store, S] = merge_data(outputs, loop_data);
+                else
+
+                    [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
+                                                           f_pass_caller_info,bf_pass_caller_info,p,p_info,true,S,Store,listing);
+                end
 
                 resid=wt.*(yval-f);
                 c=resid'*resid;
@@ -747,21 +755,32 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
     for i=1:nWorkers
         loop_data{i} = struct('w', {cell(numel(w),1)}, 'xye', xye, 'S', S, 'Store', Store);
     end
+
     for i=1:numel(w)
         if xye(i)
-            n = numel(w{i}.x);
-            nPer = repmat(n / nWorkers, nWorkers, 1);
+            n = numel(w{i}.y);
+            nPer = repmat(floor(n / nWorkers), nWorkers, 1);
             nPer(1:mod(n, nWorkers)) = nPer(1:mod(n, nWorkers)) + 1;
-            data = mat2cell(w{i}, nPer, 1);
+            points = [0; cumsum(nPer)];
+            tmp = cellfun(@(x)(mat2cell(x, nPer, 1)), w{i}.x(:), 'UniformOutput', false);
+            data = cell(nWorkers, 1);
+            for j=1:nWorkers
+                loop_data{j}.S = S;
+                loop_data{j}.Store = Store;
+                loop_data{j}.w{i} = struct('x', {cellfun(@(x)(x{j, 1}), tmp, 'UniformOutput', false)}, ...
+                                           'y', w{i}.y(points(j)+1:points(j+1)), ...
+                                           'e', w{i}.e(points(j)+1:points(j+1)), ...
+                                           'nomerge', true);
+            end
+
         else
             data = split_sqw.distribute(w{i}, 'nWorkers', nWorkers);
-        end
+            for j=1:nWorkers
+                loop_data{j}.S = S;
+                loop_data{j}.Store = Store;
+                loop_data{j}.w{i} = data(j);
 
-        for j=1:nWorkers
-            loop_data{j}.S = S;
-            loop_data{j}.Store = Store;
-            loop_data{j}.w{i} = data(j);
-
+            end
         end
     end
 end
