@@ -1,4 +1,4 @@
-function wout = rebin_xyz(win,array_is_descriptor,dir,varargin)
+function wout = rebin_(win, array_is_descriptor, iax, varargin)
 % Rebin an IX_dataset object or array of IX_dataset objects along all axis
 %
 %   >> wout = rebin (win, array_is_descriptor, descr)
@@ -46,17 +46,20 @@ if numel(win)==0, error('Empty object to rebin'), end
 if nargin==1, wout=win; return, end     % benign return if no arguments
 
 ndims = win.ndim;
-if any(dir>ndims)
+if any(iax>ndims)
     error('IX_dataset:invalid_argument',...
-        'Attempting to rebin  %dD object along %d direction(s)', ndims,dir(dir>ndims))    
+        'Attempting to rebin  %dD object along %d direction(s)', ndims,iax(iax>ndims))    
 end
 
 integrate_data=false;
 point_integration_default=false;
-iax=dir;
 
-opt=struct('empty_is_full_range',false,'range_is_one_bin',false,...
-    'array_is_descriptor',array_is_descriptor,'bin_boundaries',true);
+descsriptor_opt=struct(...
+    'empty_is_full_range',  false,...
+    'range_is_one_bin',     false,...
+    'array_is_descriptor',  array_is_descriptor,...
+    'bin_boundaries',       true);
 
-[wout,ok,mess] = rebin_IX_dataset_(win, integrate_data, point_integration_default, iax, opt, varargin{:});
+[wout,ok,mess] = rebin_object_array_(win, iax, integrate_data, point_integration_default,...
+    descsriptor_opt, varargin{:});
 if ~ok, error(mess), end

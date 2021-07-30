@@ -1,4 +1,4 @@
-function wout=hist2point(win)
+function obj_out = hist2point(obj, varargin)
 % Convert histogram IX_dataset_1d (or an array of them) to point dataset(s).
 %
 %   >> wout=hist2point(win)
@@ -16,21 +16,28 @@ function wout=hist2point(win)
 % data represents the sampling of a function at a series of points, and histogram
 % non-distribution data is not consistent with that.
 
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('sigvar')),'_docify')
+%
+%   doc_file_header = fullfile(doc_dir,'doc_binary_op_manager_header.m')
+%   doc_file_IO = fullfile(doc_dir,'doc_binary_general_args_IO_description.m')
+%   doc_file_notes = fullfile(doc_dir,'doc_binary_op_manager_notes.m')
+%   doc_file_sigvar_notes = fullfile(doc_dir,'doc_sigvar_notes.m')
+%
+%   list_operator_arg = 1
+% -----------------------------------------------------------------------------
+% <#doc_beg:> binary_and_unary_ops
+%   <#file:> <doc_file_header>
+%
+%   <#file:> <doc_file_IO> <list_operator_arg>
+%
+%
+% NOTES:
+%   <#file:> <doc_file_notes>
+%
+%   <#file:> <doc_file_sigvar_notes>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
-wout=win;
-for iw=1:numel(win)
-    if numel(win(iw).x)>numel(win(iw).signal)
-        if numel(win(iw).x)>1
-            wout(iw).x=0.5*(win(iw).x(2:end)+win(iw).x(1:end-1));
-        else
-            wout(iw).x=[];  % can have a histogram dataset with only one bin boundary and empty signal array
-        end
-        if ~win(iw).x_distribution
-            if numel(win(iw).x)>1           % don't need tconsider case of one bin, as signal is [] anyway.
-                dx=diff(win(iw).x);
-                wout(iw).signal=win(iw).signal./dx';
-            end
-            wout(iw).x_distribution=true;   % always convert into distribution
-        end
-    end
-end
+obj_out = hist2point_(obj, varargin{:});

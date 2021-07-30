@@ -1,4 +1,4 @@
-function wout = integrate_xyz(win,array_is_descriptor,dir, varargin)
+function wout = integrate_(win, array_is_descriptor, iax, varargin)
 % Integrate an IX_dataset object or array of IX_dataset objects along specified
 % axis direction
 %
@@ -63,18 +63,18 @@ if numel(win)==0, error('Empty object to integrate'), end
 
 ndims = dimensions(win);
 
-if max(dir)> ndims
+if max(iax)> ndims
     error('IX_dataset:invalid_argument',...
-        'Attempting to inegrate %dD object along %d direction', ndims,max(dir))
+        'Attempting to inegrate %dD object along %d direction', ndims,max(iax))
 end
-if any(dir>ndims)
+if any(iax>ndims)
     error('IX_dataset:invalid_argument',...
-        'Attempting to inegrate  %dD object along %d direction(s)', ndims,dir(dir>ndims))
+        'Attempting to inegrate  %dD object along %d direction(s)', ndims,iax(iax>ndims))
 end
 
 integrate_data=true;
 point_integration_default=true;
-iax=dir;
+iax=iax;
 opt=struct('empty_is_full_range',true,'range_is_one_bin',true,...
     'array_is_descriptor',array_is_descriptor,'bin_boundaries',true);
 

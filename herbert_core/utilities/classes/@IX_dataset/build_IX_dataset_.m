@@ -1,23 +1,23 @@
-function obj = build_IX_dataset(obj, varargin)
+function obj = build_IX_dataset_(obj, varargin)
 % Construct IX_dataset object with the required dimensionality
 %
 % Construct with default captioning:
-%   >> w = build_IX_dataset (obj, x1, x2,...xn)
-%   >> w = build_IX_dataset (obj, x1, x2,...xn, signal)
-%   >> w = build_IX_dataset (obj, x1, x2,...xn, signal, error)
-%   >> w = build_IX_dataset (obj, x1, x2,...xn, signal, error, x1_distribution,
-%                            x1_distribution, x2_distribution,..., xn_distribution)
+%   >> w = build_IX_dataset_ (obj, x1, x2,...xn)
+%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal)
+%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error)
+%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error, x1_distribution,
+%                             x1_distribution, x2_distribution,..., xn_distribution)
 %
 % Construct with custom captioning:
-%   >> w = build_IX_dataset (obj, x1, x2,...xn, signal, error, title,
-%                            x1_axis, x2_axis,..., xn_axis, s_axis)
-%   >> w = build_IX_dataset (obj, x1, x2,...xn, signal, error, title,
-%                            x1_axis, x2_axis,..., xn_axis, s_axis,
-%                            x1_distribution, x2_distribution,..., xn_distribution)
+%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error, title,
+%                             x1_axis, x2_axis,..., xn_axis, s_axis)
+%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error, title,
+%                             x1_axis, x2_axis,..., xn_axis, s_axis,
+%                             x1_distribution, x2_distribution,..., xn_distribution)
 %
 % Old format constructor (retained for backwards compatibility)
-%   >> w = build_IX_dataset (obj, title,  signal, error, s_axis, x1, x1_axis, x1_distribution,
-%                            x2, x2_axis, x2_distribution,..., xn, xn_axis, xn_distribution)
+%   >> w = build_IX_dataset_ (obj, title,  signal, error, s_axis, x1, x1_axis, x1_distribution,
+%                             x2, x2_axis, x2_distribution,..., xn, xn_axis, xn_distribution)
 %
 %
 % Notes about sizes of arrays
