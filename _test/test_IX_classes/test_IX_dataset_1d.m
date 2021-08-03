@@ -2,9 +2,8 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
     % Test class to test IX_dataset_1d methods
     %
     % Modified T.G.Perring 202-07-18 as part of refactoring of IX_dataset
-    %   - axis values are now columns
     %   - IX_dataset properties valid_ and error_mess_ deleted, so that
-    %     get_valid and associated methods no longer exist. Objects are 
+    %     get_valid and associated methods no longer exist. Objects are
     %     always valid if they were created.
     
     properties
@@ -26,7 +25,7 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             
             obj.w1ref = struct_to_IX_dataset_1d(S);
             obj.S = S;
-
+            
             obj.save()
         end
         
@@ -34,37 +33,37 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
         function test_constructor(obj)
             %   >> w = IX_dataset_1d (x)
             ds = IX_dataset_1d(1:10);
-            assertEqual(ds.x,(1:10)');          % now column
+            assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,zeros(10,1));
             assertEqual(ds.error,zeros(10,1));
             
             
             %   >> w = IX_dataset_1d (x,signal)
             ds = IX_dataset_1d(1:10,ones(1,9));
-            assertEqual(ds.x,(1:10)');          % now column
+            assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,ones(9,1));
             assertEqual(ds.error,zeros(9,1));
             
             
             %   >> w = IX_dataset_1d (x,signal,error)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10));
-            assertEqual(ds.x,(1:10)');          % now column
+            assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
             
-
-% *** RE-INSERT TEST
-%             data = [1:10;2*ones(1,10);ones(1,10)];
-%             ds = IX_dataset_1d(data);
-%             % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
-%             assertEqual(ds.x,(1:10)');          % now column
-%             assertEqual(ds.signal,2*ones(10,1));
-%             assertEqual(ds.error,ones(10,1));
+            
+            % *** RE-INSERT TEST
+            %             data = [1:10;2*ones(1,10);ones(1,10)];
+            %             ds = IX_dataset_1d(data);
+            %             % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
+            %             assertEqual(ds.x,(1:10));
+            %             assertEqual(ds.signal,2*ones(10,1));
+            %             assertEqual(ds.error,ones(10,1));
             
             
             %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),'my object','x-axis name','y-axis name');
-            assertEqual(ds.x,(1:10)');          % now column
+            assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
             assertEqual(ds.title,{'my object'});
@@ -75,7 +74,7 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis, x_distribution)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
                 'my object','x-axis name','y-axis name',false);
-            assertEqual(ds.x,(1:10)');          % now column
+            assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
             assertEqual(ds.title,{'my object'});
@@ -87,7 +86,7 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             %   >> w = IX_dataset_1d (title, signal, error, s_axis, x, x_axis, x_distribution)
             ds = IX_dataset_1d('my object',ones(1,10),ones(1,10),...
                 'y-axis name',1:10,'x-axis name',false);
-            assertEqual(ds.x,(1:10)');          % now column
+            assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
             assertEqual(ds.title,{'my object'});
@@ -128,13 +127,13 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
                 'my object','x-axis name','y-axis name',false);
-
+            
             try
                 ds.x = 1:15;
                 error('Failure to throw error due to invalid axes values')
             catch ME
                 if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
+                        'HERBERT:check_properties_consistency_:invalid_argument')
                     rethrow(ME)
                 end
             end
@@ -148,30 +147,30 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
                     rethrow(ME)
                 end
             end
-
+            
         end
         
         
         %------------------------------------------------------------------
         function test_set_1(obj)
             test_property_change_ok (obj.S, 'title', 'New title')
-        end        
-
+        end
+        
         function test_set_2(obj)
             mess = 'HERBERT:check_and_set_title_:invalid_argument';
             test_property_change_ok (obj.S, 'title', sigvar(37), mess)
-        end        
-
+        end
+        
         function test_set_3(obj)
             % Go from hist to point dataset
             test_property_change_ok (obj.S, 'x', obj.S.x(1:end-1))
-        end        
-
+        end
+        
         function test_set_4(obj)
             test_property_change_ok (obj.S, 'x_distribution', 1)
-        end        
+        end
         
-            
+        
         %------------------------------------------------------------------
         function test_op_managers(obj)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...

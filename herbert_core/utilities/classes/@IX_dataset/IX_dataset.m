@@ -44,7 +44,7 @@ classdef (Abstract) IX_dataset
         % Signal axis information. IX_axis object
         s_axis_
         
-        % Bin boundaries or centres. Cell array (row) of numeric column
+        % Bin boundaries or centres. Cell array (row) of numeric row
         % vectors, one per dimension
         xyz_
         

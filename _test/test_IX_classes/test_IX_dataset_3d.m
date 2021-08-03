@@ -2,9 +2,8 @@ classdef test_IX_dataset_3d <  TestCase
     % Test class to test IX_dataset_3d methods
     %
     % Modified T.G.Perring 202-07-18 as part of refactoring of IX_dataset
-    %   - axis values are now columns
     %   - IX_dataset properties valid_ and error_mess_ deleted, so that
-    %     get_valid and associated methods no longer exist. Objects are 
+    %     get_valid and associated methods no longer exist. Objects are
     %     always valid if they were created.
     
     properties
@@ -25,27 +24,27 @@ classdef test_IX_dataset_3d <  TestCase
         function test_constructor(obj)
             %   >> w = IX_dataset_3d (x,y,z)
             ds = IX_dataset_3d(1:10,1:5,1:7);
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:5)');           % now column
-            assertEqual(ds.z,(1:7)');           % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:5));
+            assertEqual(ds.z,(1:7));
             assertEqual(ds.signal,zeros(10,5,7));
             assertEqual(ds.error,zeros(10,5,7));
             
             
             %   >> w = IX_dataset_3d (x,y,z,signal)
             ds = IX_dataset_3d(1:10,1:5,1:7,ones(9,4,6));
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:5)');           % now column
-            assertEqual(ds.z,(1:7)');           % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:5));
+            assertEqual(ds.z,(1:7));
             assertEqual(ds.signal,ones(9,4,6));
             assertEqual(ds.error,zeros(9,4,6));
             
             
             %   >> w = IX_dataset_3d (x,y,z,signal,error)
             ds = IX_dataset_3d(1:10,1:5,1:7,ones(10,5,7),ones(10,5,7));
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:5)');           % now column
-            assertEqual(ds.z,(1:7)');           % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:5));
+            assertEqual(ds.z,(1:7));
             assertEqual(ds.signal,ones(10,5,7));
             assertEqual(ds.error,ones(10,5,7));
             
@@ -53,9 +52,9 @@ classdef test_IX_dataset_3d <  TestCase
             %   >> w = IX_dataset_3d (x,y,z,signal,error,title,x_axis,y_axis,z_axis,s_axis)
             ds = IX_dataset_3d(1:10,1:5,1:7,ones(10,5,7),ones(10,5,7),...
                 'my 3D obj','x-axis','y-axis','z-axis','signal');
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:5)');           % now column
-            assertEqual(ds.z,(1:7)');           % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:5));
+            assertEqual(ds.z,(1:7));
             assertEqual(ds.signal,ones(10,5,7));
             assertEqual(ds.error,ones(10,5,7));
             assertEqual(ds.title,{'my 3D obj'});
@@ -69,9 +68,9 @@ classdef test_IX_dataset_3d <  TestCase
             ds = IX_dataset_3d(1:10,1:5,1:7,ones(10,5,7),ones(10,5,7),...
                 'my 3D obj','x-axis','y-axis','z-axis','signal',...
                 false,false,false);
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:5)');           % now column
-            assertEqual(ds.z,(1:7)');           % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:5));
+            assertEqual(ds.z,(1:7));
             assertEqual(ds.signal,ones(10,5,7));
             assertEqual(ds.error,ones(10,5,7));
             assertEqual(ds.title,{'my 3D obj'});
@@ -90,9 +89,9 @@ classdef test_IX_dataset_3d <  TestCase
                 'signal',1:10,'x-axis',false,...
                 1:5,'y-axis',false,...
                 1:7,'z-axis',false);
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:5)');           % now column
-            assertEqual(ds.z,(1:7)');           % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:5));
+            assertEqual(ds.z,(1:7));
             assertEqual(ds.signal,ones(10,5,7));
             assertEqual(ds.error,ones(10,5,7));
             assertEqual(ds.title,{'my 3D obj'});
@@ -128,7 +127,7 @@ classdef test_IX_dataset_3d <  TestCase
             ay = id.y_axis;
             assertTrue(isa(ay,'IX_axis'));
             assertEqual(ay.caption,{'dist'});
-
+            
             ay.units = 'A^-1';
             id.y_axis = ay;
             assertTrue(isa(id.y_axis,'IX_axis'));
@@ -152,7 +151,7 @@ classdef test_IX_dataset_3d <  TestCase
                 error('Failure to throw error due to invalid size of signal array')
             catch ME
                 if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
+                        'HERBERT:check_properties_consistency_:invalid_argument')
                     rethrow(ME)
                 end
             end
@@ -166,9 +165,9 @@ classdef test_IX_dataset_3d <  TestCase
                     rethrow(ME)
                 end
             end
-
+            
         end
-
+        
         
         %------------------------------------------------------------------
         function test_op_managers(obj)

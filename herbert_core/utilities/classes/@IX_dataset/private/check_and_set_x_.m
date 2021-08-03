@@ -6,7 +6,7 @@ function obj = check_and_set_x_(obj, val, iax)
 % Input:
 % ------
 %   obj     IX_dataset object
-%   val     Axis coordinates: numeric row vector
+%   val     Axis coordinates: numeric vector
 %               - all elements finite (i.e. no -Inf, Inf or NaN)
 %               - monotonically increasing 
 %   iax     Axis index, assumed to be a scalar in range 1,2,... ndim()
@@ -16,12 +16,10 @@ function obj = check_and_set_x_(obj, val, iax)
 %   obj     Updated object
 
 
-% if isempty(val) || (numel(size(val))==2 && all(size(val)==[0,0]))
-%     % *** val == [0,0] should be valid??
 if ~isempty(val)
     if isnumeric(val) && isvector(val)
-        if size(val,1)==1
-            obj.xyz_{iax} = double(val(:));   % make column vector
+        if size(val,2)==1
+            obj.xyz_{iax} = double(val');   % make row vector
         else
             obj.xyz_{iax} = double(val);
         end
@@ -43,5 +41,5 @@ if ~isempty(val)
     end
     
 else
-    obj.xyz_{iax} = zeros(0,1);     % default: length zero
+    obj.xyz_{iax} = zeros(1,0);     % default: length zero row vector
 end

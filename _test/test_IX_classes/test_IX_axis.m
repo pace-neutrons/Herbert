@@ -103,7 +103,7 @@ classdef test_IX_axis <  TestCase
             % assertEqual(ia.ticks.labels, data.labels(:));
             assertEqual(ia.ticks.labels, data.labels);
             
-            ias = struct(ia);
+            ias = structPublic(ia);
             ia = IX_axis(ias);
             assertEqual(ia.caption, {'my axis name'});
             assertEqual(ia.units, 'mEv');

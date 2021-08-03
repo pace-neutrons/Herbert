@@ -2,11 +2,10 @@ classdef test_IX_dataset_2d <  TestCase
     % Test class to test IX_dataset_1d methods
     %
     % Modified T.G.Perring 202-07-18 as part of refactoring of IX_dataset
-    %   - axis values are now columns
     %   - IX_dataset properties valid_ and error_mess_ deleted, so that
-    %     get_valid and associated methods no longer exist. Objects are 
+    %     get_valid and associated methods no longer exist. Objects are
     %     always valid if they were created.
-
+    
     properties
     end
     
@@ -25,24 +24,24 @@ classdef test_IX_dataset_2d <  TestCase
         function test_constructor(obj)
             % >> w = IX_dataset_2d (x,y)
             ds = IX_dataset_2d(1:10,1:20);
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:20)');          % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:20));
             assertEqual(ds.signal,zeros(10,20));
             assertEqual(ds.error,zeros(10,20));
             
             
             %   >> w = IX_dataset_2d (x,y,signal)
             ds = IX_dataset_2d(1:10,1:20,ones(9,19));
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:20)');          % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:20));
             assertEqual(ds.signal,ones(9,19));
             assertEqual(ds.error,zeros(9,19));
             
             
             %   >> w = IX_dataset_2d (x,y,signal,error)
             ds = IX_dataset_2d(1:10,1:20,ones(10,20),ones(10,20));
-            assertEqual(ds.x,(1:10)');          % now column
-            assertEqual(ds.y,(1:20)');          % now column
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.y,(1:20));
             assertEqual(ds.signal,ones(10,20));
             assertEqual(ds.error,ones(10,20));
             
@@ -50,8 +49,8 @@ classdef test_IX_dataset_2d <  TestCase
             %   >> w = IX_dataset_2d (x,y,signal,error,title,x_axis,y_axis,s_axis)
             ds = IX_dataset_2d(1:20,1:10,ones(20,10),ones(20,10),...
                 'my object','x-axis name','y-axis name','signal');
-            assertEqual(ds.x,(1:20)');          % now column
-            assertEqual(ds.y,(1:10)');          % now column
+            assertEqual(ds.x,(1:20));
+            assertEqual(ds.y,(1:10));
             assertEqual(ds.signal,ones(20,10));
             assertEqual(ds.error,ones(20,10));
             assertEqual(ds.title,{'my object'});
@@ -64,8 +63,8 @@ classdef test_IX_dataset_2d <  TestCase
             %           x_axis,y_axis,s_axis,x_distribution,y_distribution)
             ds = IX_dataset_2d(1:20,1:10,ones(20,10),ones(20,10),...
                 'my object','x-axis name','y-axis name','signal',false,false);
-            assertEqual(ds.x,(1:20)');          % now column
-            assertEqual(ds.y,(1:10)');          % now column
+            assertEqual(ds.x,(1:20));
+            assertEqual(ds.y,(1:10));
             assertEqual(ds.signal,ones(20,10));
             assertEqual(ds.error,ones(20,10));
             assertEqual(ds.title,{'my object'});
@@ -81,8 +80,8 @@ classdef test_IX_dataset_2d <  TestCase
             ds = IX_dataset_2d('my object',ones(15,10),ones(15,10),...
                 'signal',1:15,'x-axis name',false,...
                 1:10,'y-axis name',false);
-            assertEqual(ds.x,(1:15)');          % now column
-            assertEqual(ds.y,(1:10)');          % now column
+            assertEqual(ds.x,(1:15));
+            assertEqual(ds.y,(1:10));
             assertEqual(ds.signal,ones(15,10));
             assertEqual(ds.error,ones(15,10));
             assertEqual(ds.title,{'my object'});
@@ -93,7 +92,7 @@ classdef test_IX_dataset_2d <  TestCase
             assertEqual(ds.y_distribution,false);
         end
         
-       
+        
         %------------------------------------------------------------------
         function test_properties(obj)
             
@@ -122,7 +121,7 @@ classdef test_IX_dataset_2d <  TestCase
             assertTrue(isa(id.y_axis,'IX_axis'));
             assertEqual(id.y_axis.caption,{'dist'});
             assertEqual(id.y_axis.units,'A^-1');
-
+            
             ds = IX_dataset_2d('my object',ones(15,10),ones(15,10),...
                 'signal',1:15,'x-axis name',false,...
                 1:10,'y-axis name',false);
@@ -132,7 +131,7 @@ classdef test_IX_dataset_2d <  TestCase
                 error('Failure to throw error due to invalid axes values')
             catch ME
                 if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
+                        'HERBERT:check_properties_consistency_:invalid_argument')
                     rethrow(ME)
                 end
             end
@@ -142,7 +141,7 @@ classdef test_IX_dataset_2d <  TestCase
                 error('Failure to throw error due to invalid size of signal array')
             catch ME
                 if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
+                        'HERBERT:check_properties_consistency_:invalid_argument')
                     rethrow(ME)
                 end
             end
@@ -152,7 +151,7 @@ classdef test_IX_dataset_2d <  TestCase
                 error('Failure to throw error due to invalid size of error array')
             catch ME
                 if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
+                        'HERBERT:check_properties_consistency_:invalid_argument')
                     rethrow(ME)
                 end
             end
@@ -183,7 +182,7 @@ classdef test_IX_dataset_2d <  TestCase
             dss  = 1+ dss;
             assertEqual(dss.signal,3*ones(10,20));
             assertElementsAlmostEqual(dss.error,sqrt(3*ones(10,20)));
-                     
+            
         end
         %------------------------------------------------------------------
     end

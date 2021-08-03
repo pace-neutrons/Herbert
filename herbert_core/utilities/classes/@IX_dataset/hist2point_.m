@@ -70,12 +70,10 @@ if numel(ihist2pnt)>0
     % Get bin centres and change object
     % (Note: we can have the case of a histogram axis with one bin boundary
     % and dimension extent zero - must account for this case)
+    % (Note also that we divide by 2 rather than multiply by 0.5 so that
+    % integer bins with integer centres are computed exactly)
     for i = 1:numel(ihist2pnt)
-        if numel(x{i})>1
-            x_new{i} = 0.5 * (x{ihist2pnt(i)}(2:end) + x{ihist2pnt(i)}(1:end-1));
-        else
-            x_new{i} = zeros(0,1);
-        end
+        x_new{i} = bin_centres (x{ihist2pnt(i)});
     end
     obj_out = set_xyz_(obj, x_new, ihist2pnt);
     
