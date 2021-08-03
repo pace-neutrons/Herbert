@@ -1,4 +1,4 @@
-function [x_out, ok, mess]=bin_boundaries_from_descriptor_(xbounds, x_in)
+function [x_out, ok, mess] = bin_boundaries_from_descriptor_(xbounds, x_in)
 % Get new x bin boundaries from a bin boundary descriptor
 %
 %   >> [x_out, ok]=bin_boundaries_from_descriptor_(xbounds)

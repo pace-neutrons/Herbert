@@ -38,5 +38,6 @@ function wout = rebin2_z(win, varargin)
 % See also corresponding function rebin_z which accepts a rebin descriptor
 % of form [x1,dx1,x2,dx2,...xn] instead of a set of bin boundaries
 
-wout = rebin_xyz(win,false,3,varargin{:});
 
+array_is_descriptor = false;
+wout = rebin_(win, 3, array_is_descriptor, varargin{:});

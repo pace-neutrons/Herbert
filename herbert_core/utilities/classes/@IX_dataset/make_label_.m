@@ -18,8 +18,8 @@ function [x_label, s_label] = make_label_(obj)
 
 
 % If given array of objects, get labels for the first element
-x_label = arrayfun(@(x)make_label(x), obj(1).xyz_axis_);
-[s_label,units_appended]=make_label(obj(1).s_axis);
+x_label = arrayfun(@(x)make_label(x), obj(1).xyz_axis_, 'uniformOutput', false);
+[s_label,units_appended] = make_label(obj(1).s_axis);
 
 % Now address any distributions
 str='';

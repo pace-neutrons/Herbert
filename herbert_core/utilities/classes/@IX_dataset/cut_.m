@@ -57,6 +57,8 @@ function wout = cut_(win, iax, varargin)
 % dimensionality of the output object by one, and the rebin descriptor defines
 % bin centres, not bin boundaries.
 
+
+% *** Edit the following ***
 if numel(win)==0, error('Empty object to cut'), end
 if nargin==1, wout=win; return, end     % benign return if no arguments
 
@@ -70,20 +72,20 @@ if any(iax>ndims)
     error('IX_dataset:invalid_argument',...
         'Attempting to cut  %dD object along %d direction(s)', ndims,iax(iax>ndims))    
 end
+% ***
 
 
-integrate_data=false;
-point_integration_default=false;
-iax=iax;
+config.integrate_data = false;
 
-opt=struct('empty_is_full_range',false,'range_is_one_bin',true,'array_is_descriptor',true,'bin_boundaries',false);
+config.point_average_method_default = 'average';
 
-[wout,ok,mess] = rebin_IX_dataset_(win, integrate_data, point_integration_default, iax, opt, varargin{:});
+config.descsriptor_opts = struct(...
+    'empty_is_one_bin',  false,...
+    'range_is_one_bin',     true,...
+    'array_is_descriptor',  array_is_descriptor,...
+    'values_are_boundaries',       false);
+
+wout = rebin_object_array_(win, iax, config, varargin{:});
+
 % Squeeze object(s)
-wout=wout.squeeze_IX_dataset(iax);
-if isa(wout,'IX_dataset')
-    wout = wout.isvalid();
-end
-
-if ~ok, error(mess), end
-
+wout=wout.squeeze_IX_dataset(iax);  % *** check

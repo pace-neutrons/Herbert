@@ -1,14 +1,37 @@
-function wout = rebin_(win, array_is_descriptor, iax, varargin)
+function wout = rebin_(win, iax, array_is_descriptor, varargin)
 % Rebin an IX_dataset object or array of IX_dataset objects along all axis
 %
-%   >> wout = rebin (win, array_is_descriptor, descr)
+%   >> wout = rebin (win)       % benign - output is the same as input
+%
+%   >> wout = rebin (win, iax, array_is_descriptor, descr1, descr2,...)
 %   >> wout = rebin (win, array_is_descriptor, descr, 'int')
 %
 % Input:
 % ------
 %   win     Input object or array of objects to be rebinned
+%
+%   iax     Axis or axes to rebin. Must be unique integers in the range
+%           1,2...ndim, wheren ndim is the dimensionality of the object(s)
+%
+%   array_is_descriptor
+%           If true, then the following boundary descriptors are used to
+%           generate the bin boundaries
+%           If false, then the boundary descriptors are simply the bin
+%           boundaries
+%
 %   descr   Description of new bin boundaries
-%           - [], '' or zero:       Leave bins unchanged
+%           if array_is_descriptor==true:
+%
+%   *** if cut:
+%           - 0 (or empty e.g. [])  Leave bins unchanged
+%           - dx (numeric scalar)   New bins centred on zero with constant
+%                                  width dx
+%           - [xlo, xhi]            Single bin
+%           - [xlo, dx, xhi]        Set of equal width bins centred at 
+%                                  xlo, xlo+dx, xlo+2*dx,...
+%
+%
+%           - 0 (or empty e.g. [],''):       Leave bins unchanged
 %           - dx (numeric scalar)   New bins centred on zero with constant width dx
 %           - [xlo,xhi]             Change limits but bin boundaries in between unchanged
 %           - [xlo,dx,xhi]          Lower and upper limits xlo and xhi, with intervening bins
@@ -20,6 +43,10 @@ function wout = rebin_(win, array_is_descriptor, iax, varargin)
 %
 %           The lower limit can be -Inf and/or the upper limit +Inf, when the
 %           corresponding limit is set by the full extent of the data.
+% 
+%           If array_is_descriptor==false:
+%           - [x1,x2,...x(n+1)]     The bin boundaries, monotonically
+%                                   increasing
 %
 %   Point data: for an axis with point data (as opposed to histogram data)
 %   'ave'   average the values of the points within each new bin (DEFAULT)
@@ -42,24 +69,28 @@ function wout = rebin_(win, array_is_descriptor, iax, varargin)
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
-if numel(win)==0, error('Empty object to rebin'), end
+% *** Edit the following ***
 if nargin==1, wout=win; return, end     % benign return if no arguments
+
+if numel(win)==0
+    error('HERBERT:rebin_:invalid_argument', 'Attempt to rebin empty object array')
+end
 
 ndims = win.ndim;
 if any(iax>ndims)
     error('IX_dataset:invalid_argument',...
         'Attempting to rebin  %dD object along %d direction(s)', ndims,iax(iax>ndims))    
 end
+% ***
 
-integrate_data=false;
-point_integration_default=false;
+config.integrate_data = false;
 
-descsriptor_opt=struct(...
-    'empty_is_full_range',  false,...
+config.point_average_method_default = 'average';
+
+config.descsriptor_opts = struct(...
+    'empty_is_one_bin',  false,...
     'range_is_one_bin',     false,...
     'array_is_descriptor',  array_is_descriptor,...
-    'bin_boundaries',       true);
+    'values_are_boundaries',       true);
 
-[wout,ok,mess] = rebin_object_array_(win, iax, integrate_data, point_integration_default,...
-    descsriptor_opt, varargin{:});
-if ~ok, error(mess), end
+wout = rebin_object_array_(win, iax, config, varargin{:});

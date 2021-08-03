@@ -24,14 +24,14 @@ npatch = nx*ny;
 
 if numel(x)==nx
     if numel(x)>0
-        x=bin_boundaries_simple(x);
+        x=bin_boundaries(x);
     else
         x=0;    % to ensure case of empy point dataset does not cause a crash
     end
 end
 if numel(y)==ny
     if numel(y)>0
-        y=bin_boundaries_simple(y);
+        y=bin_boundaries(y);
     else
         y=0;    % to ensure case of empy point dataset does not cause a crash
     end

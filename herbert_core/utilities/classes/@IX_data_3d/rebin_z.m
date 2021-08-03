@@ -46,4 +46,5 @@ function wout = rebin_z(win, varargin)
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
-wout = rebin_xyz(win,true,3,varargin{:});
+array_is_descriptor = true;
+wout = rebin_(win, 3, array_is_descriptor, varargin{:});

@@ -1,38 +1,35 @@
-function [xc,ok,mess]=bin_centres(xb)
+function xc = bin_centres(xb)
 % Get bin centres
 %
-%   >> [xc,ok,mess]=bin_centres(xb)
+%   >> xc = bin_centres (xb)
 %
 % Input:
 % ------
-%   xb      Vector of bin boundaries; must be strictly monotonic increasing
+%   xb      Vector of bin boundaries; must be monotonic increasing.
 %           Must have at least one bin boundary.
 %
 %
 % Output:
 % -------
-%   xc      Vector of point positions; same orientation (i.e row or column) as input
-%          Set to [] if only one bin boundary, or if there is a problem.
-%   ok      =true if all OK, =false otherwise. If called with only one return argument
-%          then an error is thrown.
-%   mess    Message; ='' if OK
+%   xc      Vector of point positions; same orientation (i.e row or column)
+%          as input.
+%           Set to zeros(1,0) if only one bin centre (i.e. assumes row
+%          priority)
 
-if numel(xb)>1
-    if all(diff(xb)>0)
-        xc=0.5*(xb(2:end)+xb(1:end-1));
-        ok=true; mess='';
+
+if isvector(xb) && numel(xb)>=1
+    if numel(xb)==1
+        xc = zeros(1,0);
+    elseif ~any(diff(xb)<0)
+        % Divide by 2 (rather than multiply by 0.5) to be exact for those
+        % cases of integer boundaries where the centres are integer
+        xc = (xb(2:end) + xb(1:end-1))/2;   
     else
-        xc=[];
-        ok=false;
-        mess='Bin boundaries must be strictly monotonic increasing';
-        if nargout==1, error(mess), end
+        error ('HERBERT:bin_centres:invalid_input',...
+            'Bin boundaries must be monotonic increasing')
     end
-elseif numel(xb)==1
-    xc=[];
-    ok=true; mess='';
+    
 else
-    xc=[];
-    ok=false;
-    mess='Must have at least two bin boundaries';
-    if nargout==1, error(mess), end
+    error ('HERBERT:bin_centres:invalid_input',...
+        'Bin boundaries must be a vector with at least one element')
 end

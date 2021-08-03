@@ -17,8 +17,22 @@ function [xb,ok,mess]=bin_boundaries_opt(xc)
 %   mess    Message; ='' if OK
 %
 % If one point only, then bin boundaries are set to row vector [x-0.5,x+0.5]
+%
+% *****************************************************************
+% Deprecated function (2021-08-03)
+%   Likely to be removed at some point in the future
+%   Replace with function: bin_boundaries
 
-% T.G.Perring, 7 September 2009
+
+%--------------------------------------------------------------------------
+% Deprecated function warning
+persistent warn_count
+if isempty(warn_count), warn_count = 3; end
+
+new_fun = 'bin_boundaries';
+warn_count = warning_deprecated_function (warn_count, new_fun);
+%--------------------------------------------------------------------------
+
 
 if numel(xc)>1
     if isvector(xc)

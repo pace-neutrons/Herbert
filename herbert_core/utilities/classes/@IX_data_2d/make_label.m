@@ -17,5 +17,5 @@ function [x_label, y_label, s_label] = make_label(obj)
 
 
 [x_labels, s_label] = make_label_(obj);
-x_label = x_labels(1);
-y_label = x_labels(2);
+x_label = x_labels{1};
+y_label = x_labels{2};

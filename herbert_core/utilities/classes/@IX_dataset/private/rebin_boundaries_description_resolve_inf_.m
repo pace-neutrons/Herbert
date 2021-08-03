@@ -1,7 +1,9 @@
-function [xb,ok,mess]=rebin_boundaries_description_resolve_inf_(xbounds,is_descriptor,xlo,xhi)
-% Resolve -Inf and Inf in bin boundaries or rebin descriptor according to the range [xlo,xhi]
+function [xb,ok,mess]=rebin_boundaries_description_resolve_inf_...
+    (xbounds,is_descriptor,xlo,xhi)
+% Resolve -Inf and/or Inf in bin boundaries or rebin descriptor
 %
-%   >> [xb,ok,mess]=rebin_boundaries_description_resolve_inf(xbounds,is_descriptor,xlo,xhi)
+%   >> [xb,ok,mess]=rebin_boundaries_description_resolve_inf...
+%           (xbounds, is_descriptor, xlo, xhi)
 %
 % Input:
 % ------

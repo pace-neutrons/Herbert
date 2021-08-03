@@ -1,5 +1,5 @@
 classdef test_IX_dataset_3d <  TestCase
-    %Test class to test IX_dataset_3d methods
+    % Test class to test IX_dataset_3d methods
     %
     % Modified T.G.Perring 202-07-18 as part of refactoring of IX_dataset
     %   - axis values are now columns
@@ -18,74 +18,6 @@ classdef test_IX_dataset_3d <  TestCase
                 name = varargin{1};
             end
             this = this@TestCase(name);
-        end
-        
-        
-        %------------------------------------------------------------------
-        function test_properties(obj)
-            
-            id = IX_dataset_3d();
-            id.title = 'my title';
-            assertEqual(id.title,{'my title'});
-            
-            id.x_axis = 'Coord';
-            ax = id.x_axis;
-            assertTrue(isa(ax,'IX_axis'));
-            assertEqual(ax.caption,{'Coord'});
-            
-            ax.units = 'A^-1';
-            id.s_axis = ax;
-            as = id.s_axis;
-            assertTrue(isa(as,'IX_axis'));
-            assertEqual(id.s_axis.units,'A^-1');
-            
-            id.y_axis = 'dist';
-            ay = id.y_axis;
-            assertTrue(isa(ay,'IX_axis'));
-            assertEqual(ay.caption,{'dist'});
-
-            ay.units = 'A^-1';
-            id.y_axis = ay;
-            assertTrue(isa(id.y_axis,'IX_axis'));
-            assertEqual(id.y_axis.caption,{'dist'});
-            
-            % TGP 2021-07-18:
-            % Modified the following tests as it is no longer possible to
-            % set an object into an invalid state - an error is always thrown.
-            % Also now create a non-empty dataset for the comparison
-            ds = IX_dataset_3d(1:10,1:5,1:7,ones(10,5,7),ones(10,5,7),...
-                'my 3D obj','x-axis','y-axis','z-axis','signal');
-            
-            try
-                ds.x = 1:12;
-                error('Failure to throw error due to invalid axes values')
-            catch ME
-                if ~isequal(ME.identifier,...
-                        'HERBERT:check_properties_consistency_:invalid_argument')
-                    rethrow(ME)
-                end
-            end
-            
-            try
-                ds.signal = ones(10,20);
-                error('Failure to throw error due to invalid size of signal array')
-            catch ME
-                if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
-                    rethrow(ME)
-                end
-            end
-            
-            try
-                ds.error = ones(20,10);
-                error('Failure to throw error due to invalid size of error array')
-            catch ME
-                if ~isequal(ME.identifier,...
-                        'HERBERT:check_properties_consistency_:invalid_argument')
-                    rethrow(ME)
-                end
-            end
-
         end
         
         
@@ -174,45 +106,69 @@ classdef test_IX_dataset_3d <  TestCase
         end
         
         
-%         %------------------------------------------------------------------
-%         function test_methods(obj)
-%             ds = IX_dataset_3d(1:10,1:5,1:7,ones(10,5,7),ones(10,5,7),...
-%                 'my object','x-axis','y-axis','z-axis','signal');
-%             [ax,hist] = ds.axis(2);
-%             assertFalse(hist);
-%             assertEqual(ax.values,1:5);
-%             assertTrue(isa(ax.axis,'IX_axis'));
-%             assertTrue(ax.distribution);
-%             
-%             dsa = repmat(ds,2,1);
-%             dsa(2).x = 0.5:1:10.5;
-%             
-%             [ax,hist] = dsa(1).axis;
-%             assertEqual(hist,false);
-%             assertEqual(ax(1).values,1:10);
-%             assertEqual(ax(2).values,1:5);
-%             assertEqual(ax(3).values,1:7);
-%             
-%             is_hist = dsa.ishistogram;
-%             is_hist1 = ishistogram(dsa,1);
-%             is_hist2 = ishistogram(dsa,2);
-%             is_hist3 = ishistogram(dsa,3);
-%             assertEqual(is_hist,[is_hist1;is_hist2;is_hist3]);
-%             assertFalse(is_hist(1,1));
-%             assertTrue(is_hist(1,2));
-%             assertFalse(is_hist(2,1));
-%             assertFalse(is_hist(2,2));
-%             assertFalse(is_hist(3,1));
-%             assertFalse(is_hist(3,2));
-%             
-%             
-%             ids = dsa.point2hist();
-%             idr = ids.hist2point();
-%             %BUG?
-%             %           assertEqual(dsa,idr);
-%             
-%         end
-        
+        %------------------------------------------------------------------
+        function test_properties(obj)
+            
+            id = IX_dataset_3d();
+            id.title = 'my title';
+            assertEqual(id.title,{'my title'});
+            
+            id.x_axis = 'Coord';
+            ax = id.x_axis;
+            assertTrue(isa(ax,'IX_axis'));
+            assertEqual(ax.caption,{'Coord'});
+            
+            ax.units = 'A^-1';
+            id.s_axis = ax;
+            as = id.s_axis;
+            assertTrue(isa(as,'IX_axis'));
+            assertEqual(id.s_axis.units,'A^-1');
+            
+            id.y_axis = 'dist';
+            ay = id.y_axis;
+            assertTrue(isa(ay,'IX_axis'));
+            assertEqual(ay.caption,{'dist'});
+
+            ay.units = 'A^-1';
+            id.y_axis = ay;
+            assertTrue(isa(id.y_axis,'IX_axis'));
+            assertEqual(id.y_axis.caption,{'dist'});
+            
+            ds = IX_dataset_3d(1:10,1:5,1:7,ones(10,5,7),ones(10,5,7),...
+                'my 3D obj','x-axis','y-axis','z-axis','signal');
+            
+            try
+                ds.x = 1:12;
+                error('Failure to throw error due to invalid axes values')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+            
+            try
+                ds.signal = ones(10,20);
+                error('Failure to throw error due to invalid size of signal array')
+            catch ME
+                if ~isequal(ME.identifier,...
+                    'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+            
+            try
+                ds.error = ones(20,10);
+                error('Failure to throw error due to invalid size of error array')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+
+        end
+
         
         %------------------------------------------------------------------
         function test_op_managers(obj)

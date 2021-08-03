@@ -1,5 +1,5 @@
-classdef test_IX_dataset_1d <  TestCase
-    %Test class to test IX_dataset_1d methods
+classdef test_IX_dataset_1d <  TestCaseWithSave
+    % Test class to test IX_dataset_1d methods
     %
     % Modified T.G.Perring 202-07-18 as part of refactoring of IX_dataset
     %   - axis values are now columns
@@ -8,64 +8,27 @@ classdef test_IX_dataset_1d <  TestCase
     %     always valid if they were created.
     
     properties
+        w1ref
+        S
     end
     
     methods
-        function this=test_IX_dataset_1d(varargin)
-            if nargin == 0
-                name = 'test_IX_dataset_1d';
-            else
-                name = varargin{1};
-            end
-            this = this@TestCase(name);
-        end
-        
-        %------------------------------------------------------------------
-        function test_properties(obj)
-            id = IX_dataset_1d();
-            id.title = 'my title';
-            assertEqual(id.title,{'my title'});
+        function obj=test_IX_dataset_1d (name)
+            obj@TestCaseWithSave(name);
             
-            id.x_axis = 'Coord';
-            ax = id.x_axis;
-            assertTrue(isa(ax,'IX_axis'));
-            assertEqual(ax.caption,{'Coord'});
+            S.title = 'My object';
+            S.signal = 1001:1010;
+            S.error = 11:20;
+            S.s_axis  = 'y-axis name';
+            S.x = 101:111;
+            S.x_axis = 'x-axis name';
+            S.x_distribution = false;
             
-            ax.units = 'A^-1';
-            id.s_axis = ax;
-            as = id.s_axis;
-            assertTrue(isa(as,'IX_axis'));
-            assertEqual(id.s_axis.units,'A^-1');
-            
-            % TGP 2021-07-18:
-            % Modified the following tests as it is no longer possible to
-            % set an object into an invalid state - an error is always thrown.
-            % Also now create a non-empty dataset for the comparison
-            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
-                'my object','x-axis name','y-axis name',false);
-            
-            try
-                ds.x = 1:15;
-                error('Failure to throw error due to invalid axes values')
-            catch ME
-                if ~isequal(ME.identifier,...
-                    'HERBERT:check_properties_consistency_:invalid_argument')
-                    rethrow(ME)
-                end
-            end
-            
-            try
-                ds.signal = ones(1,15);
-                error('Failure to throw error due to invalid size of signal array')
-            catch ME
-                if ~isequal(ME.identifier,...
-                        'HERBERT:check_properties_consistency_:invalid_argument')
-                    rethrow(ME)
-                end
-            end
+            obj.w1ref = struct_to_IX_dataset_1d(S);
+            obj.S = S;
 
+            obj.save()
         end
-        
         
         %------------------------------------------------------------------
         function test_constructor(obj)
@@ -133,39 +96,82 @@ classdef test_IX_dataset_1d <  TestCase
             assertEqual(ds.x_distribution,false);
         end
         
+        function test_constructor_small(obj)
+            % Single point is valid
+            ds = IX_dataset_1d(1, 10);
+            assertEqual(size(ds.error),[1,1])
+        end
         
-%         %------------------------------------------------------------------
-%         function test_methods(obj)
-%             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
-%                 'my object','x-axis name','y-axis name');
-%             [ax,hist] = ds.axis;
-%             assertFalse(hist);
-%             assertEqual(ax.values,1:10);
-%             assertTrue(isa(ax.axis,'IX_axis'));
-%             assertTrue(ax.distribution);
-%             
-%             dsa = repmat(ds,2,1);
-%             dsa(2).x = 0.5:1:10.5;
-%             
-%             [ax,hist] = dsa.axis;
-%             assertEqual(hist,[false,true]);
-%             assertEqual(ax(1).values,1:10);
-%             assertEqual(ax(2).values,0.5:1:10.5);
-%             
-%             is_hist = dsa.ishistogram;
-%             is_hist1 = ishistogram(dsa,1);
-%             assertEqual(is_hist,is_hist1);
-%             assertFalse(is_hist(1));
-%             assertTrue(is_hist(2));
-%             
-%             ids = dsa.cnt2dist();
-%             idr = ids.dist2cnt();
-%             % Not equal -- bug in old code!
-%             %           assertEqual(dsa,idr);
-%             
-%         end
+        function test_constructor_null(obj)
+            % Single bin boundary is valid
+            ds = IX_dataset_1d(1, zeros(0,1));
+            assertEqual(size(ds.error),[0,1])
+        end
         
         
+        %------------------------------------------------------------------
+        function test_properties(obj)
+            id = IX_dataset_1d();
+            id.title = 'my title';
+            assertEqual(id.title,{'my title'});
+            
+            id.x_axis = 'Coord';
+            ax = id.x_axis;
+            assertTrue(isa(ax,'IX_axis'));
+            assertEqual(ax.caption,{'Coord'});
+            
+            ax.units = 'A^-1';
+            id.s_axis = ax;
+            as = id.s_axis;
+            assertTrue(isa(as,'IX_axis'));
+            assertEqual(id.s_axis.units,'A^-1');
+            
+            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
+                'my object','x-axis name','y-axis name',false);
+
+            try
+                ds.x = 1:15;
+                error('Failure to throw error due to invalid axes values')
+            catch ME
+                if ~isequal(ME.identifier,...
+                    'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+            
+            try
+                ds.signal = ones(1,15);
+                error('Failure to throw error due to invalid size of signal array')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+
+        end
+        
+        
+        %------------------------------------------------------------------
+        function test_set_1(obj)
+            test_property_change_ok (obj.S, 'title', 'New title')
+        end        
+
+        function test_set_2(obj)
+            mess = 'HERBERT:check_and_set_title_:invalid_argument';
+            test_property_change_ok (obj.S, 'title', sigvar(37), mess)
+        end        
+
+        function test_set_3(obj)
+            % Go from hist to point dataset
+            test_property_change_ok (obj.S, 'x', obj.S.x(1:end-1))
+        end        
+
+        function test_set_4(obj)
+            test_property_change_ok (obj.S, 'x_distribution', 1)
+        end        
+        
+            
         %------------------------------------------------------------------
         function test_op_managers(obj)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
@@ -194,4 +200,49 @@ classdef test_IX_dataset_1d <  TestCase
         %------------------------------------------------------------------
     end
     
+end
+
+%==========================================================================
+function test_property_change_ok (Struc, name, value, message_ID)
+% Check that a property change is correctly made.
+% If the property name is invalid or a change is not valid, then an error
+% is expected; in this case an error with the given message_ID must be created
+
+% Create reference object
+wref = struct_to_IX_dataset_1d (Struc);  % this had better work!
+
+% Create object with a field changed
+Struc_new = Struc;
+Struc_new.(name) = value;
+try
+    wnew = struct_to_IX_dataset_1d (Struc_new);
+    % We expect an error to be thrown if message is present
+    if exist('message_ID','var')
+        error (['Failure to throw error with identifier: ', '''',message_ID,''''])
+    end
+catch ME
+    if exist('message_ID','var') && isequal(ME.identifier, message_ID)
+        % We expect this error
+        return
+    else
+        % Throw an error only if the error message ID is unexpected
+        rethrow(ME)
+    end
+end
+
+% If reached this point, then we expect to be able to change the field
+% Get object by changing object property
+wtest = wref;
+wtest.(name) = value;
+
+assertEqualToTol(wtest, wnew, 'tol', [1e-14, 1e-14])
+
+end
+
+%-----------------------------------------
+function obj = struct_to_IX_dataset_1d (S)
+% Create IX_dataset_1d from structure
+C = struct2cell(S)';
+obj = IX_dataset_1d(C{:});
+
 end

@@ -20,13 +20,14 @@ classdef (Abstract) IX_dataset
     end
     
     properties(Access=protected)
-        % These are the class independent properties. Some of them are the
-        % mirrors of the dependent properties inherited by all child classes
-        % (see above), others are ones that specific methods of a child
-        % class will access.
+        % These are the class independent properties.
+        % - Some of them are the mirrors of the dependent properties
+        %   inherited by all child classes (see above).
+        % - The others are arrays whose individual elements are mirrored by
+        %   class-specific dependent properties of child classes.
         %
-        % Need to be protected (not private) because this class is inherited
-        % by IX_data_1d, IX_data_2d etc.
+        % These properties need to be protected (not private) because this
+        % class is inherited by IX_data_1d, IX_data_2d etc.
         
         % Title (plotted on graphs). Cell array (column) of character strings
         title_
@@ -64,6 +65,17 @@ classdef (Abstract) IX_dataset
         %===================================================================
 
         % Set methods for dependent properties
+        % Checks on validity of the passed value made in utility routines.
+        % These are the same utility routines that are used by the class
+        % constructor, and so full consistency between constructor and
+        % set routines is guaranteed.
+        %
+        % Set methods for the other, class-specific, dependent properties
+        % defined by child classes must be accessed via the special utility
+        % set methods of IX_dataset. These set utilities perform the same
+        % checks as the class constructor. Interfaces for these methods are 
+        % declared elsewhere in this classdef
+        
         function obj = set.title(obj, val)
             obj = check_and_set_title_(obj, val);
         end
@@ -122,13 +134,7 @@ classdef (Abstract) IX_dataset
         % set up object values using object structure. (usually as above)
         obj = init_from_structure(obj,struct)
         
-        % method checks if common fields are consistent between each
-        % other. Call this method from a program after changing
-        % x,signal, error using set operations. Throws 'invalid_argument'
-        % if class is incorrent and and the method is called with one
-        % output argument. Returns error message, if class is incorrect and
-        % method called with two output arguments.
-        [obj,mess] = isvalid(obj)
+
         
         % Take absolute value of an IX_dataset_nd object or array of IX_dataset_nd objects
         % wout = abs(w)
@@ -213,11 +219,13 @@ classdef (Abstract) IX_dataset
         obj = set_xyz_distribution_(obj, val, iax)  % set axis distribution flag
 
         % Dimension independent methods used by child methods
+        [ax, hist] = axis_(obj, iax)
+        
         [nd, sz] = dimensions_(obj)
+        
+        obj_out = hist2point_(obj, iax)
 
         status = ishistogram_(obj, iax)
-        
-        [ax, hist] = axis_(obj, iax)
         
         [x_label, s_label] = make_label_(obj)
         
@@ -226,15 +234,15 @@ classdef (Abstract) IX_dataset
         
         % Make a cut from an IX_dataset object or array of IX_dataset objects along
         % specified axess direction(s).
-        wout = cut_xyz(win,dir,varargin)
+        wout = cut_(win,dir,varargin)
         
         % Integrate an IX_dataset object or array of IX_dataset
         % objects along the axes, defined by direction
-        wout = integrate_xyz(win,array_is_descriptor, dir, varargin)
+        wout = integrate_(win,array_is_descriptor, dir, varargin)
         
         % Rebin an IX_dataset object or array of IX_dataset objects along
         % along the axes, defined by direction
-        wout = rebin_xyz(win, array_is_descriptor,dir,varargin)
+        wout = rebin_(win, array_is_descriptor,dir,varargin)
     end
     
     
@@ -255,17 +263,22 @@ classdef (Abstract) IX_dataset
     
     
     methods(Abstract)
-        % Return dimensionality and extent of signal along dimensions
+        % Get axis information for one or more axes
+        [ax, hist] = axis(obj, iax)
+
+        % Return dimensionality and extent of signal along the dimensions
         [nd, sz] = dimensions(obj)
+        
+        % Convert all or selected histogram axes to point axes
+        obj_out = hist2point(obj, iax)
         
         % Return array containing true or false depending on dataset being
         % histogram or point;
         status = ishistogram(obj, iax)
         
-        % Get information for one or more axes and if it has histogram data
-        % for each axis
-        [ax,hist] = axis(obj, iax)
-
+        % Create axis annoations
+        varargout = make_label(obj)
+        
         %--- Not yet verified ---------------------------------------------
         % (re)initialize object using constructor' code
         obj = init(obj, varargin);
