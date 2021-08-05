@@ -174,6 +174,11 @@ else
     error('HERBERT:mfclass:badxye', 'temperror')
 end
 
+% $$$ celldisp(S.pstore)
+% $$$ celldisp(p)
+% $$$ celldisp(S.bpstore)
+% $$$ celldisp(bp)
+
 % Update parameters in store
 if store_calc
     S.store_filled=true;
@@ -289,7 +294,6 @@ function [calc, var, calc_filled, calculated, pstore, calc_store, var_store] = .
             var{iw}=var_store{iw};
             continue;
         end
-
         pars=plist_update(plist(k),p{k});
         calc{iw}=func{k}(w{iw}.x{:},pars{:});
         var{iw}=zeros(size(calc{iw}));
@@ -337,11 +341,8 @@ function [calc, var, calc_filled, calculated, calc_store, var_store] = ...
         pars=plist_update(plist(k),p{k});
 
         wcalc=func{k}(w{iw},pars{:});
-
         [calc{iw},var{iw},msk]=sigvar_get(wcalc);
 
-        psidisp('~/dump/calc', calc{iw})
-        psidisp('~/dump/msk', msk)
         calc{iw}=calc{iw}(msk);       % remove the points that we are told to ignore
         var{iw}=var{iw}(msk);
         calc{iw}=calc{iw}(:); % make column vector

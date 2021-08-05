@@ -330,6 +330,7 @@ else
 
         [outputs, n_failed, task_ids, jd] = jd.start_job('MFParallel_Job', common_data, loop_data, true, nWorkers, true);
         [f, v, loop_data, Store, S] = merge_data(outputs, loop_data);
+
     else
 
         [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
@@ -774,6 +775,7 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
             end
 
         else
+
             data = split_sqw.distribute(w{i}, 'nWorkers', nWorkers);
             for j=1:nWorkers
                 loop_data{j}.S = S;
@@ -785,51 +787,92 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
     end
 end
 
+function out = merge_section(in, nomerge)
+% Merge a compenent of split data into contiguous block, collating like sqw data
+% Possibly inefficient, but should be a miniscule part of calculation
+
+    out = in{1};
+
+    for i=2:numel(in)
+        for j=1:numel(in{i})
+            if nomerge{i}{j}
+                out{j} = cat(1, out{j}, in{i}{j}(1:end));
+            else
+                out{j}(end) = out{j}(end) + in{i}{j}(1);
+                out{j} = cat(1, out{j}, in{i}{j}(2:end));
+            end
+        end
+    end
+
+end
+
 function [f, v, loop_data, Store, S] = merge_data(outputs, loop_data)
 % Recombine data for use in serial segments (dfdpf).
 % Also updates loop_data's store.
 
-    f = outputs{1}.f;
-    v = outputs{1}.v;
+    nelem = cell(numel(outputs), 1);
+    nomerge = cell(numel(outputs), 1);
 
-
-    for i=2:numel(outputs)
-        if ~loop_data{i-1}.w{1}.nomerge
-            f(end) = f(end) + outputs{i}.f(1);
-            v(end) = v(end) + outputs{i}.v(1);
-            f = cat(1, f, outputs{i}.f(2:end));
-            v = cat(1, v, outputs{i}.v(2:end));
-        else
-            f = cat(1, f, outputs{i}.f(1:end));
-            v = cat(1, v, outputs{i}.v(1:end));
+    for i=1:numel(outputs)
+        nelem{i} = [];
+        nomerge{i} = cell(numel(loop_data{i}.w), 1);
+        for j=1:numel(loop_data{i}.w)
+            nelem{i} = [nelem{i}, loop_data{i}.w{j}.nelem];
+            nomerge{i}{j} = loop_data{i}.w{j}.nomerge;
         end
     end
 
-    S = struct('pstore', {outputs{1}.S.pstore}, ...
-               'bpstore', {outputs{1}.S.bpstore}, ...
-               'fcalc_store', {outputs{1}.S.fcalc_store}, ...
-               'bcalc_store', {outputs{1}.S.bcalc_store}, ...
-               'fvar_store', {outputs{1}.S.fvar_store}, ...
-               'bvar_store', {outputs{1}.S.bvar_store}, ...
-               'fstate_store', {outputs{1}.S.fstate_store}, ...
-               'bfstate_store', {outputs{1}.S.bfstate_store});
+    tmp = cellfun(@(x)(x.f), outputs, 'UniformOutput', false);
+    data = cell(numel(tmp), 1);
+    for i=1:numel(tmp)
+        data{i} = mat2cell(tmp{i}, nelem{i});
+    end
+    f = merge_section(data, nomerge);
+    f = cat(1, f{:});
 
-    Store = struct('fore', [], 'back', []);
-    S.store_filled = true;
+    tmp = cellfun(@(x)(x.v), outputs, 'UniformOutput', false);
+    data = cell(numel(tmp), 1);
+    for i=1:numel(tmp)
+        data{i} = mat2cell(tmp{i}, nelem{i});
+    end
+    v = merge_section(data, nomerge);
+    v = cat(1, v{:});
 
     for i=1:numel(outputs)
         loop_data{i}.S = outputs{i}.S;
         loop_data{i}.Store = outputs{i}.Store;
     end
 
+    S = struct('pstore', {outputs{1}.S.pstore}, ...
+               'bpstore', {outputs{1}.S.bpstore}, ...
+               'fstate_store', {outputs{end}.S.fstate_store}, ...
+               'bfstate_store', {outputs{end}.S.bfstate_store});
+    S.store_filled = true;
+
+    Store = struct('fore', [], 'back', []);
+
+    if any(cellfun(@(x)(numel(x.S.fcalc_store{1})), outputs))
+        tmp = cellfun(@(x)(x.S.fcalc_store), outputs, 'UniformOutput', false);
+        S.fcalc_store = merge_section(tmp, nomerge);
+        tmp = cellfun(@(x)(x.S.fvar_store), outputs, 'UniformOutput', false);
+        S.fvar_store = merge_section(tmp, nomerge);
+    else
+        S.fcalc_store = [];
+        S.fvar_store = [];
+    end
+
+    if any(cellfun(@(x)(numel(x.S.bcalc_store{1})), outputs))
+        tmp = cellfun(@(x)(x.S.bcalc_store), outputs, 'UniformOutput', false);
+        S.bcalc_store = merge_section(tmp, nomerge);
+        tmp = cellfun(@(x)(x.S.bvar_store), outputs, 'UniformOutput', false);
+        S.bvar_store = merge_section(tmp, nomerge);
+    else
+        S.bcalc_store = [];
+        S.bvar_store = [];
+    end
+
     for i=2:numel(outputs)
         S.store_filled = S.store_filled & outputs{i}.S.store_filled;
-        S.fcalc_store = [S.fcalc_store; outputs{i}.S.fcalc_store{1}];
-        S.bcalc_store = [S.bcalc_store; outputs{i}.S.bcalc_store{1}];
-        S.fvar_store = [S.fvar_store; outputs{i}.S.fvar_store{1}];
-        S.bvar_store = [S.bvar_store; outputs{i}.S.bvar_store{1}];
-        S.fstate_store = [S.fstate_store; outputs{i}.S.fstate_store{1}];
-        S.bfstate_store = [S.bfstate_store; outputs{i}.S.bfstate_store{1}];
         Store.fore = [Store.fore, outputs{i}.Store.fore];
         Store.back = [Store.back, outputs{i}.Store.back];
     end
