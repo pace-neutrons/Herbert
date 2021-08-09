@@ -200,6 +200,11 @@ classdef (Abstract) IX_dataset
         function [x_out, ok, mess] = bin_boundaries_from_descriptor(xbounds, x_in)
             [x_out, ok, mess] = bin_boundaries_from_descriptor_(xbounds, x_in);
         end
+        
+        % Access internal function for testing purposes
+        function xout = test_rebin_values_from_descriptor(xdescr, varargin)
+            xout = rebin_values_from_descriptor (xdescr, varargin{:});
+        end
     end
     
     %======================================================================

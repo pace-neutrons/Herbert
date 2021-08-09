@@ -1,8 +1,8 @@
-function status = ishistogram_(obj, iax)
+function hist = ishistogram_(obj, iax)
 % Return logical array indicating axes that are histogram data
 %
-%   >> status = ishistogram_(obj)
-%   >> status = ishistogram_(obj, iax)
+%   >> hist = ishistogram_(obj)
+%   >> hist = ishistogram_(obj, iax)
 %
 % Input:
 % ------
@@ -12,13 +12,13 @@ function status = ishistogram_(obj, iax)
 %
 % Output:
 % -------
-%   status  Logical with true is axis is histogran, false where point data
-%           - If a single object, size(status) = [1,numel(iax)]
-%           - If a single axis,   size(status) = size(obj)
-%           - If an array of objects and array of axes, then size(status) = 
+%   hist    Logical with true is axis is histogran, false where point data
+%           - If a single object, size(hist) = [1,numel(iax)]
+%           - If a single axis,   size(hist) = size(obj)
+%           - If an array of objects and array of axes, then size(hist) = 
 %             [numel(iax), size(w)] but with dimensions of length 1 removed
 %           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
-%               ishstogram(obj)         size(status) = [4,3]  (not [4,1,3])
+%               ishstogram(obj)         size(hist) = [4,3]  (not [4,1,3])
 %
 %           This behaviour is the same as that of the Matlab intrinsic
 %           function squeeze.
@@ -41,24 +41,24 @@ else
     end
 end
 
-% Calculate status
+% Calculate hist
 if numel(obj)==1
-    status = ishistogram_single_(obj, iax);
+    hist = ishistogram_single_(obj, iax);
     
 elseif isscalar(iax)
-    status = arrayfun(@(x)(ishistogram_single_(x, iax)), obj);
+    hist = arrayfun(@(x)(ishistogram_single_(x, iax)), obj);
     
 else
-    status = arrayfun(@(x)(make_column(ishistogram_single_(x, iax))), obj,...
+    hist = arrayfun(@(x)(make_column(ishistogram_single_(x, iax))), obj,...
         'UniformOutput',false);
-    status = reshape([status{:}], [nd, size(obj)]);
-    status = squeeze(status);
+    hist = reshape([hist{:}], [nd, size(obj)]);
+    hist = squeeze(hist);
 end
 
 
 %--------------------------------------------------------------------------
-function status = ishistogram_single_ (obj, iax)
+function hist = ishistogram_single_ (obj, iax)
 % Return ishistogram for a single object as a row vector
 sx = cellfun(@numel, obj.xyz_); % size of axis extents - row vector length nd
 [~, sz] = dimensions_(obj);
-status = ((sx(iax)-sz(iax))==1);
+hist = ((sx(iax)-sz(iax))==1);

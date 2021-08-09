@@ -69,28 +69,21 @@ function wout = rebin_(win, iax, array_is_descriptor, varargin)
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
-% *** Edit the following ***
-if nargin==1, wout=win; return, end     % benign return if no arguments
+% Benign return if no arguments
+if nargin==1
+    wout=win;
+    return
+end     
 
-if numel(win)==0
-    error('HERBERT:rebin_:invalid_argument', 'Attempt to rebin empty object array')
-end
-
-ndims = win.ndim;
-if any(iax>ndims)
-    error('IX_dataset:invalid_argument',...
-        'Attempting to rebin  %dD object along %d direction(s)', ndims,iax(iax>ndims))    
-end
-% ***
-
+% Call master rebin method
 config.integrate_data = false;
 
 config.point_average_method_default = 'average';
 
 config.descsriptor_opts = struct(...
-    'empty_is_one_bin',  false,...
+    'empty_is_one_bin',     false,...
     'range_is_one_bin',     false,...
     'array_is_descriptor',  array_is_descriptor,...
-    'values_are_boundaries',       true);
+    'values_are_boundaries',true);
 
-wout = rebin_object_array_(win, iax, config, varargin{:});
+wout = rebin_IX_dataset_(win, iax, config, varargin{:});

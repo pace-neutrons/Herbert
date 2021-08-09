@@ -1,4 +1,4 @@
-function wout = cut_(win, iax, varargin)
+function wout = cut_(win, iax, array_is_descriptor, varargin)
 % Make a cut from an IX_dataset object or array of IX_dataset objects
 %
 %   >> wout = cut_ (win, iax, descr1, descr2,...)
@@ -58,34 +58,25 @@ function wout = cut_(win, iax, varargin)
 % bin centres, not bin boundaries.
 
 
-% *** Edit the following ***
-if numel(win)==0, error('Empty object to cut'), end
-if nargin==1, wout=win; return, end     % benign return if no arguments
+% Benign return if no arguments
+if nargin==1
+    wout=win;
+    return
+end     
 
-ndims = win.ndim;
-
-if max(iax)>ndims
-    error('IX_dataset:invalid_argument',...
-        'Attempting to cut from %dD object along %d direction', dimensions(win),iax)
-end
-if any(iax>ndims)
-    error('IX_dataset:invalid_argument',...
-        'Attempting to cut  %dD object along %d direction(s)', ndims,iax(iax>ndims))    
-end
-% ***
-
-
+% Call master rebin method
 config.integrate_data = false;
 
 config.point_average_method_default = 'average';
 
 config.descsriptor_opts = struct(...
-    'empty_is_one_bin',  false,...
+    'empty_is_one_bin',     false,...
     'range_is_one_bin',     true,...
     'array_is_descriptor',  array_is_descriptor,...
-    'values_are_boundaries',       false);
+    'values_are_boundaries',false);
 
-wout = rebin_object_array_(win, iax, config, varargin{:});
+wout = rebin_IX_dataset_(win, iax, config, varargin{:});
+
 
 % Squeeze object(s)
 wout=wout.squeeze_IX_dataset(iax);  % *** check

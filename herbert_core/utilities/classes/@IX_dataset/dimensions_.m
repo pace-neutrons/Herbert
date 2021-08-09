@@ -29,7 +29,7 @@ function [nd, sz] = dimensions_(obj)
 %                               or n3=n4=1
 
 
-% Dimensionality from static method
+% Dimensionality
 nd = obj.ndim();
 
 % Get extent along each dimension from the signal array

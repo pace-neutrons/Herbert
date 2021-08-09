@@ -22,9 +22,9 @@ function [ax, hist] = axis_(obj, iax)
 %
 %   The sizes of the output arguments are the same, and are determined as
 %   follows:
-%           - If a single object, size(status) = [1,numel(iax)]
-%           - If a single axis,   size(status) = size(obj)
-%           - If an array of objects and array of axes, then size(status) = 
+%           - If a single object, size(hist) = [1,numel(iax)]
+%           - If a single axis,   size(hist) = size(obj)
+%           - If an array of objects and array of axes, then size(hist) = 
 %             [numel(iax), size(w)] but with dimensions of length 1 removed
 %           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
 %               ishstogram(obj)         size(status) = [4,3]  (not [4,1,3])

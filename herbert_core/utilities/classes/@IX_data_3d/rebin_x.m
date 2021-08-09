@@ -48,4 +48,3 @@ function wout = rebin_x(win, varargin)
 
 array_is_descriptor = true;
 wout = rebin_(win, 1, array_is_descriptor, varargin{:});
-

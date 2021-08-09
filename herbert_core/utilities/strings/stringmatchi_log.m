@@ -9,10 +9,13 @@ function status = stringmatchi_log (str, strcell, exact)
 % ------
 %   str         Character string
 %   strcell     Cell array of strings
+%
+% Optional:
 %   exact       Logical flag
 %                   false [default]: exact matches not required
 %                   true: exact match required
-%   'exact'     If present, output is true only for exact matches
+% *OR*
+%   'exact'     If present, output only for exact matches
 %
 % Output:
 % -------
@@ -53,5 +56,5 @@ elseif (islognumscalar(exact) && logical(exact)) || ...
     
 else
     error('HERBERT:stringmatchi_log:invalid_argument',...
-        'Optional third argument can only take the value ''exact''')
+        'Optional third argument can only take the value ''exact'' or logical true/false')
 end

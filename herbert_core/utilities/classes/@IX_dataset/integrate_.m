@@ -1,4 +1,4 @@
-function wout = integrate_(win, array_is_descriptor, iax, varargin)
+function wout = integrate_(win, iax, array_is_descriptor, varargin)
 % Integrate an IX_dataset object or array of IX_dataset objects along specified
 % axis direction
 %
@@ -59,32 +59,24 @@ function wout = integrate_(win, array_is_descriptor, iax, varargin)
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
-% *** Edit the following ***
-if numel(win)==0, error('Empty object to integrate'), end
+% Benign return if no arguments
+if nargin==1
+    wout=win;
+    return
+end     
 
-ndims = dimensions(win);
-
-if max(iax)> ndims
-    error('IX_dataset:invalid_argument',...
-        'Attempting to inegrate %dD object along %d direction', ndims,max(iax))
-end
-if any(iax>ndims)
-    error('IX_dataset:invalid_argument',...
-        'Attempting to inegrate  %dD object along %d direction(s)', ndims,iax(iax>ndims))
-end
-% ***
-
+% Call master rebin method
 config.integrate_data = true;
 
 config.point_average_method_default = 'interpolate';
 
 config.descsriptor_opts = struct(...
-    'empty_is_one_bin',  true,...
+    'empty_is_one_bin',     true,...
     'range_is_one_bin',     true,...
     'array_is_descriptor',  array_is_descriptor,...
-    'values_are_boundaries',       true);
+    'values_are_boundaries',true);
 
-wout = rebin_object_array_(win, iax, config, varargin{:});
+wout = rebin_IX_dataset_(win, iax, config, varargin{:});
 
 
 % Squeeze object(s)

@@ -9,9 +9,12 @@ function ind = stringmatchi (str, strcell, exact)
 % ------
 %   str         Test string
 %   strcell     Cell array of strings
+%
+% Optional:
 %   exact       Logical flag
 %                   false [default]: exact matches not required
 %                   true: exact match required
+% *OR*
 %   'exact'     If present, output only for exact matches
 %
 % Output:
@@ -50,6 +53,6 @@ elseif (islognumscalar(exact) && logical(exact)) || ...
     ind = find(strcmpi(str, strcell));
     
 else
-    error('HERBERT:stringmatchi:invalid_argument',...
-        'Optional third argument can only take the value ''exact''')
+    error('HERBERT:stringmatchi_log:invalid_argument',...
+        'Optional third argument can only take the value ''exact'' or logical true/false')
 end

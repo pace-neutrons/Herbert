@@ -41,6 +41,7 @@ function wout = cut(win, varargin)
 % Cut is similar to rebin, except that any axes that have just one bin reduce the
 % dimensionality of the output object by one, and the rebin descriptor defines
 % bin centres, not bin boundaries.
-%
 
-wout = cut_xyz(win,1:3,varargin{:});
+
+array_is_descriptor = true;
+wout = cut_(win, 1:3, array_is_descriptor, varargin{:});

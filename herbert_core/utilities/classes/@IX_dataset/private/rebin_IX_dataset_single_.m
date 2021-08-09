@@ -1,9 +1,9 @@
-function [wout,ok_rebin,mess] = rebin_IX_dataset_single_(win,iax,xbounds,true_values,is_descriptor,...
-    integrate_data,point_integration,use_mex,force_mex)
+function obj_out = rebin_IX_dataset_single_(obj, iax, xdescr, is_descriptor,...
+    resolved, values_are_boundaries, integrate_data, point_average_method)
 % Rebin dataset. Assumes that have already checked validity of input data.
 %
 %   >> [wout,ok_rebin,mess] = rebin_IX_dataset_single_(win,iax,xbounds,true_values,is_descriptor,...
-%                                                           integrate_data,point_integration,use_mex,force_mex)
+%                                                           integrate_data,point_integration)
 %
 % Input:
 % -------
@@ -22,12 +22,6 @@ function [wout,ok_rebin,mess] = rebin_IX_dataset_single_(win,iax,xbounds,true_va
 %   point_integration   Array of averging method for each axis (point data only; ignored if histogram data)
 %                         true:  Trapezoidal integration
 %                         false: Point averaging
-%   use_mex             Use mex files
-%                         true:  Try to mex functions first
-%                         false: Use matlab functions
-%   force_mex           Force mex files (only relevant if use_mex==true)
-%                         true:  Throw error if mex function fails
-%                         false: Use matlab function if mex function fails
 %
 % Output:
 % -------
@@ -47,44 +41,40 @@ function [wout,ok_rebin,mess] = rebin_IX_dataset_single_(win,iax,xbounds,true_va
 % or not. This is because it is assumed that point data is sampling a function.
 
 
-% ---------------------------------------------------------------------
-% Case of IX_dataset_nd
-use_mex = false; %FORTRAN mex have been disabled
-%
-ndim=win.ndim();
-nrebin=numel(iax);
-wout_x=cell(1,nrebin);
+ndim = obj.ndim();
+niax = numel(iax);
+x = cell(1,niax);
 
-ax=axis(win,iax(1));
-[wout_x{1},wout_s,wout_e,ok_rebin,mess] = rebin_one_axis(win,ndim,iax(1),ax.values,win.signal_,win.error_,ax.distribution,...
-    xbounds{1},true_values(1),is_descriptor(1),...
-    integrate_data,point_integration(1),use_mex,force_mex);
-if ~ok_rebin, wout=IX_dataset_nd(ndim); return, end
-
-for i=2:nrebin
-    ax=axis(win,iax(i));
-    [wout_x{i},wout_s,wout_e,ok_rebin,mess] = rebin_one_axis(win,ndim,iax(i),ax.values,wout_s,wout_e,ax.distribution,...
-        xbounds{i},true_values(i),is_descriptor(i),...
-        integrate_data,point_integration(i),use_mex,force_mex);
-    if ~ok_rebin, wout=IX_dataset_nd(ndim); return, end
+s = obj.signal_;
+e = obj.error_;
+for i=1:niax
+    ax=axis(obj,iax(i));
+    [x{i}, s, e] = rebin_one_axis(ndim, iax(i),...
+        ax.values, s, e, ax.distribution,...
+        xdescr{i}, true_values(i), is_descriptor(i),...
+        integrate_data, point_average_method(i));
 end
 
+
 if ~integrate_data
-    wout=set_simple_xsigerr(win,iax,wout_x,wout_s,wout_e);         % distribution is same as input data
+    % distribution is same as input data
+    obj_out=set_simple_xsigerr(obj, iax, x, s, e);         
 else
-    wout=set_simple_xsigerr(win,iax,wout_x,wout_s,wout_e,false);   % reset distribution to false along integration axes
+    % reset distribution to false along integration axes
+    obj_out=set_simple_xsigerr(obj, iax, x, s, e, false);   
 end
 
 
 
 
 %============================================================================================================
-function [wout_x,wout_s,wout_e,ok_rebin,mess] = rebin_one_axis(win,ndim,iax,win_x,win_s,win_e,win_xdist,xbounds,true_values,is_descriptor,...
-    integrate_data,point_integration,use_mex,force_mex)
+function [wout_x,wout_s,wout_e,ok_rebin,mess] = rebin_one_axis(win,ndim,iax,...
+    win_x,win_s,win_e,win_xdist,xbounds,true_values,is_descriptor,...
+    integrate_data,point_integration)
 % Rebin dataset. Assumes that have already checked validity of input data.
 %
 %   >> [wout_x,wout_s,wout_e,ok_rebin,mess] = rebin_one_axis(ndim,iax,win_x,win_s,win_e,win_xdist,xbounds,true_values,is_decsriptor,...
-%                                               integrate_data,point_integration,use_mex,force_mex)
+%                                               integrate_data,point_integration)
 %
 % Input:
 % -------
@@ -105,12 +95,6 @@ function [wout_x,wout_s,wout_e,ok_rebin,mess] = rebin_one_axis(win,ndim,iax,win_
 %   point_integration   Averging method (point data only; ignored if histogram data)
 %                         true:  Trapezoidal integration
 %                         false: Point averaging
-%   use_mex             Use mex files
-%                         true:  Try to mex functions first
-%                         false: Use matlab functions
-%   force_mex           Force mex files (only relevant if use_mex==true)
-%                         true:  Throw error if mex function fails
-%                         false: Use matlab function if mex function fails
 %
 % Output:
 % -------
@@ -152,7 +136,8 @@ if nx~=sz_full(iax)
     if true_values
         wout_x=xbounds;
     else
-        [xb,ok_rebin,mess]=rebin_boundaries_description_resolve_inf_(xbounds,is_descriptor,win_x(1),win_x(end));
+        [xb,ok_rebin,mess] = rebin_boundaries_description_resolve_inf_(xbounds,...
+            is_descriptor, win_x(1), win_x(end));
         if ~ok_rebin, wout_x=[]; wout_s=[]; wout_e=[]; return, end
         if is_descriptor
             if ~isempty(xb)

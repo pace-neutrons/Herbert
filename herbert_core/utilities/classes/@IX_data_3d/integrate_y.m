@@ -57,6 +57,6 @@ function wout = integrate_y(win, varargin)
 % See also corresponding function integrate2_y which accepts a set of bin boundaries
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
-wout = integrate_xyz(win,true,2,varargin{:});
 
-
+array_is_descriptor = true;
+wout = integrate_(win, 2, array_is_descriptor, varargin{:});
