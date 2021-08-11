@@ -311,7 +311,6 @@ else
         disp(' Function evaluation at starting parameter values:')
     end
 
-
     if ~all(xye) % is_parallel ||
         % Set up parallel
         nWorkers = 2;
@@ -328,13 +327,23 @@ else
                              'listing', listing);
         common_data.p = pfin;
 
+
         [outputs, n_failed, task_ids, jd] = jd.start_job('MFParallel_Job', common_data, loop_data, true, nWorkers, true);
         [f, v, loop_data, Store, S] = merge_data(outputs, loop_data);
+
+        % Potential issues follow if parallelism is used
+        % Special casing for Tobyfit where arguments need to be distributed
+        % as well as data. If functions require arguments distributing
+        % these will fail in parallel
+
+        if any(cellfun(@(x)(startsWith(functions(x).function, 'tobyfit')), func))
+% $$$             tobyfit_data = split_toby()
+        end
 
     else
 
         [f,~,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-                                              f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
+                                        f_pass_caller_info,bf_pass_caller_info,pfin,p_info,true,[],[],listing);
     end
 
     resid=wt.*(yval-f);
@@ -753,6 +762,7 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
      % Split up sqws and divvy xyes in w
 
     loop_data = cell(nWorkers, 1);
+
     for i=1:nWorkers
         loop_data{i} = struct('w', {cell(numel(w),1)}, 'xye', xye, 'S', S, 'Store', Store);
     end
@@ -766,8 +776,6 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
             tmp = cellfun(@(x)(mat2cell(x, nPer, 1)), w{i}.x(:), 'UniformOutput', false);
             data = cell(nWorkers, 1);
             for j=1:nWorkers
-                loop_data{j}.S = S;
-                loop_data{j}.Store = Store;
                 loop_data{j}.w{i} = struct('x', {cellfun(@(x)(x{j, 1}), tmp, 'UniformOutput', false)}, ...
                                            'y', w{i}.y(points(j)+1:points(j+1)), ...
                                            'e', w{i}.e(points(j)+1:points(j+1)), ...
@@ -778,16 +786,23 @@ function [loop_data] = split_data(w, xye, S, Store, nWorkers)
 
             data = split_sqw.distribute(w{i}, 'nWorkers', nWorkers);
             for j=1:nWorkers
-                loop_data{j}.S = S;
-                loop_data{j}.Store = Store;
                 loop_data{j}.w{i} = data(j);
-
             end
         end
     end
+
+    for i=1:nWorkers
+        loop_data{i}.nelem = [];
+        loop_data{i}.nomerge = cell(numel(w), 1);
+        for j=1:numel(w)
+            loop_data{i}.nelem = [loop_data{i}.nelem, loop_data{i}.w{j}.nelem];
+            loop_data{i}.nomerge{j} = loop_data{i}.w{j}.nomerge;
+        end
+    end
+
 end
 
-function out = merge_section(in, nomerge)
+function out = merge_section(in, loop_data)
 % Merge a compenent of split data into contiguous block, collating like sqw data
 % Possibly inefficient, but should be a miniscule part of calculation
 
@@ -795,7 +810,7 @@ function out = merge_section(in, nomerge)
 
     for i=2:numel(in)
         for j=1:numel(in{i})
-            if nomerge{i}{j}
+            if loop_data{i}.nomerge{j}
                 out{j} = cat(1, out{j}, in{i}{j}(1:end));
             else
                 out{j}(end) = out{j}(end) + in{i}{j}(1);
@@ -810,32 +825,23 @@ function [f, v, loop_data, Store, S] = merge_data(outputs, loop_data)
 % Recombine data for use in serial segments (dfdpf).
 % Also updates loop_data's store.
 
-    nelem = cell(numel(outputs), 1);
-    nomerge = cell(numel(outputs), 1);
-
-    for i=1:numel(outputs)
-        nelem{i} = [];
-        nomerge{i} = cell(numel(loop_data{i}.w), 1);
-        for j=1:numel(loop_data{i}.w)
-            nelem{i} = [nelem{i}, loop_data{i}.w{j}.nelem];
-            nomerge{i}{j} = loop_data{i}.w{j}.nomerge;
-        end
-    end
+    outputs{2}
+    struct2table(outputs{2}.stack)
 
     tmp = cellfun(@(x)(x.f), outputs, 'UniformOutput', false);
     data = cell(numel(tmp), 1);
     for i=1:numel(tmp)
-        data{i} = mat2cell(tmp{i}, nelem{i});
+        data{i} = mat2cell(tmp{i}, loop_data{i}.nelem);
     end
-    f = merge_section(data, nomerge);
+    f = merge_section(data, loop_data);
     f = cat(1, f{:});
 
     tmp = cellfun(@(x)(x.v), outputs, 'UniformOutput', false);
     data = cell(numel(tmp), 1);
     for i=1:numel(tmp)
-        data{i} = mat2cell(tmp{i}, nelem{i});
+        data{i} = mat2cell(tmp{i}, loop_data{i}.nelem);
     end
-    v = merge_section(data, nomerge);
+    v = merge_section(data, loop_data);
     v = cat(1, v{:});
 
     for i=1:numel(outputs)
@@ -853,9 +859,9 @@ function [f, v, loop_data, Store, S] = merge_data(outputs, loop_data)
 
     if any(cellfun(@(x)(numel(x.S.fcalc_store{1})), outputs))
         tmp = cellfun(@(x)(x.S.fcalc_store), outputs, 'UniformOutput', false);
-        S.fcalc_store = merge_section(tmp, nomerge);
+        S.fcalc_store = merge_section(tmp, loop_data);
         tmp = cellfun(@(x)(x.S.fvar_store), outputs, 'UniformOutput', false);
-        S.fvar_store = merge_section(tmp, nomerge);
+        S.fvar_store = merge_section(tmp, loop_data);
     else
         S.fcalc_store = [];
         S.fvar_store = [];
@@ -863,9 +869,9 @@ function [f, v, loop_data, Store, S] = merge_data(outputs, loop_data)
 
     if any(cellfun(@(x)(numel(x.S.bcalc_store{1})), outputs))
         tmp = cellfun(@(x)(x.S.bcalc_store), outputs, 'UniformOutput', false);
-        S.bcalc_store = merge_section(tmp, nomerge);
+        S.bcalc_store = merge_section(tmp, loop_data);
         tmp = cellfun(@(x)(x.S.bvar_store), outputs, 'UniformOutput', false);
-        S.bvar_store = merge_section(tmp, nomerge);
+        S.bvar_store = merge_section(tmp, loop_data);
     else
         S.bcalc_store = [];
         S.bvar_store = [];
@@ -878,4 +884,36 @@ function [f, v, loop_data, Store, S] = merge_data(outputs, loop_data)
     end
 
 
+end
+
+function tobyfit_data = split_tobyfit(data)
+
+tobyfit_data = data;
+% $$$
+% $$$ moderator_table: [1x1 object_lookup]
+% $$$ aperture_table: [1x1 object_lookup]
+% $$$ fermi_table: [1x1 object_lookup]
+% $$$ sample_table: [1x1 object_lookup]
+% $$$ detector_table: [1x1 object_lookup]
+% $$$ ei: {[186x1 double]}
+% $$$ x0: {[186x1 double]}
+% $$$ xa: {[186x1 double]}
+% $$$ x1: {[186x1 double]}
+% $$$ thetam: {[186x1 double]}
+% $$$ angvel: {[186x1 double]}
+% $$$ ki: {[186x1 double]}
+% $$$ kf: {[5008x1 double]}
+% $$$ s_mat: {[3x3x186 double]}
+% $$$ spec_to_rlu: {[3x3x186 double]}
+% $$$ alatt: {[2.8700 2.8700 2.8700]}
+% $$$ angdeg: {[90 90 90]}
+% $$$ f_mat: {[3x3x36864 double]}
+% $$$ d_mat: {[3x3x36864 double]}
+% $$$ detdcn: {[3x36864 double]}
+% $$$ x2: {[36864x1 double]}
+% $$$ dt: {[5008x1 double]}
+% $$$ qw: {{1x4 cell}}
+% $$$ dq_mat: {[4x11x5008 double]}
+% $$$ k_to_v: 629.6224
+% $$$ k_to_e: 2.0721
 end

@@ -34,3 +34,4 @@ end
 
 X = func_eval (obj.det_bank_, @rand, {'wvec'}, varargin{:});
 
+end
