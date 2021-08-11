@@ -162,7 +162,7 @@ elseif all(~xye)
 
     else
         [fcalc, fvar, fcalc_filled, fcalculated, S.fcalc_store, S.fvar_store, S.fstate_store] = ...
-            calc_sqw_w_info(w, p, plist, caller, func, S.fcalc_store, S.fvar_store, store_calc, S.store_filled, S.fstate_store, Store.fore);
+            calc_sqw_w_info(w, p, plist, caller, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled, S.fstate_store, Store.fore);
 
         [bcalc, bvar, bcalc_filled, bcalculated, S.bpstore, S.bcalc_store, S.bvar_store, S.bstate_store] = ...
             calc_sqw_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bstate_store, Store.back);
@@ -171,13 +171,8 @@ elseif all(~xye)
 
 else
 
-    error('HERBERT:mfclass:badxye', 'temperror')
+    error('HERBERT:mfclass:badxye', 'Mix of xye and sqw data not implemented')
 end
-
-% $$$ celldisp(S.pstore)
-% $$$ celldisp(p)
-% $$$ celldisp(S.bpstore)
-% $$$ celldisp(bp)
 
 % Update parameters in store
 if store_calc
@@ -423,12 +418,18 @@ function [calc, var, calc_filled, calculated, calc_store, var_store, state_store
             continue;
         end
         calc_filled(iw)=true;
+
         if store_filled && all(p{k}==pstore{k})
             calc{iw}=calc_store{iw};
             var{iw}=var_store{iw};
             continue;
         end
+
         pars=plist_update(plist(k),p{k});
+                caller, ...
+                state_store(iw), ...
+                foreback, ...
+                pars{3})
         [wcalc,state,foreback]=func{k}(w{iw},caller,state_store(iw),foreback,pars{:});
         [calc{iw},var{iw},msk]=sigvar_get(wcalc);
         calc{iw}=calc{iw}(msk);       % remove the points that we are told to ignore
