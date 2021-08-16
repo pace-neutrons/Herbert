@@ -34,12 +34,6 @@ if ~isempty(val)
             ': values must all be finite (i.e. cannot be -Inf,  Inf or NaN)']);
     end
     
-    if any(diff(val)<0)
-        error('HERBERT:check_and_set_x_:invalid_argument',...
-            ['Axis ', num2str(iax),...
-            ': values or histogram bin boundaries must be monotonically increasing']);
-    end
-    
 else
     obj.xyz_{iax} = zeros(1,0);     % default: length zero row vector
 end

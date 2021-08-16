@@ -12,10 +12,7 @@ function xout = rebin_values_from_descriptor(xdescr, xref)
 %       -------------------
 %         [x1, dx1, x2]
 %         [x1, dx1, x2, dx2, x3,...xn]
-%               where -Inf <= x1 <= x2 <= x3...<= xn <= Inf, or
-%                     (only x1 and xn can possibly be infinite)
-%
-%               and
+%               where -Inf < x1 < x2 < x3...< xn <= Inf, and
 %
 %               dx +ve: equal bin sizes between corresponding limits
 %               dx -ve: logarithmic bins between corresponding limits
@@ -27,8 +24,7 @@ function xout = rebin_values_from_descriptor(xdescr, xref)
 %       --------------------
 %       Descriptor defines bin boundaries:
 %         [x1, x2, x3,...xn]        
-%               where -Inf <= x1 <= x2 <=...<= xn <= Inf
-%                     (only x1 and xn can possibly be infinite)
+%               where -Inf <= x1 < x2 <...< xn <= Inf
 %
 %   xref        Reference array of values. Assumed that it is monotonic 
 %               increasing. Used where dx=0 in the descriptor

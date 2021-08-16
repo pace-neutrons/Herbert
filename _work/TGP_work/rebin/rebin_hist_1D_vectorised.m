@@ -1,7 +1,7 @@
-function [sout, eout] = rebin_hist_vectorised(x, s, e, xout)
+function [sout, eout] = rebin_hist_1D_vectorised(x, s, e, xout)
 % Rebins histogram data along axis iax=1 of an IX_dataset_nd with dimensionality ndim=1.
 %
-%   >> [sout, eout] = rebin_hist_vectorised (x, s, e, xout)
+%   >> [sout, eout] = rebin_hist_1D_vectorised (x, s, e, xout)
 %
 % Input:
 % ------

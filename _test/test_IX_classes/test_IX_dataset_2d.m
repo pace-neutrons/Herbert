@@ -92,6 +92,46 @@ classdef test_IX_dataset_2d <  TestCase
             assertEqual(ds.y_distribution,false);
         end
         
+        function test_constructor_small(obj)
+            % Single point is valid
+            ds = IX_dataset_2d(1, 10);
+            assertEqual(size(ds.error),[1,1])
+        end
+        
+        function test_constructor_null(obj)
+            % Single bin boundary is valid
+            ds = IX_dataset_2d(1, [4,5], zeros(0,1));
+            assertEqual(size(ds.error),[0,1])
+        end
+        
+        function test_non_monotonic_point (obj)
+            %   >> w = IX_dataset_2d (x,y,signal,error)
+            % This should fail, as only in 1D will the IX_dataset constructor
+            % re-order the axes
+            try
+                ds = IX_dataset_2d([1:7,9,8,10],1:20,ones(10,20),ones(10,20));
+                error('Failure to throw error due to invalid axes values')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+        end
+        
+        function test_non_strictly_monotonic_hist (obj)
+            %   >> w = IX_dataset_1d (x,signal,error)
+            % Should re-order the data
+            try
+                ds = IX_dataset_2d([1:7,7,9:11],1:20,ones(10,20),ones(10,20));
+                error('Failure to throw error due to invalid axes values')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+        end
         
         %------------------------------------------------------------------
         function test_properties(obj)

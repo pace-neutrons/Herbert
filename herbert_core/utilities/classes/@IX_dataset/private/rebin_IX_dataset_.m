@@ -7,6 +7,7 @@ function obj_out = rebin_IX_dataset_(obj, iax, config, varargin)
 %   >> obj_out = rebin_IX_dataset_(..., 'average')
 %   >> obj_out = rebin_IX_dataset_(..., 'interpolate')
 %
+%
 % Input:
 % ------
 %   win         IX_dataset_nd, or array or IX_dataset_nd (n=1,2,3)
@@ -36,15 +37,20 @@ function obj_out = rebin_IX_dataset_(obj, iax, config, varargin)
 %     	range_is_one_bin        true:   [x1,x2] ==> one bin
 %                               false:          ==> [x1,0,x2]
 %
-%      	array_is_descriptor     true:  interpret array of three or more
+%      	array_is_descriptor     For the case of a binning description with
+%                              three or more elements:
+%                               true:  interpret array of three or more
 %                                      elements as descriptor
 %                               false: interpret as actual bin boundaries
 %                                      or bin centres
 %
-%      	values_are_boundaries   true:  interpret array as defining bin
+%      	values_are_boundaries   For the case of a binning description with
+%                              three or more elements:
+%                               true:  interpret array as defining bin
 %                                      boundaries
 %                               false: interpret array as defining bin
-%                                      centres%
+%                                      centres
+%
 %   p1, p2,...  Arrays of rebin/integration intervals, one per axis.
 %               Depending on bin_opts.array_is_descriptor,
 %                      there are a number of different formats and defaults that are valid.

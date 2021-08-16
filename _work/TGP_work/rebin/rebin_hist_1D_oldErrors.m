@@ -1,7 +1,7 @@
-function [sout, eout] = rebin_hist_trueErrors(x, s, e, xout)
+function [sout, eout] = rebin_hist_1D_oldErrors(x, s, e, xout)
 % Rebins histogram data along axis iax=1 of an IX_dataset_nd with dimensionality ndim=1.
 %
-%   >> [sout, eout] = rebin_hist_trueErrors (x, s, e, xout)
+%   >> [sout, eout] = rebin_hist_1D_oldErrors (x, s, e, xout)
 %
 % Input:
 % ------
@@ -22,9 +22,12 @@ function [sout, eout] = rebin_hist_trueErrors(x, s, e, xout)
 %**************************************************************************
 % T.G.Perring 8 Aug 2021:
 % -----------------------
-% Vectorised version of original rebin_hist_
-% Retains the old-style error bar calculation i.e. adding in quadrature,
-% which does not deal consistently with split bins
+% Original rebin_hist_ algorithm refactored to change the code to make
+% clearer. A trivial change turns this into the new method for consistently
+% handling errors
+%
+% Old-style error bar calculation i.e. adding in quadrature, which does
+% not deal consistently with split bins
 %**************************************************************************
 
 iax=1;
@@ -60,7 +63,7 @@ if iin==mx+1 || iout==nx+1,  return, end    % guarantees that there is an overla
 while true
     delta = (min(xout(iout+1),x(iin+1)) - max(xout(iout),x(iin)));
     sout(iout) = sout(iout) +  delta * s(iin);
-    eout(iout) = eout(iout) + delta * (x(iin+1) - x(iin)) * (e(iin).^2);
+    eout(iout) = eout(iout) + (delta * e(iin))^2;
     if xout(iout+1) >= x(iin+1)
         if iin<mx
             iin = iin + 1;

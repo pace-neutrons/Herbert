@@ -107,7 +107,32 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             assertEqual(size(ds.error),[0,1])
         end
         
+        function test_non_monotonic_point (obj)
+            %   >> w = IX_dataset_1d (x,signal,error)
+            % Should re-order the data
+            ds = IX_dataset_1d([1:7,9,8,10],[1001:1007,1009,1008,1010],...
+                [101:107,109,108,110]);
+            assertEqual(ds.x,(1:10));
+            assertEqual(ds.signal,(1001:1010)');
+            assertEqual(ds.error,(101:110)');
+        end
         
+        function test_non_strictly_monotonic_hist (obj)
+            %   >> w = IX_dataset_1d (x,signal,error)
+            % Should fail
+            try
+                ds = IX_dataset_1d([1:7,7,9,10,11],[1001:1007,1009,1008,1010],...
+                    [101:107,109,108,110]);
+                error('Failure to throw error due to invalid axes values')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
+        end
+
+
         %------------------------------------------------------------------
         function test_properties(obj)
             id = IX_dataset_1d();
@@ -153,10 +178,12 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
         
         %------------------------------------------------------------------
         function test_set_1(obj)
+            % Change title
             test_property_change_ok (obj.S, 'title', 'New title')
         end
         
         function test_set_2(obj)
+            % Change title to invalid data type
             mess = 'HERBERT:check_and_set_title_:invalid_argument';
             test_property_change_ok (obj.S, 'title', sigvar(37), mess)
         end
@@ -167,7 +194,23 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
         end
         
         function test_set_4(obj)
+            % Change distribution type
             test_property_change_ok (obj.S, 'x_distribution', 1)
+        end
+        
+        function test_set_non_strictly_monotonic_hist (obj)
+            % Should fail
+            ds = IX_dataset_1d(1:11,[1001:1007,1009,1008,1010],...
+                    [101:107,109,108,110]);
+            try
+                ds.x = [1:6,6:10];
+                error('Failure to throw error due to invalid axes values')
+            catch ME
+                if ~isequal(ME.identifier,...
+                        'HERBERT:check_properties_consistency_:invalid_argument')
+                    rethrow(ME)
+                end
+            end
         end
         
         
@@ -207,10 +250,10 @@ function test_property_change_ok (Struc, name, value, message_ID)
 % If the property name is invalid or a change is not valid, then an error
 % is expected; in this case an error with the given message_ID must be created
 
-% Create reference object
-wref = struct_to_IX_dataset_1d (Struc);  % this had better work!
+% Create reference object - this had better work!
+wref = struct_to_IX_dataset_1d (Struc);
 
-% Create object with a field changed
+% Create object using the constructor but with the named field changed
 Struc_new = Struc;
 Struc_new.(name) = value;
 try

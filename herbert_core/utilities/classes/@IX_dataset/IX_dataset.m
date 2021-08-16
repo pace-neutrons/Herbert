@@ -46,6 +46,10 @@ classdef (Abstract) IX_dataset
         
         % Bin boundaries or centres. Cell array (row) of numeric row
         % vectors, one per dimension
+        % Bin boundaries must be non-zero in width (i.e. array is *strictly*
+        % monotonic increasing.
+        % Point data must be monotonic increasing, but not strictly: this
+        % means that points at the same x-axis value are permitted.
         xyz_
         
         % Axis information for each dimension. Row vector of IX_axis
