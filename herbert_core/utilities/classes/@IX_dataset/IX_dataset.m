@@ -1,23 +1,23 @@
 classdef (Abstract) IX_dataset
-    % Abstract parent class for IX_data_1d, IX_data_2d etc.;
+    % IX_dataset Abstract parent class for IX_data_1d, IX_data_2d etc.
     
     properties(Dependent)
         % These are public properties at all child classes will posess, so
         % we declare them here (together with their set and get methods)
         
-        % Main title to be plotted on graphs.
+        % Main title to be plotted on graphs
         title
         
-        % Array of signal values.
+        % Array of signal values
         % Numeric array, with first index corresponding to first dimension,
-        % second index to second dimension etc..
+        % second index to second dimension etc.
         signal
         
-        % Array containing standard deviations.
+        % Array containing standard deviations
         % Same size as signal array.
         error
         
-        % Signal axis information.
+        % Signal axis information
         s_axis
     end
     
