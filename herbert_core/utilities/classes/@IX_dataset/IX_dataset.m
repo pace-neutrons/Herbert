@@ -5,17 +5,19 @@ classdef (Abstract) IX_dataset
         % These are public properties at all child classes will posess, so
         % we declare them here (together with their set and get methods)
         
-        % Title (plotted on graphs). Cell array (column) of character strings
+        % Main title to be plotted on graphs.
         title
         
-        % Signal array. Numeric array, with first index corresponding to
-        % first dimension, second index to second dimension etc..
+        % Array of signal values.
+        % Numeric array, with first index corresponding to first dimension,
+        % second index to second dimension etc..
         signal
         
-        % Error array, containing standard deviations.
+        % Array containing standard deviations.
+        % Same size as signal array.
         error
         
-        % Signal axis information. IX_axis object
+        % Signal axis information.
         s_axis
     end
     
@@ -36,16 +38,16 @@ classdef (Abstract) IX_dataset
         % first dimension, second index to second dimension etc.
         signal_
         
-        % Error array, containing standard deviations. Numeric array, with
-        % first index corresponding to first dimension, second index to
-        % second dimension etc.
+        % Error array, containing standard deviations. 
+        % Numeric array, with first index corresponding to first dimension,
+        % second index to second dimension etc.
         error_
         
         % Signal axis information. IX_axis object
         s_axis_
         
         % Bin boundaries or centres. Cell array (row) of numeric row
-        % vectors, one per dimension
+        % vectors, one per dimension.
         % Bin boundaries must be non-zero in width (i.e. array is *strictly*
         % monotonic increasing.
         % Point data must be monotonic increasing, but not strictly: this

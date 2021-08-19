@@ -129,7 +129,7 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %
 % Output:
 % -------
-%   xout        Binning description in one of the following forms:
+%   xout            Binning description in one of the following forms:
 %
 %       is_descriptor==true
 %       -------------------

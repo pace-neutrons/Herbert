@@ -1,14 +1,15 @@
 classdef IX_data_1d < IX_dataset
+    % IX_data_1d One-dimensional data operations
     
     properties(Dependent)
-        % x - vector of bin boundaries for histogram data or bin centers
-        % for distribution
+        % Bin boundaries or bin centres
         x
-        % x_axis -- IX_axis class containing x-axis caption
-        x_axis;
-        % x_distribution -- an identifier, stating if the x-data contain
-        % points or distribution in x-direction
-        x_distribution;
+        
+        % Caption information for x-axis
+        x_axis
+        
+        % Logical value indicating data is from a distribution or not
+        x_distribution
     end
     
     %======================================================================

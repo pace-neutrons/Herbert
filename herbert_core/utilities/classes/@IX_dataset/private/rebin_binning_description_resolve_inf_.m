@@ -1,5 +1,5 @@
 function xout=rebin_binning_description_resolve_inf_...
-    (xin, is_descriptor, is_boundaries, xref)
+    (xin, is_descriptor, is_boundaries, xref, hist)
 % Resolve -Inf and/or Inf in bin boundaries or rebin descriptor
 %
 %   >> xb]=rebin_boundaries_description_resolve_inf...
@@ -7,12 +7,35 @@ function xout=rebin_binning_description_resolve_inf_...
 %
 % Input:
 % ------
-%   xbounds         Bin boundaries or rebin descriptor
-%   is_descriptor   True if rebin descriptor, false if bin boundaries
-%   xlo             Lower limit of data
-%                  (histogram data: lowest bin boundary; point data: lowest point position)
-%   xhi             Upper limit of data
-%                  (histogram data: highest bin boundary; point data: highest point position)
+%   xin             Binning description that has been parsed; it is valid
+%                   subject to any further checks that cannot be performed
+%                   until infinities are resolved
+%
+%   is_descriptor   Logical array:
+%                    - true if xout is a descriptor of bin boundaries or 
+%                           centres;
+%                    - false if xout contains actual bin boundaries or
+%                           centres
+%
+%   is_boundaries   Logical flag:
+%                    - true if xout defines bin boundaries
+%                    - false if xout defines bin centres
+%                  [Note that -Inf and Inf always end up defining bin
+%                   boundaries. This is a statement about the finite values
+%                   of x1, x2,... that appear in a binning description]
+%
+%   xref            Reference axis values.
+%                    - If bin boundaries then there will be at least two 
+%                      values and with bin widths greater than zero (i.e.
+%                      the values are strictly monotonic increasing)
+%                    - If bin centres, then they will be monotonic
+%                      increasing, but there may be repeated values, which
+%                      corresponds to two or more data points that have the
+%                      same position along the axis.
+%
+%   hist            Logical flag:
+%                    - true if xref defines bin boundaries
+%                    - false if xref defines bin centres
 %
 % Output:
 % -------
@@ -189,78 +212,4 @@ if xout(1)==-Inf || xout(end)==Inf
         end
         
     end
-end
-
-%----------------------------------------------------------------------------------
-function xlo = low_limit(x, xref, dx)
-% Construct a lower limit from a bin descriptor, avoiding rounding errors
-%
-%   >> xlo = low_limit(x, xref, dx)
-%
-% Input:
-% ------
-%   x       Lowest value for which must have xout >= x
-%   xref    Reference value from which to construct bins with width dx
-%   dx      Bin step
-%            dx +ve: equal bin sizes 
-%            dx -ve: logarithmic bins between corresponding limits
-%   xlo     Value such that 
-
-
-if dx==0
-    xlo=x;
-elseif dx>0
-    xlo=xref+dx*floor((x-xref)/dx);
-    if xlo>x
-        xlo=xlo-dx;
-    elseif xlo<x && xlo+dx<=x
-        xlo=xlo+dx;
-    end
-elseif dx<0 && x>0 && xref>0
-    n=floor((log(xref/x)/log(1+abs(dx))));
-    xlo=exp(log(xref)-n*log(1+abs(dx)));
-    if xlo>x
-        xlo=xlo/(1+abs(dx));
-    elseif xlo<x && xlo*(1+abs(dx))<=x
-        xlo=xlo*(1+abs(dx));
-    end
-else
-    error('IX_dataset:invalid_argument','Invalid input')
-end
-
-%----------------------------------------------------------------------------------
-function [xhi,ok]=high_limit(x,xref,dx)
-% Carefully construct an upper limit from a bin descriptor to avoid rounding errors
-%
-%   >> xout=high_limit(x,xref,delta)
-%
-%   x       Highest value for which must have xout>=x
-%   xref    Reference value from which to construct bins with width dx
-%   dx      Bin step
-%            dx +ve: equal bin sizes 
-%            dx -ve: logarithmic bins between corresponding limits
-%   xlo     Value such that 
-
-ok=true;
-if dx==0
-    xhi=x;
-elseif dx>0
-    xhi=xref+dx*ceil((x-xref)/dx);
-    if xhi<x
-        xhi=xhi+dx;
-    elseif xhi>x && xhi-dx>=x
-        xhi=xhi-dx;
-    end
-elseif dx<0 && x>0 && xref>0
-    n=ceil((log(x/xref)/log(1+abs(dx))));
-    xhi=exp(log(xref)+n*log(1+abs(dx)));
-    if xhi<x
-        xhi=xhi*(1+abs(dx));
-    elseif xhi>x && xhi/(1+abs(dx))>=x
-        xhi=xhi/(1+abs(dx));
-    end
-else
-    xhi=[];
-    ok=false;
-    if nargout==1, error('IX_dataset:invalid_argument','Invalid input'); end
 end

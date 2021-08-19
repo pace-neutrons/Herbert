@@ -157,7 +157,7 @@ if numel(args)==1 && isa(args{1},class(obj))
         if any(cellfun(@numel, x(iax)) <= 1)
             error('HERBERT:rebin_IX_dataset_:invalid_argument',...
                 ['Reference dataset must have at least one bin (histogram data)',...
-                'or two points (point data)'])
+                'or two points (point data) along each axis'])
         end
         
         % Get bin boundaries from any point axes
@@ -169,7 +169,7 @@ if numel(args)==1 && isa(args{1},class(obj))
     else
         error('HERBERT:rebin_IX_dataset_:invalid_argument',...
             ['Reference dataset for rebinning must be a single instance, ',...
-            'not an array']);
+            'not an array of datasets']);
     end
     
 else
@@ -180,7 +180,7 @@ else
         is_descriptor = false(1,niax);
         resolved = false(1,niax);
         for i = 1:iax
-            [xdescr{i}, is_descriptor(i), resolved(i)] = ...
+            [xdescr{i}, is_descriptor(i), is_boundaries(i), resolved(i)] = ...
                 rebin_binning_description_parse_(args{i}, opts);
         end
     else

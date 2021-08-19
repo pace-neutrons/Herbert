@@ -1,34 +1,40 @@
-function xout = rebin_values_from_descriptor(xdescr, xref)
+function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
+    xref, ishist)
 % Get new x values from a bin boundary descriptor
 %
-%   >> x_out = rebin_values_from_descriptor(xdescr, xref)
-%   >> x_out = rebin_values_from_descriptor(xdescr, xref)
+% If no retained input values and descriptor ranges all finite:
+%   >> x_out = rebin_boundaries_from_descriptor (xdescr)
+%
+% General case:
+%   >> x_out = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
+%                                                           xref, ishist)
 %
 % Input:
 % ------
-%   xdescr      Binning description in one of the following forms:
+%   xdescr      Binning descriptor with the following form:
 %
-%       is_descriptor==true
-%       -------------------
 %         [x1, dx1, x2]
 %         [x1, dx1, x2, dx2, x3,...xn]
-%               where -Inf < x1 < x2 < x3...< xn <= Inf, and
+%               where -Inf <= x1 < x2 < x3...< xn <= Inf  (n >= 2), and
 %
 %               dx +ve: equal bin sizes between corresponding limits
 %               dx -ve: logarithmic bins between corresponding limits
 %                      (note: if dx1<0 then x1>0, dx2<0 then x2>0 ...)
 %               dx=0  : retain existing bins between corresponding limits
 %
-%
-%       is_descriptor==false
-%       --------------------
-%       Descriptor defines bin boundaries:
-%         [x1, x2, x3,...xn]        
-%               where -Inf <= x1 < x2 <...< xn <= Inf
+%   is_boundaries   Logical flag:
+%                    - true if xdescr defines bin boundaries
+%                    - false if xdescr defines bin centres
+%                  [Note that -Inf and Inf always end up defining bin
+%                   boundaries. This is a statement about the finite values
+%                   of x1, x2,... that appear in the descriptor]
 %
 %   xref        Reference array of values. Assumed that it is strictly
 %               monotonic increasing (i.e. all(diff(xref)>0). Used where
 %               dx=0 in the descriptor.
+%
+%   ishist      True if xref contains bin boundaries, false if contains
+%               bin centres
 %
 % Output:
 % --------
