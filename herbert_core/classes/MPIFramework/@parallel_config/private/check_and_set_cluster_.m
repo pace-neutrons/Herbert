@@ -11,8 +11,10 @@ wrkr = which(obj.worker_);
 mff = MPI_clusters_factory.instance();
 
 if isempty(wrkr)
-    error('HERBERT:parallel_config:not_available',...
+    warning('HERBERT:parallel_config:not_available',...
         'Parallel worker is not on the Matlab path so parallel features are not available')
+    config_store.instance().store_config(obj,...
+        'parallel_cluster','none','cluster_config','none');
 else
     known_clusters = mff.known_cluster_names;
     full_cl_name = obj.select_option(known_clusters,cluster_name);
