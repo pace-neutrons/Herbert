@@ -1,5 +1,5 @@
 function [np, varargout] = values_contained_points (x1, xref, x2, tol)
-% Retain values in an interval
+% Retain values in the semi-open interval [x1,x2)
 %
 %   >> [np, xout] = values_contained_points (x1, xref, x2)
 %
@@ -7,15 +7,15 @@ function [np, varargout] = values_contained_points (x1, xref, x2, tol)
 %
 % Input:
 % ------
-%   x1      Starting value
+%   x1      Lower limit
 %
 %   xref    Array of strictly monotonic increasing values. Can be empty.
 %
-%   x2      limit value
+%   x2      Higher limit
 %
 %   tol     Tolerance: excludes values within a fraction tol of the 
-%           width of the interval. Prevents overly narrow extremal bins
-%           from being created.
+%           width of the interval from the end points.
+%           Prevents overly narrow extremal bins from being created.
 %               tol >= 0;    default = 1e-10
 %
 % Output:
@@ -23,11 +23,15 @@ function [np, varargout] = values_contained_points (x1, xref, x2, tol)
 %   np      Number of points
 %
 %   xout    Output array (row)
-%           If x1 < x2, then retain where xref>=x1 & xref<x2, and x1 if not
+%           If x1 < x2, then retain where x1 <= xref < x2, and x1 if not
 %           already included. Maximum value is less than x2.
-%           If x1 > x2, then retain where xref<=x1 & xref>x2, and x1 if not
-%           already included. Maximum value is greater than x2.
-%           If x1 = x2, then []
+%
+%           If x1>=x2 then xout = []
+
+
+% *** Need to make the tolerance checking more sophisticated: at the
+%     moment it is as a fraction of the entire interval, rather than the
+%     nearest reference bin widths at the extrema of the interval
 
 
 if nargin==3
@@ -41,28 +45,22 @@ if isinf(x1) || isinf(x2)
         'Must have finite x1 and x2')
 end
 
-if x1 ~= x2
+if x1 < x2
     if ~isempty(xref)
         % Get lower and upper indicies of input array of bin boundaries
-        % such that min(x1,x2) < xref(imin) <= xref(imax) < max(x1,x2):
-        xlo = min(x1,x2);
-        xhi = max(x1,x2);
+        % such that x1 < xref(imin) <= xref(imax) < x2:
         width = abs(x2-x1);
-        imin = lower_index(xref, xlo + tol*width);
-        imax = upper_index(xref, xhi - tol*width);
+        imin = lower_index(xref, x1 + tol*width);
+        imax = upper_index(xref, x2 - tol*width);
         if imin <= numel(xref) && imax >= 1
             % There is an overlap of [xlo,xhi] and xref. There may not be
             % any values of xref within or on the boundaries of [xlo,xhi]
-            if (xref(imin)==xlo), imin = imin + 1; end
-            if (xref(imax)==xhi), imax = imax - 1; end
-            if nargout==2
-                if x1 < x2
-                    varargout{1} = [x1, xref(imin:imax)];
-                else
-                    varargout{1} = [x1, xref(imax:-1:imin)];
-                end
-            end
+            if (xref(imin)==x1), imin = imin + 1; end
+            if (xref(imax)==x2), imax = imax - 1; end
             np = imax - imin + 2;
+            if nargout==2
+                varargout{1} = [x1, xref(imin:imax)];
+            end
         else
             np = 1;
             if nargout==2

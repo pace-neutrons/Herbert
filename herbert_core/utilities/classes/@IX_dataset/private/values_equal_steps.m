@@ -1,21 +1,27 @@
-function [np, varargout] = values_equal_steps (x1, del, x2, tol)
-% Equally spaced values in an interval
+function [np, varargout] = values_equal_steps (x1, del, x2, origin, tol)
+% Equally spaced values in the semi-open interval [x1,x2)
 %
-%   >> [np, xout] = values_equal_steps (x1, del, x2)
+%   >> [np, xout] = values_equal_steps (x1, del, x2, origin)
 %
-%   >> [np, xout] = values_equal_steps (x1, del, x2, tol)
+%   >> [np, xout] = values_equal_steps (x1, del, x2, origin, tol)
 %
 % Input:
 % ------
-%   x1      Starting value
+%   x1      Lower limit
 %
-%   del     Step size
+%   del     Step size (del>0)
 %
-%   x2      limit value
+%   x2      Higher limit
 %
-%   tol     Tolerance: minimum size of first and final bins as fraction
-%           of penultimate bins. Prevents overly small bins from being
-%           created.
+%   origin  Determines where the values have their origin
+%           'x1'    origin is x1 i.e. values are (x1 + n*del), n integer
+%           'x2'    origin is x2 i.e. values are (x2 + n*del), n integer
+%           'c0'    mid-points have origin at zero 
+%                   i.e. values are del*(n + 1/2), n integer
+%
+%   tol     Tolerance: smallest difference between values and end points as
+%           a fraction of del.
+%           Prevents overly small extremal bins from being created.
 %               tol >= 0;    default = 1e-10
 %
 % Output:
@@ -23,14 +29,18 @@ function [np, varargout] = values_equal_steps (x1, del, x2, tol)
 %   np      Number of points
 %
 %   xout    Output array (row)
-%           If x1 < x2, then [x1, x1+del, x1+2*del,..., x2)
-%               i.e. maximum value is less than x2
-%           If x1 > x2, then [x1, x1-del, x1-2*del,..., x2)
-%               i.e. minimum value is greater than x1
-%           If x1 = x2, then []
+%           origin = 'x1': xout = [x1, x1+del, x1+2*del,..., xmax]
+%               where xmax < x2
+%           origin = 'x2': xout = [x1, xmin,..., x2-2*del, x2-del]
+%               where x1 < xmin
+%           origin = 'c0': xout = [x1, xmin,..., -3*del/2, -del/2, del/2,...
+%                                    3*del/2,..., xmax]
+%               where x1 < xmin and xmax < x2
+%
+%           If x1>=x2 then xout = []
 
 
-if nargin==3
+if nargin==4
     tol = 1e-10;    % fractional tolerance on bin width to account for rounding
 else
     tol = abs(tol); % ensure >=0
@@ -42,15 +52,39 @@ if del <= 0 || isinf(x1) || isinf(x2)
 end
 
 if x1 < x2
-    np = floor((x2-x1)/del - tol) + 1;
-    if nargout==2
-        varargout{1} = [x1, x1 + del*(1:np-1)];
-    end
-    
-elseif x1 > x2
-    np = floor((x1-x2)/del - tol) + 1;
-    if nargout==2
-        varargout{1} = [x1, x1 + del*(-1:-1:1-np)];
+    if strcmp(origin,'x1')
+        % Steps from x1 (including x1) until within tol*del of x2
+        np = floor((x2-x1)/del - tol) + 1;
+        if nargout==2
+            varargout{1} = [x1, x1 + del*(1:np-1)];
+        end
+        
+    elseif strcmp(origin,'x2')
+        % Steps from x2-del to within tol*del of x1, and then also x1
+        np = floor((x2-x1)/del - tol) + 1;
+        if nargout==2
+            varargout{1} = [x1, x2 + del*(1-np:-1)];
+        end
+        
+    elseif strcmp(origin,'c0')
+        % Midpoints have origin on zero; values lie within the interval to
+        % within tol*del of x1 and x2, and then start with x1
+        
+        % Get measure w.r.t. x = del/2
+        % Peculiar calculation for exactness if integer boundaries and tol=0
+        nlo = ceil((2*x1-del)/(2*del) + tol);
+        nhi = floor((2*x2-del)/(2*del) - tol);
+        
+        % If there are no values in the open interval (xlo,xhi) then nhi<nlo
+        % but the following correcly given nlo:nhi as []
+        np = nhi - nlo + 2;
+        if nargout==2
+            varargout{1} = [x1, (del*((2*nlo:2:2*nhi)+1))/2];
+        end
+        
+    else
+        error('HERBERT:values_equal_steps:invalid_argument',...
+            'Unrecognised origin description')
     end
     
 else

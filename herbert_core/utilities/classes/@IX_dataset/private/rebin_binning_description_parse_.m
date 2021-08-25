@@ -5,8 +5,6 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %   >> [xout, is_descriptor, resolved] = ...
 %                       rebin_binning_description_parse_(xin, bin_opts)
 %
-% 
-%
 % Input:
 % ------
 %   xin         Binning description
@@ -148,17 +146,9 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %         [x1, x2, x3,...xn]
 %               where -Inf <= x1 < x2 <...< xn <= Inf   (n >=2)
 %
-%       Two values can only ever be bin boundaries if is_descriptor==false
-%
 %       The special case of n=2, finite x1, x2 and x1=x2 is permitted (a
 %       bin of zero width, which will be valid if point data, all points
 %       with x=x1)
-%
-%       [Note that the input binning descriptions do not include the
-%       possibility of asking for two bin centres. This was not a 
-%       deliberate design decision, but emerged as prior functionality for
-%       bin centres was enhanced. Retaining existing syntax is inconsistent
-%       with allowing the two bin centres.]
 %   
 %
 %   is_descriptor   Logical array:
@@ -179,6 +169,16 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %                      binning description, and no zero step sizes in
 %                      binning descriptors
 %                    - false if not
+%
+% Notes:
+% - 
+% - The input binning descriptions do not include the possibility of asking
+%   for one or two bin centres. This was not a deliberate design decision,
+%   but emerged as a requirement when the prior functionality for bin 
+%   centres was enhanced. Retaining existing syntax is inconsistent with
+%   allowing two bin centres. From a user perspective, this is trivially
+%   overcome by simply supplying the output of the function call:
+%   bin_boundaries([x1,x2])
 
 
 % Ensure xvals is empty, or is a numeric vector without NaNs
@@ -213,10 +213,12 @@ elseif isscalar(xin)
     
 elseif numel(xin) == 2
     if (xin(1) < xin(2)) || (bin_opts.range_is_one_bin && xin(1)==xin(2))
-        % We allow the special case of a single bin with width zero; the
-        % case of binning descriptions with -Inf &/or Inf can be resolved
-        % into this elsewhere, and is valid for the special case of point
-        % data where all points have the same value of x==xin(1)==xin(2)
+        % We allow the special case of a single bin with width zero:
+        % - It is valid for the special case of point data where all points
+        %   have the same value of x==xin(1)==xin(2)
+        % - The case of binning descriptions with -Inf &/or Inf can be 
+        %   resolved into this case in a later function if it turns out
+        %   that the data has zero range.
         if bin_opts.range_is_one_bin
             xout = [xin(1), xin(2)];
             is_descriptor = false;
