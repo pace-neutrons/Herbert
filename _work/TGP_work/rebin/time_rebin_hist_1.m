@@ -1,8 +1,8 @@
-function time_rebin_hist (nx0, nw)
+function time_rebin_hist_1 (nx0, nw)
 % Tests of timing of rebin in one dimension
 %
-%   >> time_rebin_hist              % use default nx0 and nw
-%   >> time_rebin_hist (nx0, nw)
+%   >> time_rebin_hist_1              % use default nx0 and nw
+%   >> time_rebin_hist_1 (nx0, nw)
 %
 %   nx0     Number of bins along x axis (approximately; used as input to generate data)
 %           Default = 500
@@ -54,7 +54,6 @@ disp('--------------------------------------------------------------------------
 disp('Rebin compare original and new functions')
 disp('----------------------------------------')
 tic
-S = 0;
 for i=1:min(10,numel(x))    % to keep number of comparisons down
     [sout_ref, eout_ref] = rebin_hist_(x{i}, s{i}, e{i}, xout);
     

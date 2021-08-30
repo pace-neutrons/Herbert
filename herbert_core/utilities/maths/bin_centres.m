@@ -13,7 +13,7 @@ function xc = bin_centres(xb)
 % -------
 %   xc      Vector of point positions; same orientation (i.e row or column)
 %          as input.
-%           Set to zeros(1,0) if only one bin centre (i.e. assumes row
+%           Set to zeros(1,0) if only one bin boundary (i.e. assumes row
 %          priority)
 
 

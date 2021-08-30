@@ -1,25 +1,19 @@
-function [sout, eout] = rebin_histogram_trueErrors(x, s, e, idim, xout)
-% Rebins histogram data along one dimension of signal and error arrays
+function [sout, eout] = integrate_points_trueErrors(x, s, e, idim, xout)
+% Integrate point data along one dimension of signal and error arrays
 %
 %   >> [sout, eout] = rebin_histogram_trueErrors (x, s, e, idim, xout)
-%
-% Assumes that the intensity and error are for a distribution (i.e. signal 
-% per unit measure along the x-axis)
 %
 %
 % Input:
 % ------
-%   x       Bin boundaries along axis to be rebinned (row or column vector).
-%           There must be at least two bin boundaries i.e. at least one bin.
+%   x       Point positions along the axis to be integrated (row or column
+%          vector).
+%           There must be at least two points.
 %           It is assumed that the values of x are strictly monotonic
 %          increasing i.e. all bins have width greater than zero.
 %
 %   s       Signal array. The extent along dimension idim must match the
-%          number of bins i.e. (numel(x)-1).
-%           If the number of dimensions of the signal array as determined
-%          using the size function is less than idim, then following the
-%          standard Matlab convention the array is treated as having higher
-%          dimensions of length one. Accordingly, x must have length 2.
+%          number of points i.e. numel(x).
 %
 %   e       Standard deviations on the values in the signal array.
 %          The sizes of the signal and error arrays must be the same
@@ -27,23 +21,27 @@ function [sout, eout] = rebin_histogram_trueErrors(x, s, e, idim, xout)
 %   idim    Dimension of signal and error arrays to be rebinned (scalar).
 %          Assumes idim >= 1.
 %
-%   xout    Output rebin axis bin boundaries (row or column vector).
+%   xout    Output integration axis bin boundaries (row or column vector).
 %           There must be at least two bin boundaries i.e. at least one bin.
 %           It is assumed that the values of xout are strictly monotonic
 %          increasing i.e. all bins have width greater than zero.
+%           The integrated signal and standard deviation in the ith bin
+%          i.e. from xout(i) to xout(i+1) are placed in the output arrays
+%          at position i i.e. sout(i) and eout(i).
 %
 % Output:
 % -------
-%   sout    Rebinned signal array. The size of the array is the same as the
-%          input array except for dimension number idim, which has 
+%   sout    Integrated signal array. The size of the array is the same as
+%          the input array except for dimension number idim, which has 
 %          extent equal to the number of output bins i.e. (numel(xout)-1).
 %
-%   eout    Standard deviations on rebinned signal. Has the same size as
+%   eout    Standard deviations on integrated signal. Has the same size as
 %          the rebinned signal array, sout.
 % 
-% The method to calculate the standard deviations on the rebinned data
-% assures consistency of splitting those on the original bins such that the
-% bins can recombined to recover the original standard deviations.
+% The method to calculate the standard deviations on the integrated data
+% assures consistency of splitting those on the original points such that
+% the bins can recombined to yield the same standard deviations as
+% integrating the whole bins.
 
 % The rebinning is performed by permuting and reshaping the signal and 
 % error arrays to size = [n,mx] where mx is the number of bins along the
@@ -55,14 +53,14 @@ function [sout, eout] = rebin_histogram_trueErrors(x, s, e, idim, xout)
 
 % Perform checks on input parameters and get size of output arrays
 % ----------------------------------------------------------------
-mx = numel(x) - 1;      % number of bins along the input rebin axis
+mx = numel(x) - 1;      % number of intervals along the input axis
 if mx<1
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
-        'The input bin boundary array must have at least two bin boundaries')
+    error('HERBERT:integrate_points_trueErrors:invalid_argument',...
+        'The input point position array must have at least two values')
 end
 
 if numel(size(s))~=numel(size(s)) || ~all(size(s)==size(e))
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+    error('HERBERT:integrate_points_trueErrors:invalid_argument',...
         'The sizes of signal array (=[%s]) and error array (=[%s]) do not match',...
         str_compress(num2str(size(s)),','),...
         str_compress(num2str(size(e)),','))
@@ -70,7 +68,7 @@ end
 
 nx = numel(xout) - 1;   % number of bins along the output rebin axis
 if nx<1
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+    error('HERBERT:integrate_points_trueErrors:invalid_argument',...
         'The output bin boundary array must have at least two bin boundaries')
 end
 
@@ -78,11 +76,11 @@ end
 % than the dimension of input signal array, s
 sz = [size(s), ones(1, idim-numel(size(s)))];
 
-if sz(idim)~=mx
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+if sz(idim) ~= (mx+1)
+    error('HERBERT:integrate_points_trueErrors:invalid_argument',...
         ['The extent of the signal array along axes number %s and the ',...
-        'number of axis values in the input bin boundary array is ',...
-        'inconsistent with histogram data along that axis'], num2str(idim))
+        'number of values in the input point position array is ',...
+        'inconsistent with point data along that axis'], num2str(idim))
 end
 
 % Size of output arrays
@@ -90,8 +88,8 @@ end
 sz_out = [sz(1:idim-1), nx, sz(idim+1:end)];
 
 
-% Perform rebin
-% -------------
+% Perform integration
+% -------------------
 % Find the first output bin to which there is a contribution from the input bins
 % and find the index of the first input bin which makes that contribution
 
@@ -111,31 +109,52 @@ end
 % axes to place the rebin axis at the end, and allocate output arrays
 % (The following works for any length of sz and value of idim >=1, because
 % prod([])=1)
-s = reshape (s, [prod(sz(1:idim-1)), mx, prod(sz(idim+1:end))]);
-e = reshape (e, [prod(sz(1:idim-1)), mx, prod(sz(idim+1:end))]);
+s = reshape (s, [prod(sz(1:idim-1)), (mx+1), prod(sz(idim+1:end))]);
+e = reshape (e, [prod(sz(1:idim-1)), (mx+1), prod(sz(idim+1:end))]);
 s = permute(s,[3,1,2]);
 e = permute(e,[3,1,2]);
-s = reshape(s,[prod(sz)/mx, mx]);
-e = reshape(e,[prod(sz)/mx, mx]);
-sout = zeros([prod(sz)/mx, nx]);
-eout = zeros([prod(sz)/mx, nx]);
+s = reshape(s,[prod(sz)/(mx+1), (mx+1)]);
+e = reshape(e,[prod(sz)/(mx+1), (mx+1)]);
+sout = zeros([prod(sz)/(mx+1), nx]);
+eout = zeros([prod(sz)/(mx+1), nx]);
 
 % Perform the integration
+delta_iin = x(iin+1) - x(iin);
+if iin > 1, twodelta_lo = x(iin+1) - x(iin-1); else, twodelta_lo = delta_iin; end
+if iin < mx-1, twodelta_hi = x(iin+2) - x(iin); else, twodelta_hi = delta_iin; end
+
 while true
-    delta = (min(xout(iout+1),x(iin+1)) - max(xout(iout),x(iin)));
-    sout(:,iout) = sout(:,iout) + delta * s(:,iin);
-    eout(:,iout) = eout(:,iout) + delta * (x(iin+1) - x(iin)) * (e(:,iin).^2);
+    xlo = max(xout(iout),x(iin));
+    xhi = min(xout(iout+1),x(iin+1));
+    xcent = (xhi + xlo)/2;
+    xcent_1 = xcent - x(iin);
+    xcent_2 = xcent - x(iin+1);
+    delta = xhi - xlo;
+    sout(:,iout) = sout(:,iout) + delta *...
+        (s(:,iin) * (1 - xcent_1/delta_iin) +...
+        s(:,iin+1) * (1 + xcent_2/delta_iin));
+    eout(:,iout) = eout(:,iout) + (delta/2) *...
+        ((e(:,iin).^2) * (twodelta_lo * (1 - xcent_1/delta_iin)) + ...
+        (e(:,iin+1).^2) * (twodelta_hi * (1 + xcent_2/delta_iin)));
+    
     if xout(iout+1) >= x(iin+1)
+        % Increment input bin counter; break if no further bins
         if iin < mx
             iin = iin + 1;
+            delta_iin = x(iin+1) - x(iin);
+            twodelta_lo = x(iin+1) - x(iin-1);
+            if iin < mx-1
+                twodelta_hi = x(iin+2) - x(iin);
+            else
+                twodelta_hi = delta_iin;
+            end
         else
-            sout(:,iout) = sout(:,iout) / (xout(iout+1)-xout(iout));		% end of input array reached
-            eout(:,iout) = sqrt(eout(:,iout)) / (xout(iout+1)-xout(iout));
+            eout(:,iout) = sqrt(eout(:,iout));
             break
         end
     else
-        sout(:,iout) = sout(:,iout) / (xout(iout+1)-xout(iout));
-        eout(:,iout) = sqrt(eout(:,iout)) / (xout(iout+1)-xout(iout));
+        % Increment output bin counter; break if no further bins
+        eout(:,iout) = sqrt(eout(:,iout));
         if iout < nx
             iout = iout + 1;
         else
