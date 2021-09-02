@@ -106,7 +106,6 @@ function [ycalc,varcalc,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,plist,
 %   points can be implicitly indicated in the object, so that the required method
 %   sigvar_get for the object returns a mask array.
 
-
 % Original author: T.G.Perring
 
 % Initialise store if required
@@ -148,7 +147,7 @@ if all(xye)
             calc_xye_w_info(w, p, plist, caller, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled, S.fstate_store, Store.fore);
 
         [bcalc, bvar, bcalc_filled, bcalculated, S.bcalc_store, S.bvar_store, S.bstate_store] = ...
-            calc_xye_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bstate_store, Store.back);
+            calc_xye_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bfstate_store, Store.back);
 
     end
 
@@ -161,11 +160,12 @@ elseif all(~xye)
             calc_sqw(w, bp, bplist, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled);
 
     else
+
         [fcalc, fvar, fcalc_filled, fcalculated, S.fcalc_store, S.fvar_store, S.fstate_store] = ...
             calc_sqw_w_info(w, p, plist, caller, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled, S.fstate_store, Store.fore);
 
-        [bcalc, bvar, bcalc_filled, bcalculated, S.bpstore, S.bcalc_store, S.bvar_store, S.bstate_store] = ...
-            calc_sqw_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bstate_store, Store.back);
+        [bcalc, bvar, bcalc_filled, bcalculated, S.bcalc_store, S.bvar_store, S.bstate_store] = ...
+            calc_sqw_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bfstate_store, Store.back);
 
     end
 
@@ -426,11 +426,17 @@ function [calc, var, calc_filled, calculated, calc_store, var_store, state_store
         end
 
         pars=plist_update(plist(k),p{k});
-                caller, ...
-                state_store(iw), ...
-                foreback, ...
-                pars{3})
-        [wcalc,state,foreback]=func{k}(w{iw},caller,state_store(iw),foreback,pars{:});
+        try
+% $$$             [wcalc,state,foreback]=func{k}(w{iw},caller,state_store(iw),foreback,pars{:});
+            [wcalc, state] =func{k}(w{iw},caller,state_store(iw),foreback,pars{:});
+        catch ME
+% $$$             psidisp('~/dump/bbb', func{k}, w{iw},caller,state_store(iw),foreback,pars{:});
+            wcalc = func{k}(w{iw},pars{:},caller,state_store(iw),foreback);
+            state = [];
+% $$$             psidisp('~/dump/aaa', a);
+% $$$             rethrow(ME)
+        end
+
         [calc{iw},var{iw},msk]=sigvar_get(wcalc);
         calc{iw}=calc{iw}(msk);       % remove the points that we are told to ignore
         var{iw}=var{iw}(msk);

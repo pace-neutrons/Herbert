@@ -26,6 +26,13 @@ classdef MFParallel_Job < JobExecutor
 
             data = obj.loop_data_{1};
 
+            if isfield(data, 'tobyfit_data')
+                for i=1:numel(data.tobyfit_data)
+                    psidisp(['~/dump/dat',num2str(i)], data.tobyfit_data(i), obj.common_data_.pin(i).plist_, obj.common_data_.pin(i).plist_{3})
+                    obj.common_data_.pin(i).plist_{3} = data.tobyfit_data(i);
+                end
+            end
+
             [obj.yc, obj.vc, S, Store] = multifit_lsqr_func_eval( ...
                 data.w, ...
                 data.xye, ...
