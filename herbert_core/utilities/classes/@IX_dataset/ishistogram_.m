@@ -1,8 +1,8 @@
 function hist = ishistogram_(obj, iax)
-% Return logical array indicating axes that are histogram data
+% Return a logical array indicating axes that are histogram data
 %
-%   >> hist = ishistogram_(obj)
-%   >> hist = ishistogram_(obj, iax)
+%   >> status = ishistogram_ (obj)
+%   >> status = ishistogram_ (obj, iax)
 %
 % Input:
 % ------
@@ -12,16 +12,32 @@ function hist = ishistogram_(obj, iax)
 %
 % Output:
 % -------
-%   hist    Logical with true is axis is histogran, false where point data
-%           - If a single object, size(hist) = [1,numel(iax)]
-%           - If a single axis,   size(hist) = size(obj)
-%           - If an array of objects and array of axes, then size(hist) = 
+%   status  Logical array with true if an axis has histogram data, or false
+%           if the axis corresponds to point data
+%           - If a single object, size(status) = [1,numel(iax)]
+%           - If a single axis,   size(status) = size(obj)
+%           - If an array of objects and array of axes, then size(status) =
 %             [numel(iax), size(w)] but with dimensions of length 1 removed
 %           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
-%               ishstogram(obj)         size(hist) = [4,3]  (not [4,1,3])
+%               ishstogram(obj)         size(status) = [4,3]  (not [4,1,3])
 %
 %           This behaviour is the same as that of the Matlab intrinsic
 %           function squeeze.
+
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_ishistogram_method.m')
+%
+%   object = 'IX_dataset'
+%   method = 'ishistogram_'
+%   ndim = 'ndim'
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
 
 nd = obj(1).ndim();

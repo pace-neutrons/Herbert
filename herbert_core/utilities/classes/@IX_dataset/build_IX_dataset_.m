@@ -2,22 +2,25 @@ function obj = build_IX_dataset_(obj, varargin)
 % Construct IX_dataset object with the required dimensionality
 %
 % Construct with default captioning:
-%   >> w = build_IX_dataset_ (obj, x1, x2,...xn)
-%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal)
-%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error)
-%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error, x1_distribution,
-%                             x1_distribution, x2_distribution,..., xn_distribution)
+%   >> obj = build_IX_dataset_ (obj, x1, x2,...xn)
+%   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal)
+%   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error)
+%   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error,...
+%                       x1_distribution, x2_distribution,..., xn_distribution)
 %
 % Construct with custom captioning:
-%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error, title,
-%                             x1_axis, x2_axis,..., xn_axis, s_axis)
-%   >> w = build_IX_dataset_ (obj, x1, x2,...xn, signal, error, title,
-%                             x1_axis, x2_axis,..., xn_axis, s_axis,
-%                             x1_distribution, x2_distribution,..., xn_distribution)
+%   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error,...
+%                       title, x1_axis, x2_axis,..., xn_axis, s_axis)
+%
+%   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error,,...
+%                       title, x1_axis, x2_axis,..., xn_axis, s_axis,
+%                       x1_distribution, x2_distribution,..., xn_distribution)
 %
 % Old format constructor (retained for backwards compatibility)
-%   >> w = build_IX_dataset_ (obj, title,  signal, error, s_axis, x1, x1_axis, x1_distribution,
-%                             x2, x2_axis, x2_distribution,..., xn, xn_axis, xn_distribution)
+%   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
+%                       x1, x1_axis, x1_distribution,...
+%                       x2, x2_axis, x2_distribution,...
+%                       xn, xn_axis, xn_distribution)
 %
 %
 % Notes about sizes of arrays
@@ -76,6 +79,10 @@ if  narg==0
 elseif narg>=nd && narg<=nd+2
     % Construct with default captioning and distribution flags
     % --------------------------------------------------------
+    %   >> obj = build_IX_dataset_ (obj, x1, x2,...xn)
+    %   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal)
+    %   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error)
+    
     % Axis values
     sz = ones(1, max(nd,2));    % size of default signal and error arrays if point data
     for iax = 1:nd
@@ -112,6 +119,9 @@ elseif narg>=nd && narg<=nd+2
 elseif narg==(2*nd+2)
     % Construct with default captioning and custom distribution flags
     % ---------------------------------------------------------------
+    %   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error,...
+    %                   x1_distribution, x2_distribution,..., xn_distribution)
+
     % Axis values
     for iax = 1:nd
         obj = obj.check_and_set_x_(varargin{iax}, iax);
@@ -137,6 +147,13 @@ elseif narg==(2*nd+2)
 elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
     % Construct with custom captioning and default/custom distribution flags
     % ----------------------------------------------------------------------
+    %   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error,...
+    %                       title, x1_axis, x2_axis,..., xn_axis, s_axis)
+    %
+    %   >> obj = build_IX_dataset_ (obj, x1, x2,...xn, signal, error,,...
+    %                       title, x1_axis, x2_axis,..., xn_axis, s_axis,
+    %                       x1_distribution, x2_distribution,..., xn_distribution)
+
     % Axis values
     for iax = 1:nd
         obj = obj.check_and_set_x_(varargin{iax}, iax);
@@ -168,6 +185,11 @@ elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
 elseif narg==(3*nd+4)
     % Construct with custom captioning and distribution flags
     % -------------------------------------------------------
+    %   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
+    %                       x1, x1_axis, x1_distribution,...
+    %                       x2, x2_axis, x2_distribution,...
+    %                       xn, xn_axis, xn_distribution)
+
     % Title
     obj = obj.check_and_set_title_(varargin{1});
     

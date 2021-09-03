@@ -98,6 +98,13 @@ for i=1:min(10,numel(x))    % to keep number of comparisons down
         disp('Error !!')
         error('trueError_Nx and trueError routines give different results')
     end
+    
+    % Production version
+    [sout, eout] = rebin_histogram(x{i}, s{i}, e{i}, 1, xout);
+    if max(abs(sout_true-sout))>tol || max(abs(eout_true-eout))>tol
+        disp('Error !!')
+        error('trueError_Nx and trueError routines give different results')
+    end
 end
 disp('All tested outputs within tolerance')
 toc
@@ -161,7 +168,7 @@ disp(['     Rebin true error bars - simple: ',num2str(toc), ' seconds.'])
 % disp(['        Rebin true error bars - xNx: ',num2str(toc), ' seconds.'])
 
 
-% Rebin true error bars - xN'
+% Rebin true error bars - xN
 % -----------------------------------------'
 tic
 S = 0;
@@ -174,7 +181,7 @@ disp(['         Rebin true error bars - xN: ',num2str(toc), ' seconds.'])
 
 
 
-% Rebin true error bars - Nx'
+% Rebin true error bars - Nx
 % -----------------------------------------'
 tic
 S = 0;
@@ -184,6 +191,18 @@ for i=1:numel(x)
     S = S + sout(1) + eout(1);
 end
 disp(['         Rebin true error bars - Nx: ',num2str(toc), ' seconds.'])
+
+
+% Rebin true error bars - production version
+% ---------------------------------------------'
+tic
+S = 0;
+idim = 1;
+for i=1:numel(x)
+    [sout, eout] = rebin_histogram (x{i}, s{i}, e{i}, idim, xout);
+    S = S + sout(1) + eout(1);
+end
+disp([' Rebin true error bars - production: ',num2str(toc), ' seconds.'])
 
 disp(' ')
 

@@ -30,7 +30,8 @@ elseif narg<=4 && isnumeric(varargin{end})
     obj.positions = varargin{end};
     
 elseif narg>1 && narg<=5 && isnumeric(varargin{end-1}) 
-    % Penultimate argument is numeric array: assume arguments form (..., positions, labels)
+    % Penultimate argument is numeric array: assume arguments form
+    % (..., positions, labels)
     nch = narg - 2;
     if nch>=1, obj.caption = varargin{1}; end
     if nch>=2, obj.units = varargin{2}; end

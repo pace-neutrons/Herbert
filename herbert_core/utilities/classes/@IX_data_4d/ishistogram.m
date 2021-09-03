@@ -6,9 +6,9 @@ function status = ishistogram(obj, varargin)
 %
 % Input:
 % ------
-%   obj     IX_dataset_1d object or array of objects
-%   iax     [optional] axis index, or array of indicies, in range 1 to 1
-%           Default: 1:1
+%   obj     IX_dataset_4d object or array of objects
+%   iax     [optional] axis index, or array of indicies, in range 1 to 4
+%           Default: 1:4
 %
 % Output:
 % -------
@@ -30,9 +30,9 @@ function status = ishistogram(obj, varargin)
 %
 %   doc_file = fullfile(doc_dir,'doc_ishistogram_method.m')
 %
-%   object = 'IX_dataset_1d'
+%   object = 'IX_dataset_4d'
 %   method = 'ishistogram'
-%   ndim = '1'
+%   ndim = '4'
 % -----------------------------------------------------------------------------
 % <#doc_beg:> IX_dataset
 %   <#file:> <doc_file>

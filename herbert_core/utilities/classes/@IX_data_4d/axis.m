@@ -6,9 +6,9 @@ function [ax, hist] = axis (obj, varargin)
 %
 % Input:
 % -------
-%   obj     IX_dataset_3d object or array of objects
-%   iax     [optional] axis index, or array of indicies, in range 1 to 3
-%           Default: 1:3
+%   obj     IX_dataset_4d object or array of objects
+%   iax     [optional] axis index, or array of indicies, in range 1 to 4
+%           Default: 1:4
 %
 % Output:
 % -------
@@ -39,9 +39,9 @@ function [ax, hist] = axis (obj, varargin)
 %
 %   doc_file = fullfile(doc_dir,'doc_axis_method.m')
 %
-%   object = 'IX_dataset_3d'
+%   object = 'IX_dataset_4d'
 %   method = 'axis'
-%   ndim = '3'
+%   ndim = '4'
 % -----------------------------------------------------------------------------
 % <#doc_beg:> IX_dataset
 %   <#file:> <doc_file>

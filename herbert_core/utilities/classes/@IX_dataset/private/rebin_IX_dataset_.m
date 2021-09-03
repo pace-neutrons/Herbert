@@ -1,5 +1,5 @@
-function obj_out = rebin_IX_dataset_(obj, iax, config, varargin)
-% Rebin an IX_dataset object or array of IX_dataset objects along one or more axes
+function obj_out = rebin_IX_dataset_ (obj, iax, config, varargin)
+% Rebin an IX_dataset object or object array along one or more axes
 %
 %   >> obj_out = rebin_IX_dataset_(obj, iax, config, p1, p2,...)
 %   >> obj_out = rebin_IX_dataset_(obj, iax, config, obj_ref)
@@ -10,7 +10,7 @@ function obj_out = rebin_IX_dataset_(obj, iax, config, varargin)
 %
 % Input:
 % ------
-%   win         IX_dataset_nd, or array or IX_dataset_nd (n=1,2,3)
+%   obj         IX_dataset, or array of IX_dataset objects
 %
 %   iax         Axis index or array of axes indices. Must be unique
 %               integers in the range 1,2...ndim, wheren ndim is the
@@ -18,8 +18,12 @@ function obj_out = rebin_IX_dataset_(obj, iax, config, varargin)
 %               It is assumed that the input is valid.
 %
 %   config      Structure describing configuration of rebinning. Fields are
+%               as follows:
+%
 %       - integrate_data
 %           Perform rebinning (false) or integration (true)
+%           Rebinning means that the signal is normalised by the bin size
+%           whereas integration means otherwise.
 %
 %       - point_average_method_default
 %           Default averging method for axes with point data (ignored by
@@ -51,42 +55,39 @@ function obj_out = rebin_IX_dataset_(obj, iax, config, varargin)
 %                               false: interpret array as defining bin
 %                                      centres
 %
-%   p1, p2,...  Arrays of rebin/integration intervals, one per axis.
-%               Depending on bin_opts.array_is_descriptor,
-%                      there are a number of different formats and defaults that are valid.
-%                       If win is one dimensional, then if all the arguments can be scalar they are treated as the
-%                      elements of range_1
-%         *OR*
-%   wref                Reference dataset from which to take bins. Must be a scalar, and the same class as win
-%                      Only those axes indicated by input argument iax are taken from the reference object.
+%   p1, p2,...  Arrays of binning descriptions, one per axis.
+%               The binning description defines the intervals over which
+%               the data is rebinned or integrated.
+%               
+%               Depending on the values of the fields in config.bin_opts
+%               there are a number of different formats and defaults that
+%               are valid. See the function rebin_binning_description_parse
+%               for details.
 %
-%   point_average_method   Averaging method if point data (if not given, then uses default determined by point_integration_default above)
-%                        - character string 'integration' or 'average'
-%                        - cell array with number of entries equalling number of rebin/integration axes (i.e. numel(iax))
-%                          each entry the character string 'integration' or 'average'
-%                       If an axis is a histogram data axis, then its corresponding entry is ignored
+%               If iax is scalar i.e. there is only one integration axis, 
+%               then if p1, p2,... are all scalar they are interpreted as
+%               forming the single binning description [p1, p2, p3,...]
+%
+%   obj_ref     Reference IX_dataset from which to take bins. Must be a 
+%               scalar object, and have the same dimensionality as the
+%               object to be rebinned.
+%               Only those axes indicated by input argument iax are taken
+%               from the reference object.
+%
+%   point_average_method   
+%               Averaging method for point data axes:
+%               - character string 'interpolate' or 'average' (or 
+%                 abbreviation)
+%               - cell array of character strings, one per axis being
+%                 rebinned or integrated (i.e. the number is numel(iax))
+%               If an axis is a histogram data axis, then its corresponding
+%               entry is ignored.
+%
 %
 % Output:
 % -------
-%   wout                IX_dataset_nd object or array of objects following the rebinning/integration
-%                   *OR*
-%                       Structure array, where the fields of each element are
-%                           wout(i).x             Cell array of arrays containing the x axis boundaries or points
-%                           wout(i).signal        Signal array
-%                           wout(i).err           Array of standard deviations
-%                           wout(i).distribution  Array of elements, one per axis that is true if a distribution, false if not
-
-
-% NOTES
-% To be able to rebin or integrate we need to specify at least two bin
-% boundaries. This can be done either 
-% - directly, by specification of two or more finite bin boundaries
-% - indirectly via taking the lower &/or upper range of the input data to
-%   resolve -Inf &/or -Inf in a binning descriptor
-% In the direct case, the axis can have a zero length signal, and the output
-% is trivial: zeros for the data
-% In the indirect case, there must be at least one data point (which can
-% be used to reolve both -Inf and +Inf to give a bin of zero width)
+%   out_out     IX_dataset object or array of objects with the results of
+%               the rebinning/integration
 
 
 % Get object dimensionality
@@ -163,8 +164,9 @@ if numel(args)==1 && isa(args{1},class(obj))
         % Get bin boundaries from any point axes
         xdescr = x;
         xdescr(~ishist(iax)) = cellfun (@bin_boundaries, x(~ishist(iax)));
-        is_descriptor = false(1,niax);
-        resolved = true(1,niax);
+        is_descriptor = false(1, niax);
+        is_boundaries = true(1, niax);
+        resolved = true(1, niax);
         
     else
         error('HERBERT:rebin_IX_dataset_:invalid_argument',...
@@ -175,18 +177,36 @@ if numel(args)==1 && isa(args{1},class(obj))
 else
     % Use rebin description(s) to define new bin boundaries
     if numel(args)==niax
-        opts = config.bin_opts;
         xdescr = cell(1, niax);
-        is_descriptor = false(1,niax);
-        resolved = false(1,niax);
-        for i = 1:iax
+        is_descriptor = false(1, niax);
+        is_boundaries = false(1, niax);
+        resolved = false(1, niax);
+        for i = 1:niax
             [xdescr{i}, is_descriptor(i), is_boundaries(i), resolved(i)] = ...
-                rebin_binning_description_parse_(args{i}, opts);
+                rebin_binning_description_parse_(args{i}, config.bin_opts);
         end
+        
+    elseif niax==1 && all(cellfun(@isscalar, args)) &&...
+            all(cellfun(@isnumeric, args))
+        % Single axis, all args are numeric scalars: collect as single array
+        xdescr = cell(1, 1);
+        [xdescr{1}, is_descriptor, is_boundaries, resolved] = ...
+            rebin_binning_description_parse_(cell2mat(args), config.bin_opts);
+        
     else
         error('HERBERT:rebin_IX_dataset_:invalid_argument',...
             ['The number of bin boundary descriptions does not match ',...
             'the number of rebin axes']);
+    end
+    
+    % For resolved axes (i.e. no -Inf or +Inf, and no binning interval in
+    % a descriptor requires reference values to be retained) compute the
+    % output bin boundaries
+    for i = 1:niax
+        if resolved(i)
+            xdescr{i} = rebin_boundaries_from_binning_description ...
+                (xdescr{i}, is_descriptor(i), is_boundaries(i));
+        end
     end
 end
 
@@ -194,18 +214,14 @@ end
 % Perform rebin
 % -------------
 integrate_data = config.integrate_data;
-values_are_boundaries = config.values_are_boundaries;
 
 if numel(obj)==1
     obj_out = rebin_IX_dataset_single_ (obj, iax, xdescr, is_descriptor,...
-        resolved, values_are_boundaries, integrate_data, point_average_method);
+        is_boundaries, resolved, integrate_data, point_average_method);
 else
-    % --> Code that depends on data input class
-    ndim=dimensions(obj(1));
-    obj_out=repmat(IX_dataset_nd(ndim),size(obj));
-    % <--
+    obj_out = repmat(eval(class(obj)), size(obj));
     for i=1:numel(obj)
         obj_out(i) = rebin_IX_dataset_single_ (obj(i), iax, xdescr, is_descriptor,...
-            resolved, values_are_boundaries, integrate_data, point_average_method);
+            is_boundaries, resolved, integrate_data, point_average_method);
     end
 end

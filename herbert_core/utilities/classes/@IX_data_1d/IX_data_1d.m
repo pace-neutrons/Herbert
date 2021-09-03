@@ -4,10 +4,8 @@ classdef IX_data_1d < IX_dataset
     properties(Dependent)
         % Bin boundaries or bin centres
         x
-        
         % Caption information for x-axis
         x_axis
-        
         % Logical value indicating data is from a distribution or not
         x_distribution
     end

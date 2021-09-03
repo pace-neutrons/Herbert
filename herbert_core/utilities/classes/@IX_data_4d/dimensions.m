@@ -5,7 +5,7 @@ function [nd, sz] = dimensions(obj)
 %
 % Input:
 % ------
-%   obj     IX_dataset_3d object
+%   obj     IX_dataset_4d object
 %
 % Output:
 % -------
@@ -34,9 +34,9 @@ function [nd, sz] = dimensions(obj)
 %
 %   doc_file = fullfile(doc_dir,'doc_dimensions_method.m')
 %
-%   object = 'IX_dataset_3d'
+%   object = 'IX_dataset_4d'
 %   method = 'dimensions'
-%   ndim = '3'
+%   ndim = '4'
 % -----------------------------------------------------------------------------
 % <#doc_beg:> IX_dataset
 %   <#file:> <doc_file>

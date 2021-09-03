@@ -1,52 +1,55 @@
-classdef IX_data_3d < IX_dataset
-    % IX_data_3d
+classdef IX_data_4d < IX_dataset
+    % IX_data_4d
     
     properties(Dependent)
-        % x - vector of bin boundaries for histogram data or bin centers
-        % for distribution
+        % Bin boundaries or bin centres
         x
-        % x_axis -- IX_axis class containing x-axis caption
-        x_axis;
-        % x_distribution -- an identifier, stating if the x-data contain
-        % points or distribution in x-direction
-        x_distribution;
-        % y - vector of bin boundaries for histogram data or bin centers
-        % for distribution in y-direction
+        % Caption information for x-axis
+        x_axis
+        % Logical value indicating data is from a distribution or not
+        x_distribution
+
+        % Bin boundaries or bin centres
         y
-        % y_axis -- IX_axis class containing y-axis caption
-        y_axis;
-        % y_distribution -- an identifier, stating if the y-data contain
-        % points or distribution in y-direction
-        y_distribution;
-        % z - vector of bin boundaries for histogram data or bin centers
-        % for distribution in z-direction
+        % Caption information for y-axis
+        y_axis
+        % Logical value indicating data is from a distribution or not
+        y_distribution
+        
+        % Bin boundaries or bin centres
         z
-        % z_axis -- IX_axis class containing z-axis caption
-        z_axis;
-        % z_distribution -- an identifier, stating if the z-data contain
-        % points or distribution in z-direction
-        z_distribution;
+        % Caption information for z-axis
+        z_axis
+        % Logical value indicating data is from a distribution or not
+        z_distribution
+        
+        % Bin boundaries or bin centres
+        w
+        % Caption information for w-axis
+        w_axis
+        % Logical value indicating data is from a distribution or not
+        w_distribution
     end
 
     %======================================================================
     methods
-        function obj = IX_data_3d(varargin)
-            % Create IX_data_3d object
+        function obj = IX_data_4d(varargin)
+            % Create IX_data_4d object
             %
-            %   >> w = IX_data_3d (x,y,z)
-            %   >> w = IX_data_3d (x,y,z,signal)
-            %   >> w = IX_data_3d (x,y,z,signal,error)
+            %   >> w = IX_data_4d (x,y,z)
+            %   >> w = IX_data_4d (x,y,z,signal)
+            %   >> w = IX_data_4d (x,y,z,signal,error)
             %   >> w = IX_data_2d (x,y,z,signal,error, x_distribution,y_distribution,z_distribution)
-            %   >> w = IX_data_3d (x,y,z,signal,error,title,x_axis,y_axis,z_axis,s_axis)
-            %   >> w = IX_data_3d (x,y,z,signal,error,title,x_axis,y_axis,z_axis,s_axis,x_distribution,y_distribution,z_distribution)
-            %   >> w = IX_data_3d (title, signal, error, s_axis, x, x_axis, x_distribution,...
+            %   >> w = IX_data_4d (x,y,z,signal,error,title,x_axis,y_axis,z_axis,s_axis)
+            %   >> w = IX_data_4d (x,y,z,signal,error,title,x_axis,y_axis,z_axis,s_axis,x_distribution,y_distribution,z_distribution)
+            %   >> w = IX_data_4d (title, signal, error, s_axis, x, x_axis, x_distribution,...
             %                                          y, y_axis, y_distribution, z, z-axis, z_distribution)
             %
-            %  Creates an IX_dataset_3d object with the following elements:
+            %  Creates an IX_dataset_4d object with the following elements:
             %
             % 	title				char/cellstr	Title of dataset for plotting purposes (character array or cellstr)
-            % 	signal              double  		Signal (3D array)
-            % 	error				        		Standard error (3D array)
+            % 	signal              double  		Signal (4D array)
+            % 	error				        		Standard error (4D array)
             % 	s_axis				IX_axis			Signal axis object containing caption and units codes
             %                   (or char/cellstr    Can also just give caption; multiline input in the form of a
             %                                      cell array or a character array)
@@ -64,18 +67,13 @@ classdef IX_data_3d < IX_dataset
             %   z                   double          -|
             %   z_axis              IX_axis          |- same as above but for z-axis
             %   z_distribution      logical         -|
+            %
+            %   w                   double          -|
+            %   w_axis              IX_axis          |- same as above but for w-axis
+            %   w_distribution      logical         -|
 
-            
             obj = build_IX_dataset_(obj, varargin{:});
         end
-        
-        %--- Not yet verified ---------------------------------------------
-        function obj = init(obj,varargin)
-            % efficiently (re)initialize object using constructor's code
-            obj = build_IXdataset_3d_(obj,varargin{:});
-        end
-        %------------------------------------------------------------------
-        
   
         %------------------------------------------------------------------
         % Get methods for dependent properties
@@ -92,6 +90,10 @@ classdef IX_data_3d < IX_dataset
             val = obj.xyz_{3};
         end
         
+        function val = get.w(obj)
+            val = obj.xyz_{4};
+        end
+        
         function val = get.x_axis(obj)
             val = obj.xyz_axis_(1);
         end
@@ -104,6 +106,10 @@ classdef IX_data_3d < IX_dataset
             val = obj.xyz_axis_(3);
         end
         
+        function val = get.w_axis(obj)
+            val = obj.xyz_axis_(4);
+        end
+        
         function val = get.x_distribution(obj)
             val = obj.xyz_distribution_(1);
         end
@@ -114,6 +120,10 @@ classdef IX_data_3d < IX_dataset
         
         function val = get.z_distribution(obj)
             val = obj.xyz_distribution_(3);
+        end
+        
+        function val = get.w_distribution(obj)
+            val = obj.xyz_distribution_(4);
         end
         
         %------------------------------------------------------------------
@@ -131,6 +141,10 @@ classdef IX_data_3d < IX_dataset
             obj = set_xyz_(obj, val, 3);
         end
         
+        function obj = set.w(obj, val)
+            obj = set_xyz_(obj, val, 4);
+        end
+        
         function obj = set.x_axis(obj, val)
             obj = set_xyz_axis_(obj, val, 1);
         end
@@ -141,6 +155,10 @@ classdef IX_data_3d < IX_dataset
         
         function obj = set.z_axis(obj, val)
             obj = set_xyz_axis_(obj, val, 3);
+        end
+        
+        function obj = set.w_axis(obj, val)
+            obj = set_xyz_axis_(obj, val, 4);
         end
         
         function obj = set.x_distribution(obj, val)
@@ -155,6 +173,10 @@ classdef IX_data_3d < IX_dataset
             obj = set_xyz_distribution_(obj, val, 3);
         end
         
+        function obj = set.w_distribution(obj, val)
+            obj = set_xyz_distribution_(obj, val, 4);
+        end
+        
         %-----------------------------------------------------------------
     end
     
@@ -163,19 +185,12 @@ classdef IX_data_3d < IX_dataset
     methods(Static)
         function nd  = ndim()
             % Return the number of class dimensions
-            nd = 3;
+            nd = 4;
         end
     end
     
     %======================================================================
     methods(Static,Access = protected)
-        
-        %--- Not yet verified ---------------------------------------------
-        % Rebins histogram data along specific axis.
-        [wout_s, wout_e] = rebin_hist(iax,x, s, e, xout)
-
-        % Integrates point data along along specific axis.
-        [wout_s, wout_e] = integrate_points(iax, x, s, e, xout)
         
     end
     

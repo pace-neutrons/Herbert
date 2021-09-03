@@ -1,14 +1,13 @@
-function [ax, hist] = axis (obj, varargin)
 % Return all information about an axis or set of axes from a dataset
 %
-%   >> [ax, hist] = axis (obj)
-%   >> [ax, hist] = axis (obj, iax)
+%   >> [ax, hist] = <method> (obj)
+%   >> [ax, hist] = <method> (obj, iax)
 %
 % Input:
 % -------
-%   obj     IX_dataset_3d object or array of objects
-%   iax     [optional] axis index, or array of indicies, in range 1 to 3
-%           Default: 1:3
+%   obj     <object> object or array of objects
+%   iax     [optional] axis index, or array of indicies, in range 1 to <ndim>
+%           Default: 1:<ndim>
 %
 % Output:
 % -------
@@ -25,28 +24,10 @@ function [ax, hist] = axis (obj, varargin)
 %   follows:
 %           - If a single object, size(hist) = [1,numel(iax)]
 %           - If a single axis,   size(hist) = size(obj)
-%           - If an array of objects and array of axes, then size(hist) =
+%           - If an array of objects and array of axes, then size(hist) = 
 %             [numel(iax), size(w)] but with dimensions of length 1 removed
 %           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
 %               ishistogram(obj)        size(status) = [4,3]  (not [4,1,3])
 %
 %           This behaviour is the same as that of the Matlab intrinsic
 %           function squeeze.
-
-% -----------------------------------------------------------------------------
-% <#doc_def:>
-%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
-%
-%   doc_file = fullfile(doc_dir,'doc_axis_method.m')
-%
-%   object = 'IX_dataset_3d'
-%   method = 'axis'
-%   ndim = '3'
-% -----------------------------------------------------------------------------
-% <#doc_beg:> IX_dataset
-%   <#file:> <doc_file>
-% <#doc_end:>
-% -----------------------------------------------------------------------------
-
-
-[ax, hist] = axis_ (obj, varargin{:});

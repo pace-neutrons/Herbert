@@ -1,5 +1,5 @@
 function obj_out = hist2point(obj, varargin)
-% Convert histogram IX_dataset_3d object or array to point object(s).
+% Convert histogram IX_dataset_4d object or array to point object(s).
 %
 %   >> obj_out = hist2point (obj)        % convert all axes
 %   >> obj_out = hist2point (obj, iax)   % convert given axis or axes
@@ -8,13 +8,13 @@ function obj_out = hist2point(obj, varargin)
 %
 % Input:
 % -------
-%   obj     IX_dataset_3d object or array of objects
-%   iax     [optional] axis index, or array of indicies, in range 1 to 3
-%           Default: 1:3
+%   obj     IX_dataset_4d object or array of objects
+%   iax     [optional] axis index, or array of indicies, in range 1 to 4
+%           Default: 1:4
 %
 % Output:
 % -------
-%   obj_out IX_dataset_3d object or array of objects with histogram axes
+%   obj_out IX_dataset_4d object or array of objects with histogram axes
 %           converted to point axes
 %
 %
@@ -37,9 +37,9 @@ function obj_out = hist2point(obj, varargin)
 %
 %   doc_file = fullfile(doc_dir,'doc_hist2point_method.m')
 %
-%   object = 'IX_dataset_3d'
+%   object = 'IX_dataset_4d'
 %   method = 'hist2point'
-%   ndim = '3'
+%   ndim = '4'
 % -----------------------------------------------------------------------------
 % <#doc_beg:> IX_dataset
 %   <#file:> <doc_file>

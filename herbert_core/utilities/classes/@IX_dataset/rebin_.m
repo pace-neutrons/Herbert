@@ -1,4 +1,4 @@
-function wout = rebin_(win, iax, array_is_descriptor, varargin)
+function obj_out = rebin_(obj, iax, array_is_descriptor, varargin)
 % Rebin an IX_dataset object or array of IX_dataset objects along all axis
 %
 %   >> wout = rebin (win)       % benign - output is the same as input
@@ -71,7 +71,7 @@ function wout = rebin_(win, iax, array_is_descriptor, varargin)
 
 % Benign return if no arguments
 if nargin==1
-    wout=win;
+    obj_out = obj;
     return
 end     
 
@@ -86,4 +86,4 @@ config.descsriptor_opts = struct(...
     'array_is_descriptor',  array_is_descriptor,...
     'values_are_boundaries',true);
 
-wout = rebin_IX_dataset_(win, iax, config, varargin{:});
+obj_out = rebin_IX_dataset_(obj, iax, config, varargin{:});

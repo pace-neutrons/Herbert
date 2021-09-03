@@ -195,7 +195,7 @@ if isempty(xin)
         is_descriptor = false;
         resolved = false;
     else
-        xout = [-Inf,0,Inf];
+        xout = [-Inf, 0, Inf];
         is_descriptor = true;
         resolved = false;
     end

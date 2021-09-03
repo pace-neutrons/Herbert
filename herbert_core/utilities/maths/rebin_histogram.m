@@ -1,10 +1,15 @@
-function [sout, eout] = rebin_histogram_trueErrors(x, s, e, idim, xout)
+function [sout, eout] = rebin_histogram (x, s, e, idim, xout, distr)
 % Rebins histogram data along one dimension of signal and error arrays
 %
-%   >> [sout, eout] = rebin_histogram_trueErrors (x, s, e, idim, xout)
-%
 % Assumes that the intensity and error are for a distribution (i.e. signal 
-% per unit measure along the x-axis)
+% per unit measure along the x-axis):
+%
+%   >> [sout, eout] = rebin_histogram (x, s, e, idim, xout)
+%
+% General case where distribution or total counts per bin for input and/or
+% output are given:
+%
+%   >> [sout, eout] = rebin_histogram (x, s, e, idim, xout, distr)
 %
 %
 % Input:
@@ -32,6 +37,14 @@ function [sout, eout] = rebin_histogram_trueErrors(x, s, e, idim, xout)
 %           It is assumed that the values of xout are strictly monotonic
 %          increasing i.e. all bins have width greater than zero.
 %
+% Optional argument:
+%   distr   Logical array length two: [distr_1, distr_out] where distr_1,
+%          distr_2 are true or false according to the input and output
+%          signal being distributions.
+%           Default: [true, true] i.e. the intensity and error are for a
+%          distribution (i.e. signal per unit measure along the x-axis)
+%          both on ionput and output.
+%
 % Output:
 % -------
 %   sout    Rebinned signal array. The size of the array is the same as the
@@ -57,12 +70,12 @@ function [sout, eout] = rebin_histogram_trueErrors(x, s, e, idim, xout)
 % ----------------------------------------------------------------
 mx = numel(x) - 1;      % number of bins along the input rebin axis
 if mx<1
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+    error('HERBERT:rebin_histogram:invalid_argument',...
         'The input bin boundary array must have at least two bin boundaries')
 end
 
 if numel(size(s))~=numel(size(s)) || ~all(size(s)==size(e))
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+    error('HERBERT:rebin_histogram:invalid_argument',...
         'The sizes of signal array (=[%s]) and error array (=[%s]) do not match',...
         str_compress(num2str(size(s)),','),...
         str_compress(num2str(size(e)),','))
@@ -70,7 +83,7 @@ end
 
 nx = numel(xout) - 1;   % number of bins along the output rebin axis
 if nx<1
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+    error('HERBERT:rebin_histogram:invalid_argument',...
         'The output bin boundary array must have at least two bin boundaries')
 end
 
@@ -79,7 +92,7 @@ end
 sz = [size(s), ones(1, idim-numel(size(s)))];
 
 if sz(idim)~=mx
-    error('HERBERT:rebin_hist_trueErrors_:invalid_argument',...
+    error('HERBERT:rebin_histogram:invalid_argument',...
         ['The extent of the signal array along axes number %s and the ',...
         'number of axis values in the input bin boundary array is ',...
         'inconsistent with histogram data along that axis'], num2str(idim))
@@ -88,6 +101,20 @@ end
 % Size of output arrays
 % (note: any trailing singletons will be eliminated on allocation)
 sz_out = [sz(1:idim-1), nx, sz(idim+1:end)];
+
+% Check optional parameter
+if nargin==6
+    if islognum(distr) && numel(distr)==2
+        distr_in = logical(distr(1));
+        distr_out = logical(distr(2));
+    else
+        error('HERBERT:rebin_histogram:invalid_argument',...
+            'Optional argument ''distr'' has wrong type and/or size')
+    end
+else
+    distr_in = true;
+    distr_out = true;
+end
 
 
 % Perform rebin
@@ -121,21 +148,41 @@ sout = zeros([prod(sz)/mx, nx]);
 eout = zeros([prod(sz)/mx, nx]);
 
 % Perform the integration
+dx_in = x(iin+1) - x(iin);
+
 while true
     delta = (min(xout(iout+1),x(iin+1)) - max(xout(iout),x(iin)));
-    sout(:,iout) = sout(:,iout) + delta * s(:,iin);
-    eout(:,iout) = eout(:,iout) + delta * (x(iin+1) - x(iin)) * (e(:,iin).^2);
+    if distr_in
+        sout(:,iout) = sout(:,iout) + delta * s(:,iin);
+        eout(:,iout) = eout(:,iout) + delta * dx_in * (e(:,iin).^2);
+    else
+        sout(:,iout) = sout(:,iout) + (delta / dx_in) * s(:,iin);
+        eout(:,iout) = eout(:,iout) + (delta / dx_in) * (e(:,iin).^2);
+    end
     if xout(iout+1) >= x(iin+1)
+        % Increment input bin counter; break if no further bins
         if iin < mx
             iin = iin + 1;
+            dx_in = x(iin+1) - x(iin);
         else
-            sout(:,iout) = sout(:,iout) / (xout(iout+1)-xout(iout));		% end of input array reached
-            eout(:,iout) = sqrt(eout(:,iout)) / (xout(iout+1)-xout(iout));
+            if distr_out
+                dx_out = xout(iout+1) - xout(iout);
+                sout(:,iout) = sout(:,iout) / dx_out;
+                eout(:,iout) = sqrt(eout(:,iout)) / dx_out;
+            else
+                eout(:,iout) = sqrt(eout(:,iout));
+            end
             break
         end
     else
-        sout(:,iout) = sout(:,iout) / (xout(iout+1)-xout(iout));
-        eout(:,iout) = sqrt(eout(:,iout)) / (xout(iout+1)-xout(iout));
+        % Increment output bin counter; break if no further bins
+        if distr_out
+            dx_out = xout(iout+1) - xout(iout);
+            sout(:,iout) = sout(:,iout) / dx_out;
+            eout(:,iout) = sqrt(eout(:,iout)) / dx_out;
+        else
+            eout(:,iout) = sqrt(eout(:,iout));
+        end
         if iout < nx
             iout = iout + 1;
         else

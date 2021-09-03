@@ -1,4 +1,4 @@
-function wout = integrate_(win, iax, array_is_descriptor, varargin)
+function obj_out = integrate_(obj, iax, array_is_descriptor, varargin)
 % Integrate an IX_dataset object or array of IX_dataset objects along specified
 % axis direction
 %
@@ -61,7 +61,7 @@ function wout = integrate_(win, iax, array_is_descriptor, varargin)
 
 % Benign return if no arguments
 if nargin==1
-    wout=win;
+    obj_out = obj;
     return
 end     
 
@@ -76,8 +76,8 @@ config.descsriptor_opts = struct(...
     'array_is_descriptor',  array_is_descriptor,...
     'values_are_boundaries',true);
 
-wout = rebin_IX_dataset_(win, iax, config, varargin{:});
+obj_out = rebin_IX_dataset_(obj, iax, config, varargin{:});
 
 
 % Squeeze object(s)
-wout=wout.squeeze_IX_dataset(iax);  % *** check
+obj_out = squeeze(obj_out, iax);

@@ -73,7 +73,7 @@ tol = 1e-14;
 tic
 S = 0;
 for i=1:numel(x)
-    [~, sout_ref, eout_ref] = average_points (x{i}, s{i}, e{i}, 1, xout);
+    [~, sout_ref, eout_ref] = average_points_ver1 (x{i}, s{i}, e{i}, 1, xout);
     S = S + sout_ref(1) + eout_ref(1);
 end
 disp(['                         Average points: ',num2str(toc), ' seconds.'])
@@ -91,6 +91,17 @@ disp(['              Integrate true error bars: ',num2str(toc), ' seconds.'])
 
 
 disp(' ')
+
+
+% Average points production
+% -------------------------
+tic
+S = 0;
+for i=1:numel(x)
+    [~, sout_ref, eout_ref] = average_points (x{i}, s{i}, e{i}, 1, xout);
+    S = S + sout_ref(1) + eout_ref(1);
+end
+disp(['              Production average points: ',num2str(toc), ' seconds.'])
 
 
 %--------------------------------------------------------------------------------

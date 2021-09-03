@@ -1,7 +1,7 @@
 function [nd, sz] = dimensions_(obj)
 % Find number of dimensions and extent along each dimension.
 %
-%   >> [nd, sz] = dimensions_(obj)
+%   >> [nd, sz] = dimensions_ (obj)
 %
 % Input:
 % ------
@@ -11,8 +11,8 @@ function [nd, sz] = dimensions_(obj)
 % -------
 %   nd      Dimensionality of the object
 %   sz      Extend along each of the dimensions (row vector length nd)
-
-
+%
+%
 % Notes about sizes of arrays
 % ---------------------------
 % Dimensions method must return object dimensionality, nd, and extent along
@@ -27,6 +27,21 @@ function [nd, sz] = dimensions_(obj)
 %   3D  nd=3  sz=[n1,n2,n3]     even if n3=1   [n1,n2,n3] less trailing singletons
 %   4D  nd=4  sz=[n1,n2,n3,n4]  even if n4=1,  [n1,n2,n3,n4] "    "        "
 %                               or n3=n4=1
+
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_dimensions_method.m')
+%
+%   object = 'IX_dataset'
+%   method = 'dimensions_'
+%   ndim = 'ndims'
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
 
 % Dimensionality
