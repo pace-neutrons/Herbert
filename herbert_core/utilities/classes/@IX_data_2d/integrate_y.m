@@ -1,4 +1,4 @@
-function wout = integrate_y(win, varargin)
+function obj_out = integrate_y (obj, varargin)
 % Integrate an IX_dataset_2d object or array of IX_dataset_2d objects along the y-axis
 %
 %   >> wout = integrate_y (win, descr)
@@ -57,5 +57,6 @@ function wout = integrate_y(win, varargin)
 % See also corresponding function integrate2_y which accepts a set of bin boundaries
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
-wout = integrate_xyz(win,true,2,varargin{:});
 
+array_is_descriptor = true;
+obj_out = integrate_ (obj, 2, array_is_descriptor, varargin{:});

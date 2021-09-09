@@ -1,14 +1,14 @@
-function wout = cut_z(win, varargin)
+function obj_out = cut_z (obj, varargin)
 % Make a cut from an IX_dataset_3d object or array of IX_dataset_3d objects along the z-axis
 %
-%   >> wout = cut_z (win, descr)
-%   >> wout = cut_z (win, wref)           % reference object to provide output bins
+%   >> obj_out = cut_z (obj, descr)
+%   >> obj_out = cut_z (obj, wref)           % reference object to provide output bins
 %
-%   >> wout = cut_z (..., 'int')          % change averaging method for point data
+%   >> obj_out = cut_z (..., 'int')          % change averaging method for point data
 %   
 % Input:
 % ------
-%   win     Input object or array of objects to be cut
+%   obj     Input object or array of objects to be cut
 %   descr   Description of new bin boundaries 
 %           - [], '' or zero:       Leave bins unchanged
 %           - dx (numeric scalar)   New bins centred on zero with constant width dx
@@ -26,17 +26,17 @@ function wout = cut_z(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %           If just one bin was specified along an axis, i.e. gave just upper and
 %          lower limits, then the output object has dimension reduced by one.
 %
 % EXAMPLES
-%   >> wout = cut_z (win, [])
-%   >> wout = cut_z (win, [-Inf,Inf])    % equivalent to above
-%   >> wout = cut_z (win, 10)
-%   >> wout = cut_z (win, [2000,3000])
-%   >> wout = cut_z (win, [2000,Inf])
-%   >> wout = cut_z (win, [2000,3000,4000,5000,6000])
+%   >> obj_out = cut_z (obj, [])
+%   >> obj_out = cut_z (obj, [-Inf,Inf])    % equivalent to above
+%   >> obj_out = cut_z (obj, 10)
+%   >> obj_out = cut_z (obj, [2000,3000])
+%   >> obj_out = cut_z (obj, [2000,Inf])
+%   >> obj_out = cut_z (obj, [2000,3000,4000,5000,6000])
 %
 % Cut is similar to rebin, except that any axes that have just one bin reduce the
 % dimensionality of the output object by one, and the rebin descriptor defines
@@ -44,4 +44,4 @@ function wout = cut_z(win, varargin)
 
 
 array_is_descriptor = true;
-wout = cut_(win, 3, array_is_descriptor, varargin{:});
+obj_out = cut_ (obj, 3, array_is_descriptor, varargin{:});

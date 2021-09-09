@@ -92,6 +92,64 @@ classdef test_IX_dataset_2d <  TestCase
             assertEqual(ds.y_distribution,false);
         end
         
+        function test_constructor_by_array_args(obj)
+            % >> w = IX_dataset_2d (x,y)
+            ds = IX_dataset_2d(1:10,1:20);
+            ds2 = IX_dataset_2d({1:10,1:20});
+            assertEqual(ds, ds2);
+
+
+            %   >> w = IX_dataset_2d (x,y,signal)
+            ds = IX_dataset_2d(1:10,1:20,ones(9,19));
+            ds2 = IX_dataset_2d({1:10,1:20},ones(9,19));
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_2d (x,y,signal,error)
+            ds = IX_dataset_2d(1:10,1:20,ones(10,20),ones(10,20));
+            ds2 = IX_dataset_2d({1:10,1:20},ones(10,20),ones(10,20));
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_2d (x,y,signal,error,title,x_axis,y_axis,s_axis)
+            ds = IX_dataset_2d(1:20,1:10,ones(20,10),ones(20,10),...
+                'my object','x-axis name','y-axis name','signal');
+            ds2 = IX_dataset_2d({1:20,1:10},ones(20,10),ones(20,10),...
+                'my object',{'x-axis name','y-axis name'},'signal');
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_2d (x,y,signal,error,title,...
+            %           x_axis,y_axis,s_axis,x_distribution,y_distribution)
+            ds = IX_dataset_2d(1:20,1:10,ones(20,10),ones(20,10),...
+                'my object','x-axis name','y-axis name','signal',false,false);
+            ds2 = IX_dataset_2d({1:20,1:10},ones(20,10),ones(20,10),...
+                'my object',{'x-axis name','y-axis name'},'signal',[false,false]);
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_2d (title, signal, error, s_axis,...
+            %           x, x_axis, x_distribution, y, y_axis, y_distribution)
+            ds = IX_dataset_2d('my object',ones(15,10),ones(15,10),...
+                'signal',1:15,'x-axis name',false,...
+                1:10,'y-axis name',false);
+            ds2 = IX_dataset_2d('my object',ones(15,10),ones(15,10),...
+                'signal',{1:15, 1:10},{'x-axis name','y-axis name'},...
+                [false,false]);
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_2d (title, signal, error, s_axis,...
+            %           x, x_axis, x_distribution, y, y_axis, y_distribution)
+            ds = IX_dataset_2d('my object',ones(15,10),ones(15,10),...
+                'signal',1:15,'x-axis name',false,...
+                1:10,'y-axis name',false);
+            ds2 = IX_dataset_2d('my object',ones(15,10),ones(15,10),...
+                'signal',{1:15, 1:10},{'x-axis name','y-axis name'},...
+                {false,false});
+            assertEqual(ds, ds2);
+        end
+        
         function test_constructor_small(obj)
             % Single point is valid
             ds = IX_dataset_2d(1, 10);

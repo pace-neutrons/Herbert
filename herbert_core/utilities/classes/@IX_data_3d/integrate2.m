@@ -1,14 +1,14 @@
-function wout = integrate2(win, varargin)
+function obj_out = integrate2 (obj, varargin)
 % Integrate an IX_dataset_3d object or array of IX_dataset_3d objects along the x-,y- and z-axes
 %
-%   >> wout = integrate2 (win, descr_x, descr_y, descr_z)
-%   >> wout = integrate2 (win, wref)             % reference object to provide output bins
+%   >> obj_out = integrate2 (obj, descr_x, descr_y, descr_z)
+%   >> obj_out = integrate2 (obj, wref)             % reference object to provide output bins
 %
-%   >> wout = integrate2 (..., 'ave')            % change integration method for axes with point data
+%   >> obj_out = integrate2 (..., 'ave')            % change integration method for axes with point data
 %
 % Input:
 % ------
-%   win     Input object or array of objects to be integrated
+%   obj     Input object or array of objects to be integrated
 %   descr   Description of integration bin boundaries (one per axis)
 %
 %           Integration is performed for each bin defined in the description:
@@ -36,20 +36,20 @@ function wout = integrate2(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = integrate2 (win)    % integrates entire dataset
-%   >> wout = integrate2 (win, [],...)
-%   >> wout = integrate2 (win, [-Inf,Inf],...)    % equivalent to above
-%   >> wout = integrate2 (win, 10,...)
-%   >> wout = integrate2 (win, [2000,3000],...)
-%   >> wout = integrate2 (win, [2000,Inf],...)
-%   >> wout = integrate2 (win, [2000,3000,4000,5000,6000],...)
+%   >> obj_out = integrate2 (obj)    % integrates entire dataset
+%   >> obj_out = integrate2 (obj, [],...)
+%   >> obj_out = integrate2 (obj, [-Inf,Inf],...)    % equivalent to above
+%   >> obj_out = integrate2 (obj, 10,...)
+%   >> obj_out = integrate2 (obj, [2000,3000],...)
+%   >> obj_out = integrate2 (obj, [2000,Inf],...)
+%   >> obj_out = integrate2 (obj, [2000,3000,4000,5000,6000],...)
 %
 % See also corresponding function integrate which accepts a rebin descriptor
 % of form [x1,dx1,x2,dx2,...xn] instead of a set of bin boundaries
 
 
 array_is_descriptor = false;
-wout = integrate_(win, 1:3, array_is_descriptor, varargin{:});
+obj_out = integrate_ (obj, 1:3, array_is_descriptor, varargin{:});

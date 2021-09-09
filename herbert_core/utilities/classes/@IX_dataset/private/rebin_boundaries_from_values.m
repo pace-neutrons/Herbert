@@ -42,11 +42,12 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, xref)
 
 if ~(isinf(xin(1)) || isinf(xin(end)))
     % All input values are all finite
-    if ~is_boundaries
+    if is_boundaries
         xout = xin;
     else
         xout = bin_boundaries (xin);
     end
+    
 else
     % Bin boundaries or centres:
     %   [x1, x2, x3,...xn]

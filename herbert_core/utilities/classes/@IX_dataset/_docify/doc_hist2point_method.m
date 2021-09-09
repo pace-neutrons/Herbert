@@ -8,6 +8,7 @@
 % Input:
 % -------
 %   obj     <object> object or array of objects
+%
 %   iax     [optional] axis index, or array of indicies, in range 1 to <ndim>
 %           Default: 1:<ndim>
 %

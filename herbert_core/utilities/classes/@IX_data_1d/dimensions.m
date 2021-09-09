@@ -5,12 +5,24 @@ function [nd, sz] = dimensions(obj)
 %
 % Input:
 % ------
-%   obj     IX_dataset_1d object
+%   obj     IX_dataset_1d object, or array of IX_dataset_1d objects
 %
 % Output:
 % -------
 %   nd      Dimensionality of the object
+%
 %   sz      Extend along each of the dimensions (row vector length nd)
+%           If obj is an array of objects, then sz is array size [nobj,nd]
+%           - If a single object, size(sz) = [1,nd] (i.e. row vector)
+%           - If one-dimensional, size(sz) = size(obj)
+%           - If an array of multi-dimensional objects,
+%                                 size(sz) = [nd, size(obj)]
+%             but with dimensions of length one removed
+%           e.g. if nd = 4, size(obj) = [1,3] then
+%               dimensions(obj)  size(sz) = [4,3]  (not [4,1,3])
+%
+%           This behaviour is the same as that of the Matlab intrinsic
+%           function squeeze.
 %
 %
 % Notes about sizes of arrays

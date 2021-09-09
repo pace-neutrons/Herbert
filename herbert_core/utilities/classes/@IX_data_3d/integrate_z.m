@@ -1,14 +1,14 @@
-function wout = integrate_z(win, varargin)
+function obj_out = integrate_z (obj, varargin)
 % Integrate an IX_dataset_3d object or array of IX_dataset_3d objects along the z-axis
 %
-%   >> wout = integrate_z (win, descr)
-%   >> wout = integrate_z (win, wref)           % reference object to provide output bins
+%   >> obj_out = integrate_z (obj, descr)
+%   >> obj_out = integrate_z (obj, wref)           % reference object to provide output bins
 %
-%   >> wout = integrate_z (..., 'ave')          % change integration method for point data
+%   >> obj_out = integrate_z (..., 'ave')          % change integration method for point data
 %   
 % Input:
 % ------
-%   win     Input object or array of objects to be integrated
+%   obj     Input object or array of objects to be integrated
 %   descr   Description of integration bin boundaries 
 %
 %           Integration is performed fo each bin defined in the description:
@@ -41,22 +41,22 @@ function wout = integrate_z(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = integrate_z (win)    % integrates entire dataset
-%   >> wout = integrate_z (win, [])
-%   >> wout = integrate_z (win, [-Inf,Inf])    % equivalent to above
-%   >> wout = integrate_z (win, 10)
-%   >> wout = integrate_z (win, [2000,3000])
-%   >> wout = integrate_z (win, [2000,Inf])
-%   >> wout = integrate_z (win, [2000,10,3000])
-%   >> wout = integrate_z (win, [5,-0.01,3000])
-%   >> wout = integrate_z (win, [5,-0.01,1000,20,4000,50,20000])
+%   >> obj_out = integrate_z (obj)    % integrates entire dataset
+%   >> obj_out = integrate_z (obj, [])
+%   >> obj_out = integrate_z (obj, [-Inf,Inf])    % equivalent to above
+%   >> obj_out = integrate_z (obj, 10)
+%   >> obj_out = integrate_z (obj, [2000,3000])
+%   >> obj_out = integrate_z (obj, [2000,Inf])
+%   >> obj_out = integrate_z (obj, [2000,10,3000])
+%   >> obj_out = integrate_z (obj, [5,-0.01,3000])
+%   >> obj_out = integrate_z (obj, [5,-0.01,1000,20,4000,50,20000])
 %
 % See also corresponding function integrate2_z which accepts a set of bin boundaries
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
 array_is_descriptor = true;
-wout = integrate_(win, 3, array_is_descriptor, varargin{:});
+obj_out = integrate_ (obj, 3, array_is_descriptor, varargin{:});

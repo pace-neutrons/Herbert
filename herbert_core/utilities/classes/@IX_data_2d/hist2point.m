@@ -9,6 +9,7 @@ function obj_out = hist2point(obj, varargin)
 % Input:
 % -------
 %   obj     IX_dataset_2d object or array of objects
+%
 %   iax     [optional] axis index, or array of indicies, in range 1 to 2
 %           Default: 1:2
 %

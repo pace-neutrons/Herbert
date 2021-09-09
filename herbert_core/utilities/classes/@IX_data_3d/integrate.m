@@ -1,14 +1,14 @@
-function wout = integrate(win, varargin)
+function obj_out = integrate (obj, varargin)
 % Integrate an IX_dataset_3d object or array of IX_dataset_3d objects along the x-,y- and z-axes
 %
-%   >> wout = integrate (win, descr_x, descr_y, descr_z)
-%   >> wout = integrate (win, wref)             % reference object to provide output bins
+%   >> obj_out = integrate (obj, descr_x, descr_y, descr_z)
+%   >> obj_out = integrate (obj, wref)             % reference object to provide output bins
 %   
-%   >> wout = integrate (..., 'ave')            % change integration method for axes with point data
+%   >> obj_out = integrate (..., 'ave')            % change integration method for axes with point data
 %   
 % Input:
 % ------
-%   win     Input object or array of objects to be integrated
+%   obj     Input object or array of objects to be integrated
 %   descr   Description of integration bin boundaries (one per axis)
 %
 %           Integration is performed for each bin defined in the description:
@@ -41,22 +41,22 @@ function wout = integrate(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = integrate (win)    % integrates entire dataset
-%   >> wout = integrate (win, [],...)
-%   >> wout = integrate (win, [-Inf,Inf],...)    % equivalent to above
-%   >> wout = integrate (win, 10,...)
-%   >> wout = integrate (win, [2000,3000],...)
-%   >> wout = integrate (win, [2000,Inf],...)
-%   >> wout = integrate (win, [2000,10,3000],...)
-%   >> wout = integrate (win, [5,-0.01,3000],...)
-%   >> wout = integrate (win, [5,-0.01,1000,20,4000,50,20000],...)
+%   >> obj_out = integrate (obj)    % integrates entire dataset
+%   >> obj_out = integrate (obj, [],...)
+%   >> obj_out = integrate (obj, [-Inf,Inf],...)    % equivalent to above
+%   >> obj_out = integrate (obj, 10,...)
+%   >> obj_out = integrate (obj, [2000,3000],...)
+%   >> obj_out = integrate (obj, [2000,Inf],...)
+%   >> obj_out = integrate (obj, [2000,10,3000],...)
+%   >> obj_out = integrate (obj, [5,-0.01,3000],...)
+%   >> obj_out = integrate (obj, [5,-0.01,1000,20,4000,50,20000],...)
 %
 % See also corresponding function integrate2 which accepts a set of bin boundaries
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
 array_is_descriptor = true;
-wout = integrate_(win, 1:3, array_is_descriptor, varargin{:});
+obj_out = integrate_ (obj, 1:3, array_is_descriptor, varargin{:});

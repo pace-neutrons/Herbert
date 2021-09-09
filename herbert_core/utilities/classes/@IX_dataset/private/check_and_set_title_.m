@@ -6,14 +6,17 @@ function obj = check_and_set_title_(obj, val)
 % Input:
 % ------
 %   obj     IX_dataset object
+%
 %   val     Title for plot. One of:
 %           - cellstr
 %           - character string or 2D character array
 %           - string array
+%           If val is empty, then the title will be set to the default
 %
 % Output:
 % -------
 %   obj     Updated object
+%           Title is a column cell array of character strings
 
 
 if ~isempty(val)

@@ -1,4 +1,4 @@
-function wout = cut(win, varargin)
+function obj_out = cut (obj, varargin)
 % Make a cut from an IX_dataset_2d object or array of IX_dataset_2d objects along the x- and y-axes
 %
 %   >> wout = cut (win, descr_x, descr_y)
@@ -42,4 +42,6 @@ function wout = cut(win, varargin)
 % dimensionality of the output object by one, and the rebin descriptor defines
 % bin centres, not bin boundaries.
 
-wout = cut_xyz(win,1:2,varargin{:});
+
+array_is_descriptor = true;
+obj_out = cut_ (obj, 1:2, array_is_descriptor, varargin{:});

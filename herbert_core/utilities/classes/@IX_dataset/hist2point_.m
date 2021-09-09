@@ -9,6 +9,7 @@ function obj_out = hist2point_(obj, iax)
 % Input:
 % -------
 %   obj     IX_dataset object or array of objects
+%
 %   iax     [optional] axis index, or array of indicies, in range 1 to ndim
 %           Default: 1:ndim
 %
@@ -47,7 +48,7 @@ function obj_out = hist2point_(obj, iax)
 % -----------------------------------------------------------------------------
 
 
-nd = obj(1).ndim();
+nd = obj.ndim();    % works even if empty obj array, as static method
 
 % Check the validity of the axis indices
 if nargin==1
@@ -58,7 +59,8 @@ else
         if nd==1
             mess = 'Axis indices can only take the value 1';
         else
-            mess = ['Axis indices must be unique and in the range 1 to ', num2str(nd)];
+            mess = ['Axis indices must be unique and in the range 1 to ',...
+                num2str(nd)];
         end
         error('HERBERT:hist2point_:invalid_argument', mess)
     end

@@ -2,19 +2,18 @@ function obj_out = rebin_IX_dataset_single_ (obj, iax, xdescr, is_descriptor,...
         is_boundaries, resolved, integrate_data, point_average_method)
     
     
-ndim = obj.ndim();
 niax = numel(iax);
 
-% Compute the output bin boundariesFor unresolved axes (i.e. -Inf or +Inf,
+% Compute the output bin boundaries for unresolved axes (i.e. -Inf or +Inf,
 % or a binning interval in a descriptor requires reference values to be 
 % retained)
+ishist = ishistogram_(obj);
 xref = obj.xyz_;
 
 if all(resolved)
     xrebin = xdescr;
 else
     xrebin = cell(1,niax);
-    ishist = ishistogram_(obj);
     for i = 1:niax
         if ~resolved(i)
             xrebin{i} = rebin_boundaries_from_binning_description ...
@@ -49,16 +48,18 @@ for i = 1:niax
 end
     
 % Now perform rebinning along each rebin axis in succession
-xout = xref;
+xout = obj.xyz_;
 sout = obj.signal_;
 eout = obj.error_;
+xdistout = obj.xyz_distribution_;
 for i = 1:niax
     if ishist(iax(i))
         % Histogram axis
-        distr = [obj.xyz_distribution_(iax(i)), integrate_data];
+        distr = [obj.xyz_distribution_(iax(i)), ~integrate_data];
         [sout, eout] = rebin_histogram (xref{iax(i)}, sout, eout,...
             iax(i), xrebin{i}, distr);
         xout{iax(i)} = xrebin{i};
+        xdistout(iax(i)) = distr(2);
         
     else
         % Point axis
@@ -68,6 +69,7 @@ for i = 1:niax
             [sout, eout] = integrate_points (xref{iax(i)}, sout, eout,...
                 iax(i), xrebin{i}, distr);
             xout{iax(i)} = xrebin{i};
+            xdistout(iax(i)) = distr;
             
         elseif strcmp(point_average_method, 'average')
             % Point averaging method
@@ -81,6 +83,7 @@ for i = 1:niax
                 [xout{iax(i)}, sout, eout] = average_points (xref{iax(i)},...
                     sout, eout, iax(i), xrebin{i}, 'integrate');
             end
+            xdistout(iax(i)) = ~integrate_data;
             
         else
             error('HERBERT:rebin_IX_dataset_single_:invalid_argument',...
@@ -89,6 +92,5 @@ for i = 1:niax
     end
 end
 
-% Create output object
-obj_out = obj;
-
+% Create output object using input object as a template (retain captions)
+obj_out = init (obj, xout, sout, eout, xdistout);

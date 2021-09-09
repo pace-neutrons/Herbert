@@ -55,14 +55,11 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             % *** RE-INSERT TEST
             %             data = [1:10;2*ones(1,10);ones(1,10)];
             %             ds = IX_dataset_1d(data);
-            %             % assertTrue(ds.get_isvalid());     % *** DELETED PROPERTY
-            %             assertEqual(ds.x,(1:10));
-            %             assertEqual(ds.signal,2*ones(10,1));
-            %             assertEqual(ds.error,ones(10,1));
             
             
             %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis)
-            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),'my object','x-axis name','y-axis name');
+            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),'my object',...
+                'x-axis name','y-axis name');
             assertEqual(ds.x,(1:10));
             assertEqual(ds.signal,ones(10,1));
             assertEqual(ds.error,ones(10,1));
@@ -71,7 +68,8 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             assertEqual(ds.s_axis.caption,{'y-axis name'});
             
             
-            %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis, x_distribution)
+            %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis,...
+            %                                               x_distribution)
             ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
                 'my object','x-axis name','y-axis name',false);
             assertEqual(ds.x,(1:10));
@@ -83,7 +81,8 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             assertEqual(ds.x_distribution,false);
             
             
-            %   >> w = IX_dataset_1d (title, signal, error, s_axis, x, x_axis, x_distribution)
+            %   >> w = IX_dataset_1d (title, signal, error, s_axis, x,...
+            %                                       x_axis, x_distribution)
             ds = IX_dataset_1d('my object',ones(1,10),ones(1,10),...
                 'y-axis name',1:10,'x-axis name',false);
             assertEqual(ds.x,(1:10));
@@ -93,6 +92,56 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             assertEqual(ds.x_axis.caption,{'x-axis name'});
             assertEqual(ds.s_axis.caption,{'y-axis name'});
             assertEqual(ds.x_distribution,false);
+        end
+        
+        function test_constructor_by_array_args(obj)
+            %   >> w = IX_dataset_1d (x)
+            ds = IX_dataset_1d(1:10);
+            ds2 = IX_dataset_1d({1:10});
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_1d (x,signal)
+            ds = IX_dataset_1d(1:10,ones(1,9));
+            ds2 = IX_dataset_1d({1:10},ones(1,9));
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_1d (x,signal,error)
+            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10));
+            ds2 = IX_dataset_1d({1:10},ones(1,10),ones(1,10));
+            assertEqual(ds, ds2);
+            
+            
+            % *** RE-INSERT TEST
+            %             data = [1:10;2*ones(1,10);ones(1,10)];
+            %             ds = IX_dataset_1d(data);
+            
+            
+            %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis)
+            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),'my object',...
+                'x-axis name','y-axis name');
+            ds2 = IX_dataset_1d({1:10},ones(1,10),ones(1,10),{'my object'},...
+                {'x-axis name'},{'y-axis name'});
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_1d (x,signal,error,title,x_axis,s_axis,...
+            %                                               x_distribution)
+            ds = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
+                'my object','x-axis name','y-axis name',false);
+            ds2 = IX_dataset_1d(1:10,ones(1,10),ones(1,10),...
+                {'my object'},'x-axis name',{'y-axis name'},false);
+            assertEqual(ds, ds2);
+            
+            
+            %   >> w = IX_dataset_1d (title, signal, error, s_axis, x,...
+            %                                       x_axis, x_distribution)
+            ds = IX_dataset_1d('my object',ones(1,10),ones(1,10),...
+                'y-axis name',1:10,{'x-axis name','Indeed!'},false);
+            ds2 = IX_dataset_1d('my object',ones(1,10),ones(1,10),...
+                {'y-axis name'},{1:10},{'x-axis name','Indeed!'},{false});
+            assertEqual(ds, ds2);
         end
         
         function test_constructor_small(obj)

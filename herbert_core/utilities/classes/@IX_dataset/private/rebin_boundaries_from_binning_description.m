@@ -12,8 +12,7 @@ function xout = rebin_boundaries_from_binning_description (xin,...
 %                                     (xdescr, is_boundaries, xref, ishist)
 
 if is_descriptor
-    xout = rebin_boundaries_from_descriptor (xin, is_boundaries,...
-        varargin{1}, varargin{2});
+    xout = rebin_boundaries_from_descriptor (xin, is_boundaries, varargin{:});
 else
-    xout = rebin_boundaries_from_values (xin, is_boundaries, varargin{1});
+    xout = rebin_boundaries_from_values (xin, is_boundaries, varargin{:});
 end

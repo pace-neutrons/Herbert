@@ -61,8 +61,12 @@ classdef (Abstract) IX_dataset
         % Description of whether or not the signal along the axis is a
         % distribution (true) i.e. signal per unit measure, or not (false).
         % Logical row vector.
-        xyz_distribution_
-        
+        xyz_distribution_        
+    end
+
+    properties (Access=private)
+        % True if the object has been initialised
+        valid_ = false
     end
     
     methods
@@ -168,8 +172,8 @@ classdef (Abstract) IX_dataset
         
 
 
+        % *** ONLY USED BY rebin_IX_dataset_nd:
         function xyz = get_xyz(obj,nd)
-            % *** ONLY USED BY rebin_IX_dataset_nd:
             % get x (y,z) values without checking for their validity
             if ~exist('nd', 'var')
                 xyz  = obj.xyz_;
@@ -178,8 +182,8 @@ classdef (Abstract) IX_dataset
             end
         end
         
+        % *** ONLY USED BY rebin_IX_dataset_nd
         function dis = get_isdistribution(obj)
-            % *** ONLY USED BY rebin_IX_dataset_nd
             % get boolean array informing if the state of distribution
             % along all axis
             dis= obj.xyz_distribution_;
@@ -220,40 +224,53 @@ classdef (Abstract) IX_dataset
         % provided if requested.
         
         % Build object
+        % ------------
+        % Build a new object
         obj = build_IX_dataset_(obj, varargin)
         
+        % Re-initialise an object
+        obj_out = init_(obj, varargin)
+        
         % Set child properties
-        obj = set_xyz_(obj, val, iax)   % set axis data
+        % --------------------
+        obj = set_xyz_ (obj, val, iax)   % set axis data
 
-        obj = set_xyz_axis_(obj, val, iax)  % set axis annotation information
+        obj = set_xyz_axis_ (obj, val, iax)  % set axis annotation information
 
-        obj = set_xyz_distribution_(obj, val, iax)  % set axis distribution flag
+        obj = set_xyz_distribution_ (obj, val, iax)  % set axis distribution flag
 
         % Dimension independent methods used by child methods
-        [ax, hist] = axis_(obj, iax)
+        % ---------------------------------------------------
+        % Get axis information
+        [ax, hist] = axis_ (obj, iax)
         
-        [nd, sz] = dimensions_(obj)
+        % Cut an IX_dataset object or array of IX_dataset objects along
+        % one or more axes
+        obj_out = cut_ (obj, iax, array_is_descriptor, varargin)
         
-        obj_out = hist2point_(obj, iax)
+        % Get dimensionality and signal size
+        [nd, sz] = dimensions_ (obj)
 
-        status = ishistogram_(obj, iax)
+        % Convert histogram axes to point axes
+        obj_out = hist2point_ (obj, iax)
+
+        % Integrate an IX_dataset object or array of IX_dataset objects
+        % along one or more axes
+        obj_out = integrate_ (obj, iax, array_is_descriptor, varargin)
         
-        [x_label, s_label] = make_label_(obj)
+        % Determine histogram or point status for axes
+        status = ishistogram_ (obj, iax)
         
-        
-        %--- Not yet verified ---------------------------------------------
-        
-        % Make a cut from an IX_dataset object or array of IX_dataset objects along
-        % specified axess direction(s).
-        wout = cut_(win,dir,varargin)
-        
-        % Integrate an IX_dataset object or array of IX_dataset
-        % objects along the axes, defined by direction
-        wout = integrate_(win,array_is_descriptor, dir, varargin)
+        % Create plot labels
+        [x_label, s_label] = make_label_ (obj)
         
         % Rebin an IX_dataset object or array of IX_dataset objects along
-        % along the axes, defined by direction
-        wout = rebin_(win, array_is_descriptor,dir,varargin)
+        % one or more axes
+        obj_out = rebin_ (obj, iax, array_is_descriptor, varargin)
+        
+        % Remove dimensions of length one dimensions in an IX_dataset object
+        obj_out = squeeze_ (obj, iax)
+        
     end
     
     
@@ -283,16 +300,15 @@ classdef (Abstract) IX_dataset
         % Convert all or selected histogram axes to point axes
         obj_out = hist2point(obj, iax)
         
+        % Re-initialize object using class constructor code
+        obj_out = init(obj, varargin);
+        
         % Return array containing true or false depending on dataset being
         % histogram or point;
         status = ishistogram(obj, iax)
         
         % Create axis annoations
         varargout = make_label(obj)
-        
-        %--- Not yet verified ---------------------------------------------
-        % (re)initialize object using constructor' code
-        obj = init(obj, varargin);
         
     end
     
@@ -306,15 +322,5 @@ classdef (Abstract) IX_dataset
         obj = loadobj(data)
     end
     
-    
-    %======================================================================
-    methods(Abstract, Static, Access=protected)
-        %--- Not yet verified ---------------------------------------------
-        % Rebins histogram data along specific axis.
-        [wout_s, wout_e] = rebin_hist(iax, wout_x);
-        
-        %Integrates point data along along specific axis.
-        [wout_s,wout_e] = integrate_points(iax, xbounds_true);
-    end
-end
 
+end

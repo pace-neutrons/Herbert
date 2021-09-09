@@ -1,4 +1,4 @@
-function wout = rebin2(win, varargin)
+function obj_out = rebin2 (obj, varargin)
 % Rebin an IX_dataset_2d object or array of IX_dataset_2d objects along the x- and y-axes
 %
 %   >> wout = rebin2 (win, descr_x, descr_y)
@@ -38,5 +38,6 @@ function wout = rebin2(win, varargin)
 % See also corresponding function rebin which accepts a rebin descriptor
 % of form [x1,dx1,x2,dx2,...xn] instead of a set of bin boundaries
 
-wout = rebin_xyz(win,false,1:2,varargin{:});
 
+array_is_descriptor = false;
+obj_out = rebin_ (obj, 1:2, array_is_descriptor, varargin{:});

@@ -1,14 +1,14 @@
-function wout = rebin_z(win, varargin)
+function obj_out = rebin_z (obj, varargin)
 % Rebin an IX_dataset_3d object or array of IX_dataset_3d objects along the z-axis
 %
-%   >> wout = rebin_z (win, descr)
-%   >> wout = rebin_z (win, wref)           % reference object to provide output bins
+%   >> obj_out = rebin_z (obj, descr)
+%   >> obj_out = rebin_z (obj, wref)           % reference object to provide output bins
 %
-%   >> wout = rebin_z (..., 'int')          % change averaging method for point data
+%   >> obj_out = rebin_z (..., 'int')          % change averaging method for point data
 %   
 % Input:
 % ------
-%   win     Input object or array of objects to be rebinned
+%   obj     Input object or array of objects to be rebinned
 %   descr   Description of new bin boundaries 
 %           - [], '' or zero:       Leave bins unchanged
 %           - dx (numeric scalar)   New bins centred on zero with constant width dx
@@ -31,20 +31,20 @@ function wout = rebin_z(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = rebin_z (win, [])
-%   >> wout = rebin_z (win, 10)
-%   >> wout = rebin_z (win, [2000,3000])
-%   >> wout = rebin_z (win, [2000,Inf])
-%   >> wout = rebin_z (win, [2000,10,3000])
-%   >> wout = rebin_z (win, [5,-0.01,3000])
-%   >> wout = rebin_z (win, [5,-0.01,1000,20,4000,50,20000])
+%   >> obj_out = rebin_z (obj, [])
+%   >> obj_out = rebin_z (obj, 10)
+%   >> obj_out = rebin_z (obj, [2000,3000])
+%   >> obj_out = rebin_z (obj, [2000,Inf])
+%   >> obj_out = rebin_z (obj, [2000,10,3000])
+%   >> obj_out = rebin_z (obj, [5,-0.01,3000])
+%   >> obj_out = rebin_z (obj, [5,-0.01,1000,20,4000,50,20000])
 %
 % See also corresponding function rebin2_z which accepts a set of bin boundaries
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
 array_is_descriptor = true;
-wout = rebin_(win, 3, array_is_descriptor, varargin{:});
+obj_out = rebin_ (obj, 3, array_is_descriptor, varargin{:});

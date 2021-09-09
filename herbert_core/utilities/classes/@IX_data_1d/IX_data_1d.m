@@ -45,14 +45,6 @@ classdef IX_data_1d < IX_dataset
             obj = build_IX_dataset_(obj,varargin{:});
         end
         
-        %--- Not yet verified ---------------------------------------------
-        function obj = init(obj,varargin)
-            % efficiently (re)initialize object using constructor's code
-            obj = build_IXdataset_1d_(obj,varargin{:});
-        end
-        %------------------------------------------------------------------
-
-        
         %------------------------------------------------------------------
         % Get methods for dependent properties
         
@@ -92,17 +84,6 @@ classdef IX_data_1d < IX_dataset
             % Return the number of class dimensions
             nd = 1;
         end
-    end
-    
-    %======================================================================
-    methods(Static, Access = protected)
-        
-        %--- Not yet verified ---------------------------------------------
-        % Rebins histogram data along specific axis.
-        [wout_s, wout_e] = rebin_hist(iax, x, s, e, xout)
-        
-        % Integrates point data along along specific axis.
-        [wout_s, wout_e] = integrate_points(iax, x, s, e, xout)
     end
     
 end

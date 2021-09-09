@@ -1,14 +1,14 @@
-function wout = integrate2_y(win, varargin)
+function obj_out = integrate2_y (obj, varargin)
 % Integrate an IX_dataset_3d object or array of IX_dataset_3d objects along the y-axis
 %
-%   >> wout = integrate2_y (win, descr)
-%   >> wout = integrate2_y (win, wref)           % reference object to provide output bins
+%   >> obj_out = integrate2_y (obj, descr)
+%   >> obj_out = integrate2_y (obj, wref)           % reference object to provide output bins
 %
-%   >> wout = integrate2_y (..., 'ave')          % change integration method for point data
+%   >> obj_out = integrate2_y (..., 'ave')          % change integration method for point data
 %   
 % Input:
 % ------
-%   win     Input object or array of objects to be integrated
+%   obj     Input object or array of objects to be integrated
 %   descr   Description of integration bin boundaries 
 %
 %           Integration is performed for each bin defined in the description:
@@ -36,20 +36,20 @@ function wout = integrate2_y(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = integrate2_y (win)    % integrates entire dataset
-%   >> wout = integrate2_y (win, [])
-%   >> wout = integrate2_y (win, [-Inf,Inf])    % equivalent to above
-%   >> wout = integrate2_y (win, 10)
-%   >> wout = integrate2_y (win, [2000,3000])
-%   >> wout = integrate2_y (win, [2000,Inf])
-%   >> wout = integrate2_y (win, [2000,3000,4000,5000,6000])
+%   >> obj_out = integrate2_y (obj)    % integrates entire dataset
+%   >> obj_out = integrate2_y (obj, [])
+%   >> obj_out = integrate2_y (obj, [-Inf,Inf])    % equivalent to above
+%   >> obj_out = integrate2_y (obj, 10)
+%   >> obj_out = integrate2_y (obj, [2000,3000])
+%   >> obj_out = integrate2_y (obj, [2000,Inf])
+%   >> obj_out = integrate2_y (obj, [2000,3000,4000,5000,6000])
 %
 % See also corresponding function integrate_y which accepts a rebin descriptor
 % of form [x1,dx1,x2,dx2,...xn] instead of a set of bin boundaries
 
 
 array_is_descriptor = false;
-wout = integrate_(win, 2, array_is_descriptor, varargin{:});
+obj_out = integrate_ (obj, 2, array_is_descriptor, varargin{:});

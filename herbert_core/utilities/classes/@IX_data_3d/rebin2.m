@@ -1,14 +1,14 @@
-function wout = rebin2(win, varargin)
+function obj_out = rebin2 (obj, varargin)
 % Rebin an IX_dataset_3d object or array of IX_dataset_3d objects along the x-,y- and z-axes
 %
-%   >> wout = rebin2 (win, descr_x, descr_y, descr_z)
-%   >> wout = rebin (win, wref)             % reference object to provide output bins
+%   >> obj_out = rebin2 (obj, descr_x, descr_y, descr_z)
+%   >> obj_out = rebin (obj, wref)             % reference object to provide output bins
 %   
-%   >> wout = rebin (..., 'int')            % change averaging method for axes with point data
+%   >> obj_out = rebin (..., 'int')            % change averaging method for axes with point data
 %   
 % Input:
 % ------
-%   win     Input object or array of objects to be rebinned
+%   obj     Input object or array of objects to be rebinned
 %   descr   Description of new bin boundaries (one per axis)
 %           - [], '' or zero:       Leave bins unchanged
 %           - dx (numeric scalar)   New bins centred on zero with constant width dx
@@ -26,18 +26,18 @@ function wout = rebin2(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = rebin2 (win, [],...)
-%   >> wout = rebin2 (win, 10,...)
-%   >> wout = rebin2 (win, [2000,3000],...)
-%   >> wout = rebin2 (win, [2000,Inf],...)
-%   >> wout = rebin2 (win, [2000,3000,4000,5000,6000],...)
+%   >> obj_out = rebin2 (obj, [],...)
+%   >> obj_out = rebin2 (obj, 10,...)
+%   >> obj_out = rebin2 (obj, [2000,3000],...)
+%   >> obj_out = rebin2 (obj, [2000,Inf],...)
+%   >> obj_out = rebin2 (obj, [2000,3000,4000,5000,6000],...)
 %
 % See also corresponding function rebin which accepts a rebin descriptor
 % of form [x1,dx1,x2,dx2,...xn] instead of a set of bin boundaries
 
 
 array_is_descriptor = false;
-wout = rebin_(win, 1:3, array_is_descriptor, varargin{:});
+obj_out = rebin_ (obj, 1:3, array_is_descriptor, varargin{:});

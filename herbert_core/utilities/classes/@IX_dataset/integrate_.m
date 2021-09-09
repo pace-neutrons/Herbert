@@ -70,14 +70,13 @@ config.integrate_data = true;
 
 config.point_average_method_default = 'interpolate';
 
-config.descsriptor_opts = struct(...
+config.bin_opts = struct (...
     'empty_is_one_bin',     true,...
     'range_is_one_bin',     true,...
     'array_is_descriptor',  array_is_descriptor,...
     'values_are_boundaries',true);
 
-obj_out = rebin_IX_dataset_(obj, iax, config, varargin{:});
-
+obj_out = rebin_IX_dataset_ (obj, iax, config, varargin{:});
 
 % Squeeze object(s)
-obj_out = squeeze(obj_out, iax);
+obj_out = squeeze (obj_out, iax);

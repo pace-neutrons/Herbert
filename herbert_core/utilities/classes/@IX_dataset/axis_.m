@@ -7,6 +7,7 @@ function [ax, hist] = axis_(obj, iax)
 % Input:
 % -------
 %   obj     IX_dataset object or array of objects
+%
 %   iax     [optional] axis index, or array of indicies, in range 1 to ndim
 %           Default: 1:ndim
 %
@@ -21,14 +22,15 @@ function [ax, hist] = axis_(obj, iax)
 %
 %   hist    Logical with true is axis is histogram, false where point data
 %
+%
 %   The sizes of the output arguments are the same, and are determined as
 %   follows:
 %           - If a single object, size(hist) = [1,numel(iax)]
 %           - If a single axis,   size(hist) = size(obj)
 %           - If an array of objects and array of axes, then size(hist) =
-%             [numel(iax), size(w)] but with dimensions of length 1 removed
+%             [numel(iax), size(obj)] but with dimensions of length 1 removed
 %           e.g. if ndim(obj) = 4, size(obj) = [1,3] then
-%               ishistogram(obj)        size(status) = [4,3]  (not [4,1,3])
+%               axis_(obj)       size(hist) = [4,3]  (not [4,1,3])
 %
 %           This behaviour is the same as that of the Matlab intrinsic
 %           function squeeze.
@@ -49,17 +51,19 @@ function [ax, hist] = axis_(obj, iax)
 % -----------------------------------------------------------------------------
 
 
-nd = obj(1).ndim();
+nd = obj.ndim();    % works even if empty obj array, as static method
 
 % Check the validity of the axis indices
 if nargin==1
     iax = 1:nd;
 else
-    if isempty(iax) || any(rem(iax,1)~=0) || any(iax<1) || any(iax>nd)
+    if isempty(iax) || ~isnumeric(iax) || any(rem(iax,1)~=0) ||...
+            any(iax<1) || any(iax>nd) || numel(unique(iax))~=numel(iax)
         if nd==1
             mess = 'Axis indices can only take the value 1';
         else
-            mess = ['Axis indices must be in the range 1 to ', num2str(nd)];
+            mess = ['Axis indices must be unique and in the range 1 to ',...
+                num2str(nd)];
         end
         error('HERBERT:axis_:invalid_argument', mess)
     end

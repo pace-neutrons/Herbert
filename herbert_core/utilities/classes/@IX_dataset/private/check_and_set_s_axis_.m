@@ -1,16 +1,18 @@
 function obj = check_and_set_s_axis_(obj, val)
-% Set axis information, converting to column cellstr if needed
+% Set signal axis information
 %
 %   >> obj = check_and_set_s_axis_(obj, val)
 %
 % Input:
 % ------
 %   obj     IX_dataset object
+%
 %   val     IX_axis object, or signal caption which is one of
 %           - cellstr
 %           - character string or 2D character array
 %           - string array
-%   iax     Axis index 1,2,... ndim()
+%           If val is empty, then the signal caption will be set to the
+%           default
 %
 % Output:
 % -------

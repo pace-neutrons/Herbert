@@ -1,14 +1,14 @@
-function wout = rebin(win, varargin)
+function obj_out = rebin (obj, varargin)
 % Rebin an IX_dataset_3d object or array of IX_dataset_3d objects along the x-,y- and z-axes
 %
-%   >> wout = rebin (win, descr_x, descr_y, descr_z)
-%   >> wout = rebin (win, wref)             % reference object to provide output bins
+%   >> obj_out = rebin (obj, descr_x, descr_y, descr_z)
+%   >> obj_out = rebin (obj, wref)             % reference object to provide output bins
 %
-%   >> wout = rebin (..., 'int')            % change averaging method for axes with point data
+%   >> obj_out = rebin (..., 'int')            % change averaging method for axes with point data
 %
 % Input:
 % ------
-%   win     Input object or array of objects to be rebinned
+%   obj     Input object or array of objects to be rebinned
 %   descr   Description of new bin boundaries (one per axis)
 %           - [], '' or zero:       Leave bins unchanged
 %           - dx (numeric scalar)   New bins centred on zero with constant width dx
@@ -31,21 +31,20 @@ function wout = rebin(win, varargin)
 %
 % Output:
 % -------
-%   wout    Output object or array of objects
+%   obj_out    Output object or array of objects
 %
 % EXAMPLES
-%   >> wout = rebin (win, [],...)
-%   >> wout = rebin (win, 10,...)
-%   >> wout = rebin (win, [2000,3000],...)
-%   >> wout = rebin (win, [2000,Inf],...)
-%   >> wout = rebin (win, [2000,10,3000],...)
-%   >> wout = rebin (win, [5,-0.01,3000],...)
-%   >> wout = rebin (win, [5,-0.01,1000,20,4000,50,20000],...)
+%   >> obj_out = rebin (obj, [],...)
+%   >> obj_out = rebin (obj, 10,...)
+%   >> obj_out = rebin (obj, [2000,3000],...)
+%   >> obj_out = rebin (obj, [2000,Inf],...)
+%   >> obj_out = rebin (obj, [2000,10,3000],...)
+%   >> obj_out = rebin (obj, [5,-0.01,3000],...)
+%   >> obj_out = rebin (obj, [5,-0.01,1000,20,4000,50,20000],...)
 %
 % See also corresponding function rebin2 which accepts a set of bin boundaries
 % of form [x1,x2,x3,...xn] instead of a rebin descriptor
 
 
 array_is_descriptor = true;
-wout = rebin_(win, 1:3, array_is_descriptor, varargin{:});
-
+obj_out = rebin_ (obj, 1:3, array_is_descriptor, varargin{:});

@@ -93,7 +93,7 @@ function obj_out = rebin_IX_dataset_ (obj, iax, config, varargin)
 % Get object dimensionality
 % -------------------------
 if numel(obj)>0
-    ndims = win.ndim();
+    nd = obj.ndim();
 else
     error('HERBERT:rebin_IX_dataset_:invalid_argument',...
         'Object array to rebin must contain at least one element')
@@ -106,7 +106,7 @@ niax=numel(iax); % number of axes to be rebinned
 
 if isempty(iax) || ~isnumeric(iax) || any(rem(iax,1)~=0) ||...
         any(iax<1) || any(iax>nd) || numel(unique(iax))~=numel(iax)
-    if ndims==1
+    if nd==1
         mess = 'Axis indices along which to rebin can only take the value 1';
     else
         mess = ['Axis indices along which to rebin must be unique and ',...
@@ -114,10 +114,10 @@ if isempty(iax) || ~isnumeric(iax) || any(rem(iax,1)~=0) ||...
     end
     error('HERBERT:rebin_IX_dataset_:invalid_argument', mess)
     
-elseif any(iax>ndims)
-    str = str_compress(num2str(iax(iax>ndims)),',');
+elseif any(iax>nd)
+    str = str_compress(num2str(iax(iax>nd)),',');
     error('HERBERT:rebin_IX_dataset_:invalid_argument',...
-        'Attempting to rebin  %dD object along %s direction(s)', ndims, str)
+        'Attempting to rebin  %dD object along %s direction(s)', nd, str)
 end
 
 
@@ -126,12 +126,12 @@ end
 if ~(numel(varargin)==1 && isa(varargin{1},class(obj))) && ...
         (numel(varargin)>=1 && ~isnumeric(varargin{end}))
     % Last argument is point averaging option
-    point_average_method = rebin_point_averaging_parse_(varargin{end}, niax);
+    point_average_method = rebin_point_averaging_parse (varargin{end}, niax);
     args = varargin(1:end-1);
     
 else
     % Use default point averaging method
-    point_average_method = rebin_point_averaging_parse_(...
+    point_average_method = rebin_point_averaging_parse (...
         config.point_average_method_default, niax);
     args = varargin;
 end
@@ -183,7 +183,7 @@ else
         resolved = false(1, niax);
         for i = 1:niax
             [xdescr{i}, is_descriptor(i), is_boundaries(i), resolved(i)] = ...
-                rebin_binning_description_parse_(args{i}, config.bin_opts);
+                rebin_binning_description_parse (args{i}, config.bin_opts);
         end
         
     elseif niax==1 && all(cellfun(@isscalar, args)) &&...
@@ -191,7 +191,7 @@ else
         % Single axis, all args are numeric scalars: collect as single array
         xdescr = cell(1, 1);
         [xdescr{1}, is_descriptor, is_boundaries, resolved] = ...
-            rebin_binning_description_parse_(cell2mat(args), config.bin_opts);
+            rebin_binning_description_parse (cell2mat(args), config.bin_opts);
         
     else
         error('HERBERT:rebin_IX_dataset_:invalid_argument',...
@@ -219,7 +219,7 @@ if numel(obj)==1
     obj_out = rebin_IX_dataset_single_ (obj, iax, xdescr, is_descriptor,...
         is_boundaries, resolved, integrate_data, point_average_method);
 else
-    obj_out = repmat(eval(class(obj)), size(obj));
+    obj_out = repmat(eval(class(obj)), size(obj));  % 'eval' not nice, but blind
     for i=1:numel(obj)
         obj_out(i) = rebin_IX_dataset_single_ (obj(i), iax, xdescr, is_descriptor,...
             is_boundaries, resolved, integrate_data, point_average_method);

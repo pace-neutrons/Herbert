@@ -180,18 +180,12 @@ classdef IX_data_4d < IX_dataset
         %-----------------------------------------------------------------
     end
     
-    
     %======================================================================
     methods(Static)
         function nd  = ndim()
             % Return the number of class dimensions
             nd = 4;
         end
-    end
-    
-    %======================================================================
-    methods(Static,Access = protected)
-        
     end
     
 end
