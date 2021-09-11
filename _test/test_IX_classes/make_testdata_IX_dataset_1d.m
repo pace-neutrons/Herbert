@@ -30,11 +30,11 @@ function [hh_1d_gau,hp_1d_gau,pp_1d_gau]=make_testdata_IX_dataset_1d (nx0, nw, v
 %                   Default: 10
 %
 % Optional:
-%   'seed',val  Give random number generator seed. This will enable the same
+%   '-seed',val Give random number generator seed. This will enable the same
 %               datasets to be regenerated.
 %               Positive integer
 %                   Default: the current value on entry (so random)
-%   'nfrac',val Maximum number of additional points as a fraction of nx0.
+%   '-nfrac',val Maximum number of additional points as a fraction of nx0.
 %               A random number of additional point points is chosen with a
 %              hat distribution. Can be set to zero by putting val=0.
 %

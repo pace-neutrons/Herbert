@@ -27,7 +27,7 @@ function [hh_gau, hp_gau, ph_gau, pp_gau] = make_testdata_IX_dataset_2d...
 %                   Default: [10, 6]
 %
 % Optional:
-%   'seed',val  Give random number generator seed. This will enable the same
+%   '-seed',val Give random number generator seed. This will enable the same
 %               datasets to be regenerated.
 %               Positive integer
 %                   Default: the current value on entry (so random)

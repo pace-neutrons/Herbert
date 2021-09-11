@@ -6,9 +6,9 @@ function [xave, sout, eout, npnt, kept] = average_points (x, s, e, idim,...
 %   >> [xave, sout, eout, nout, kept] = average_points (x, s, e, idim, xout)
 %
 % Options:
-%   >> ... = average_points (..., 'alldata', TF,...)    % retain all bins
-%   >> ... = average_points (..., 'sum', TF,...)        % sum (not average)
-%   >> ... = average_points (..., 'integrate', TF,...)  % average * binwidth
+%   >> ... = average_points (..., 'alldata',...)    % retain all bins
+%   >> ... = average_points (..., 'sum',...)        % sum (not average)
+%   >> ... = average_points (..., 'integrate',...)  % average * binwidth
 %
 %
 % Input:
@@ -36,12 +36,24 @@ function [xave, sout, eout, npnt, kept] = average_points (x, s, e, idim,...
 %          i.e. from xout(i) to xout(i+1) are placed in the output arrays
 %          at position i i.e. sout(i) and eout(i).
 %
-%   alldata Logical flag  [Default: false]
-%           true:  Keep signal and error even where no contributing points
-%                  to the bins defined by xout: their values will be set to
-%                  zero.
-%           false: Retain only the signal and error where there were
-%                  contributing points.
+% Keyword options:
+% 'alldata'   Present: Keep signal and error even where no contributing
+%                   points to the bins defined by xout: their values will
+%                   be set to zero.
+%             Absent (i.e. default): Retain only the signal and error where
+%                   there were contributing points.
+%
+% 'sum'       Present: Sum the points rather than average the points in the 
+%                   output bins. Can only be present if 'integrate' (below)
+%                   is absent.
+%             Absent (i.e. default): Average the points in the output bin
+%                   unless 'integrate' (below) is present.
+%
+% 'integrate' Present: Multiply the average signal in the output bin by the
+%                   output bin width. Can only be present if 'sum' (above)
+%                   is absent.
+%             Absent (i.e. default): Average the points in the output bin
+%                   unless 'sum' (above) is present.
 %
 % Output:
 % -------
@@ -120,7 +132,7 @@ sz_out = [sz(1:idim-1), nx, sz(idim+1:end)];
 
 % Check optional parameters
 flagnames = {'alldata', 'sum', 'integrate'};
-flags = parse_flags (flagnames, varargin{:});
+flags = parse_flags_simple (flagnames, varargin{:});
 alldata = flags(1);
 integrate = flags(2);
 sum_signal = flags(3);
@@ -128,16 +140,6 @@ if sum_signal && integrate
     error('HERBERT:average_points:invalid_argument',...
         'Cannot have both optional arguments ''sum'' and ''integrate''')
 end 
-
-% flagnames = {'alldata', 'sum', 'integrate'};
-% flags = parse_flags (flagnames, varargin{:});
-% alldata = flags.alldata;
-% integrate = flags.integrate;
-% sum_signal = flags.sum;
-% if sum_signal && integrate
-%     error('HERBERT:average_points:invalid_argument',...
-%         'Cannot have both optional arguments ''sum'' and ''integrate''')
-% end 
 
 
 % Perform averaging

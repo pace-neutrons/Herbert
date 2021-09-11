@@ -93,8 +93,9 @@ end
 %-------------------------------------------------------------------------- 
 function [ax, hist] = axis_single_ (obj, iax)
 % Get axis information for a single object as a row structure array
-ax = struct('values', obj.xyz_(iax), 'axis', obj.xyz_axis_(iax),...
-    'distribution', obj.xyz_distribution_(iax));
+ax = struct('values', obj.xyz_(iax),...
+    'axis', num2cell(obj.xyz_axis_(iax)),...
+    'distribution', num2cell(obj.xyz_distribution_(iax)));
 
 % Return ishistogram for a single object as a row vector
 sx = cellfun(@numel, obj.xyz_); % size of axis extents - row vector length nd

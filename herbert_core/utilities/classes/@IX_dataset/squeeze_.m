@@ -126,13 +126,19 @@ elseif ~any(keep)
     
 else
     % Some but not all axes to be removed
-    obj_out = repmat (IX_dataset_nd(nd), size(obj));
-    sz = sz(:, keep);
+    ndout = sum(keep);
+    obj_out = repmat (IX_dataset_nd(ndout), size(obj));
+    szout = sz(:, keep);
+    if size(szout,2) < 2
+        sz_matlab = [szout, ones(size(szout,1), 2-size(szout,2))];
+    else
+        sz_matlab = szout;
+    end
     for i=1:numel(obj)
         obj_out(i) = init (obj_out(i), obj(i).xyz_(keep), ...
-            reshape(obj(i).signal_, sz(i,:)), ...
-            reshape(obj(i).error_, sz(i,:)), ...
+            reshape(obj(i).signal_, sz_matlab(i,:)), ...
+            reshape(obj(i).error_, sz_matlab(i,:)), ...
             obj(i).title_, obj(i).xyz_axis_(keep), obj(i).s_axis_, ...
-            obj(i).xyz_distribution_);
+            obj(i).xyz_distribution_(keep));
     end
 end
