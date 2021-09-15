@@ -16,9 +16,8 @@ else
     xrebin = cell(1,niax);
     for i = 1:niax
         if ~resolved(i)
-            xrebin{i} = rebin_boundaries_from_binning_description ...
-                (xdescr{i}, is_descriptor(i), is_boundaries(i), ...
-                xref{iax(i)}, ishist(iax(i)));
+            xrebin{i} = rebin_boundaries (xdescr{i}, is_descriptor(i),...
+                is_boundaries(i), xref{iax(i)}, ishist(iax(i)));
         else
             xrebin{i} = xdescr{i};
         end

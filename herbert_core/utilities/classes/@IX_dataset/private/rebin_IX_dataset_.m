@@ -204,8 +204,8 @@ else
     % output bin boundaries
     for i = 1:niax
         if resolved(i)
-            xdescr{i} = rebin_boundaries_from_binning_description ...
-                (xdescr{i}, is_descriptor(i), is_boundaries(i));
+            xdescr{i} = rebin_boundaries (xdescr{i}, is_descriptor(i),...
+                is_boundaries(i));
         end
     end
 end

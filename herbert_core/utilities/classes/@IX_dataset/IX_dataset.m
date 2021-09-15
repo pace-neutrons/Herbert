@@ -149,13 +149,7 @@ classdef (Abstract) IX_dataset
         % Take absolute value of an IX_dataset_nd object or array of IX_dataset_nd objects
         % wout = abs(w)
         %------------------------------------------------------------------
-        % Squeeze singleton dimensions awaay in IX_dataset_nd objects
-        % to get to object of lower dimensionality
-        wout=squeeze_IX_dataset(win,iax)
-        
-        % Rebin an IX_dataset object or array of IX_dataset objects along one or more axes
-        [wout,ok,mess] = rebin_IX_dataset (win, integrate_data,...
-            point_integration_default, iax, descriptor_opt, varargin)
+
         
         % Save object or array of objects of class type to binary file.
         % Inverse of read.
@@ -207,12 +201,7 @@ classdef (Abstract) IX_dataset
         obj = read(filename);
         
         % Access internal function for testing purposes
-        function [x_out, ok, mess] = bin_boundaries_from_descriptor(xbounds, x_in)
-            [x_out, ok, mess] = bin_boundaries_from_descriptor_(xbounds, x_in);
-        end
-        
-        % Access internal function for testing purposes
-        function xout = test_rebin_values_from_descriptor(xdescr, varargin)
+        function xout = test_rebin_descriptor_blocks(xdescr, varargin)
             xout = rebin_values_from_descriptor (xdescr, varargin{:});
         end
     end

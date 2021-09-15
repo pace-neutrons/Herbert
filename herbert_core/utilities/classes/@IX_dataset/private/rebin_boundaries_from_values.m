@@ -1,11 +1,13 @@
-function xout = rebin_boundaries_from_values (xin, is_boundaries, xref)
+function xout = rebin_boundaries_from_values (xin, is_boundaries, varargin)
 % Resolve -Inf and/or Inf in the array of bin boundaries or centres
 %
 % If x-axis values are all finite:
 %   >> xout = rebin_boundaries_from_values (xin, is_boundaries)
+%   >> xout = rebin_boundaries_from_values (xin, is_boundaries, tol)
 %
 % General case:
 %   >> xout = rebin_boundaries_from_values (xin, is_boundaries, xref)
+%   >> xout = rebin_boundaries_from_values (xin, is_boundaries, xref, tol)
 %
 % Input:
 % ------
@@ -22,8 +24,9 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, xref)
 %                    - true if xin defines bin boundaries
 %                    - false if xin defines bin centres
 %                  [Note that -Inf and Inf always end up defining bin
-%                   boundaries. This is a statement about the finite values
-%                   of x1, x2,... that appear in the descriptor]
+%                   boundaries. The value of is_boundaries is a statement
+%                   about the finite values of [x1,] x2, x3... that appear
+%                   in the descriptor]
 %
 %   xref            Reference axis values.
 %                    - If bin boundaries then there will be at least two
@@ -33,6 +36,13 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, xref)
 %                      increasing, but there may be repeated values, which
 %                      corresponds to two or more data points that have the
 %                      same position along the axis.
+%
+%   tol             If the terminal bin widths from resolving infinities
+%                   are less than fraction tolerance tol of the penultimate
+%                   bin widths then the terminal bins are merged with the
+%                   penultimate bins. Prevents very narrow bins being 
+%                   created.
+%
 %
 % Output:
 % -------
@@ -49,6 +59,8 @@ if ~(isinf(xin(1)) || isinf(xin(end)))
     end
     
 else
+    % One or both end values are infinite
+    %
     % Bin boundaries or centres:
     %   [x1, x2, x3,...xn]
     %       where -Inf <= x1 < x2 <...< xn <= Inf
@@ -56,8 +68,8 @@ else
     % Guiding principles in resolving +/-infinity:
     %
     % - Inf (-Inf) if present define the value of the outermost bin
-    %   boundaries, unless an explicit value (boundary or centre) in
-    %   the description that is more extreme.
+    %   boundaries, unless there is an explicit value (boundary or centre)
+    %   in the description that is more extreme.
     %
     % - The finite values will always exist as bin boundaries
     %   (is_boundaries = true), or be used to generate a set of
@@ -65,7 +77,7 @@ else
     %
     % - Inf (-Inf) will be resolved into xhi (xlo) and then made the
     %   more extreme of xhi and x(n-1) (xlo and x2) as the defining
-    %   outer boundary. This is true for is_boundaries true or
+    %   outer boundary. This is true whether is_boundaries is true or
     %   false [*1]. That is, Inf and -Inf if present will declare the
     %   extent of the data as the outer boundaries, except where there
     %   is an explicit value in the description that is more extreme.
@@ -86,8 +98,26 @@ else
     %       to extend no lower than the data unless an explicit finite
     %       value has been given. That is what the first guiding
     %       principle states. Therefore the lowest bin boundary is set
-    %       to 9.5. If The data mionimum was 10.5, then it would be set
+    %       to 9.5. If The data minimum was 10.5, then it would be set
     %       to 10, as this appeared in the bin centres list.
+    
+    % Parse input arguments
+    narg = numel(varargin);
+    if narg==1 || narg==2
+        xref = varargin{1};
+        if narg==2
+            tol = varargin{2};
+        else
+            tol = 1e-10;    % default
+        end
+    elseif narg > 2
+        error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
+            'Too many input arguments');
+    else
+        error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
+            ['Reference binning information required to resolve infinities ',...
+            'is not given']);
+    end
     
     xlo = xref(1);
     xhi = xref(end);
@@ -96,31 +126,47 @@ else
             (numel(xin) - isinf(xin(1)) - isinf(xin(end))) >= 2
         % Contains at least two finite bin centres so able to generate
         % bin boundaries.
-        % These finite bin centres will have a non-zero separation, so
+        % These finite bin centres will have a non-zero separation (by
+        % supposition - see input argument description), so
         % we are guaranteed to have at least one, non-zero width bin
         % at the conclusion of this block of code.
         xout = bin_boundaries(xin(1+isinf(xin(1)):end-isinf(xin(end))));
         if xin(1) == -Inf
             if xlo < xout(1)
                 % Data lies outside bin boundaries, so add an extra bin
-                xout = [xlo, xout];
+                % or, if inside tolerance, broaden the bin
+                if (xout(1)-xlo)/(xout(2)-xout(1)) < tol
+                    xout(1) = xlo;
+                else
+                    xout = [xlo, xout];
+                end
             else
-                % Limit of data within outer bin; truncate bin
+                % Limit of data greater than outer bin; truncate bin at the
+                % data minimum or lowest finite value i.e. xin(2) - even
+                % though this was given as a bin centre)
                 xout(1) = min(xlo, xin(2));
             end
         end
         if xin(end) == Inf
             if xhi > xout(end)
                 % Data lies outside bin boundaries, so add an extra bin
-                xout = [xout, xhi];
+                % or, if inside tolerance, broaden the bin
+                if (xhi-xout(end))/(xout(end)-xout(end-1)) < tol
+                    xout(end) = xhi;
+                else
+                    xout = [xout, xhi];
+                end
             else
-                % Limit of data within outer bin; truncate bin
+                % Limit of data within outer bin; truncate bin at the
+                % data maximum or highest finite value i.e. xin(end-1) -
+                % even though this was given as a bin centre)
                 xout(end) = max(xhi, xin(end-1));
             end
         end
         
     else
-        % Bin boundaries, or bin centres with one or no finite value.
+        % Bin boundaries, or bin centres with one or no finite value (and
+        % so not possible to generate bin boundaries).
         % It is possible to have a single bin [xlo,xhi] at the end,
         % This will be valid if the data is point data and all points
         % have the same value of x == xlo.
@@ -128,7 +174,15 @@ else
         if xin(1) == -Inf
             if ~isempty(xout)
                 if xlo < xout(1)
-                    xout = [xlo, xout];
+                    % Data lies outside bin boundaries, so add an extra bin
+                    % or, if inside tolerance, broaden the bin. Note that
+                    % there may not be two values in xout, so must check 
+                    % if a bin exists
+                    if numel(xout)>=2 && (xout(1)-xlo)/(xout(2)-xout(1)) < tol
+                        xout(1) = xlo;
+                    else
+                        xout = [xlo, xout];
+                    end
                 else
                     xout(1) = min(xlo, xout(1));
                 end
@@ -138,7 +192,16 @@ else
         end
         if xin(end) == Inf
             if xhi > xout(end)
-                xout = [xout, xhi];
+                % Data lies outside bin boundaries, so add an extra bin
+                % or, if inside tolerance, broaden the bin. Note that
+                % there may not be two values in xout, so must check 
+                % if a bin exists
+                if numel(xout)>=2 && ...
+                        (xhi-xout(end))/(xout(end)-xout(end-1)) < tol
+                    xout(end) = xhi;
+                else
+                    xout = [xout, xhi];
+                end
             else
                 xout(end) = max(xhi, xout(end));
             end

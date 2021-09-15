@@ -23,7 +23,7 @@ function obj = build_IX_dataset_(obj, varargin)
 %                       title, x1_axis, x2_axis,..., xn_axis, s_axis,
 %                       x1_distribution, x2_distribution,..., xn_distribution)
 %
-% Old format constructor (retained for backwards compatibility)
+% Older format constructor:
 %   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
 %                       x1, x1_axis, x1_distribution,...
 %                       x2, x2_axis, x2_distribution,...
@@ -45,9 +45,11 @@ function obj = build_IX_dataset_(obj, varargin)
 %   >> obj = build_IX_dataset_ (obj, x, signal, error, ...
 %                       title, x_axis, s_axis, x_distribution)
 %
-% Old format constructor (retained for backwards compatibility)
+% Older format constructor:
 %   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
 %                       x, x_axis, x_distribution)
+%
+%   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis, ax)
 
 
 narg = numel(varargin);
@@ -56,13 +58,17 @@ narg = numel(varargin);
 nd = obj.ndim();
 
 % Determine if array argument input or not.
-% The defining quality is that for nd>=2 the first argument is a cell
-% array of numeric vectors, or (if the first argument is the title) it is 
-% the fifth argument. Note that for 1D objects there is no distinction.
+% The way to distinguish is:
+% - for nd>=2 the first argument is a cell array of numeric vectors, or, 
+%   if the first argument is the title, the fifth argument is.
+% - the fifth argument is a structure (the axis structure)
 
-if narg==0 || (narg>=1 && ~isempty(varargin{1}) && iscell(varargin{1}) && ...
-        isnumeric(varargin{1}{1})) || (narg>=5 && ~isempty(varargin{5}) && ...
-        iscell(varargin{5}) && isnumeric(varargin{5}{1}))
+if narg==0 || ...
+        (narg>=1 && ~isempty(varargin{1}) && iscell(varargin{1}) && ...
+        isnumeric(varargin{1}{1})) || ...
+        (narg>=5 && ~isempty(varargin{5}) && iscell(varargin{5}) && ...
+        isnumeric(varargin{5}{1})) || ...
+        (narg==5 && isstruct(varargin{5}))
     % Default or axis items given in arrays
     obj = build_IX_dataset_internal_(obj, varargin{:});
     
@@ -134,9 +140,11 @@ function obj = build_IX_dataset_internal_(obj, varargin)
 %   >> obj = build_IX_dataset_ (obj, x, signal, error, ...
 %                       title, x_axis, s_axis, x_distribution)
 %
-% Old format constructor (retained for backwards compatibility)
+% Older format constructor:
 %   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
 %                       x, x_axis, x_distribution)
+%
+%   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis, ax)
 %
 %
 % Input:
@@ -163,6 +171,14 @@ function obj = build_IX_dataset_internal_(obj, varargin)
 %   s_axis  IX_axis object, cell array of character vectors, character 
 %           vector or 2D character array, or string array, containing the
 %           signal axis caption information.
+%
+%   ax      Structure array with the following fields, one element of the 
+%           structure array per axis:
+%             values        Values of bin boundaries (if histogram data)
+%                           Values of data point positions (if point data)
+%             axis          IX_axis object containing caption and units codes
+%             distribution  Logical scalar: true if a distribution; false
+%                           otherwise)
 %
 %
 % Notes about sizes of arrays
@@ -192,9 +208,9 @@ nd = obj.ndim();
 initialised = obj.valid_;
 
 if ~initialised
-    % Fill default object: create properties with the correct size and type
-    % Contents may not be valid defaults however. These will be filled as the
-    % elements of these properties are populated.
+    % Pre-allocate array properties with the correct size and type.
+    % The ontents may not be valid defaults however. These will be filled
+    % as the elements of these properties are populated.
     obj.xyz_ = cell(1, nd);
     obj.xyz_distribution_ = true(1, nd);
     obj.xyz_axis_ = repmat(IX_axis, [1, nd]);
@@ -285,7 +301,34 @@ elseif narg==4
         obj = obj.check_and_set_x_axis_([], 1:nd);
         obj = obj.check_and_set_s_axis_([]);
     end
-
+    
+elseif narg==5
+    % Construct with custom captioning and distribution flags from structure
+    % ----------------------------------------------------------------------
+    %   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis, ax)
+    
+    % Title
+    obj = obj.check_and_set_title_(varargin{1});
+    
+    % Signal and errors
+    obj = obj.check_and_set_signal_(varargin{2});
+    obj = obj.check_and_set_error_(varargin{3});
+    obj = obj.check_and_set_s_axis_(varargin{4});
+    
+    % Axis values
+    ax = varargin{5};
+    if isstruct(ax) && numel(ax)==nd && ...
+            all(isfield(ax,{'values','axis','distribution'}))
+        for i = 1:nd
+            obj = obj.check_and_set_x_(ax(i).values, i);
+            obj = obj.check_and_set_x_axis_(ax(i).axis, i);
+            obj = obj.check_and_set_x_distribution_(ax(i).distribution, i);
+        end
+    else
+        error('HERBERT:build_IX_dataset_internal_:invalid_argument',...
+            'Axis structure has incorrect fields or wrong number of elements')
+    end
+    
     
 elseif narg==6 || (narg==7 && iscell(varargin{1}) && ~iscellstr(varargin{1}))
     % Construct with custom captioning and default/custom distribution flags

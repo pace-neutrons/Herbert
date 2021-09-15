@@ -11,7 +11,7 @@ function flags = parse_flags_simple (flagnames, varargin)
 % Output:
 % -------
 %   flags           Logical array with true where the flag is present,
-%                   and false if not, in the order if the names in
+%                   and false if not, in the order of the names in
 %                   flagnames
 %
 % This is a simple parsing utility function for a common task that attempts

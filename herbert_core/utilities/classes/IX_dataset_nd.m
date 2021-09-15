@@ -1,8 +1,13 @@
 function w = IX_dataset_nd (varargin)
 % Constructor for generic n-dimensional dataset. Not a class method, but gateway to constructors
 %
-%   >> w = IX_dataset_nd (ndim)         Create empty of object of the requested dimensionality
+% Create default object of the requested dimensionality:
+%   >> w = IX_dataset_nd (ndim)
+%
+% Create populated object:
 %   >> w = IX_dataset_nd (title, signal, err, s_axis, ax)
+%   >> w = IX_dataset_nd (title, signal, err, s_axis, x, x_axis, x_distribution)
+%
 %
 % 	title				char/cellstr	Title of dataset for plotting purposes (character array or cellstr)
 % 	signal              double  		Signal
@@ -38,42 +43,58 @@ if nargin==1 && isnumeric(varargin{1}) && isscalar(varargin{1})
     
     % ---------------------------------------------------------------------
 elseif numel(varargin)==5
+    % Format is: w = IX_dataset_nd (title, signal, err, s_axis, ax)
     title=varargin{1};
     signal=varargin{2};
     err=varargin{3};
     s_axis=varargin{4};
     ax=varargin{5};
-    % Format is: w = IX_dataset_nd (title, signal, err, s_axis, ax)
     fields = {'values';'axis';'distribution'};
     
     ndim=numel(ax);
-    if ~(isstruct(ax) && isequal(fieldnames(ax),fields))
+    if isstruct(ax) && all(isfield(ax,fields))
+        if ndim==1
+            w=IX_dataset_1d (title, signal, err, s_axis, ax);
+        elseif ndim==2
+            w=IX_dataset_2d (title, signal, err, s_axis, ax);
+        elseif ndim==3
+            w=IX_dataset_3d (title, signal, err, s_axis, ax);
+        elseif ndim==4
+            w=IX_dataset_4d (title, signal, err, s_axis, ax);
+        else
+            error('HERBERT:IX_dataset_nd:invalid_argument', ['IX_dataset_nd with ',...
+                'dimensionality ndim = ',num2str(ndim),' is not supported'])
+        end
+    else
         error('HERBERT:IX_dataset_nd:invalid_argument', ...
             'Axis description does not have correct fields')
     end
     
+    % ---------------------------------------------------------------------
+elseif numel(varargin)==7
+    % Format is: w = IX_dataset_nd (title, signal, err, s_axis, x, x_axis, x_distribution)
+    title=varargin{1};
+    signal=varargin{2};
+    err=varargin{3};
+    s_axis=varargin{4};
+    x=varargin{5};
+    x_axis=varargin{6};
+    x_distribution=varargin{7};
+    
+    ndim=numel(x_distribution);
     if ndim==1
-        w=IX_dataset_1d (title, signal, err, s_axis, ...
-            ax(1).values, ax(1).axis, ax(1).distribution);
+        w=IX_dataset_1d (title, signal, err, s_axis, x, x_axis, x_distribution);
     elseif ndim==2
-        w=IX_dataset_2d (title, signal, err, s_axis, ...
-            ax(1).values, ax(1).axis, ax(1).distribution,...
-            ax(2).values, ax(2).axis, ax(2).distribution);
+        w=IX_dataset_2d (title, signal, err, s_axis, x, x_axis, x_distribution);
     elseif ndim==3
-        w=IX_dataset_3d (title, signal, err, s_axis, ...
-            ax(1).values, ax(1).axis, ax(1).distribution,...
-            ax(2).values, ax(2).axis, ax(2).distribution,...
-            ax(3).values, ax(3).axis, ax(3).distribution);
+        w=IX_dataset_3d (title, signal, err, s_axis, x, x_axis, x_distribution);
     elseif ndim==4
-        w=IX_dataset_4d (title, signal, err, s_axis, ...
-            ax(1).values, ax(1).axis, ax(1).distribution,...
-            ax(2).values, ax(2).axis, ax(2).distribution,...
-            ax(3).values, ax(3).axis, ax(3).distribution,...
-            ax(4).values, ax(4).axis, ax(4).distribution);
+        w=IX_dataset_4d (title, signal, err, s_axis, x, x_axis, x_distribution);
     else
         error('HERBERT:IX_dataset_nd:invalid_argument', ['IX_dataset_nd with ',...
             'dimensionality ndim = ',num2str(ndim),' is not supported'])
     end
+    
     
     % ---------------------------------------------------------------------
 else

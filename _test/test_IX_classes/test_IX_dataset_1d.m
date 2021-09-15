@@ -144,6 +144,26 @@ classdef test_IX_dataset_1d <  TestCaseWithSave
             assertEqual(ds, ds2);
         end
         
+        function test_constructor_via_IX_dataset_nd(obj)
+            w = IX_dataset_1d;
+            wtmp = IX_dataset_nd(1);
+            assertEqual(w,wtmp)
+            
+            ds = IX_dataset_1d('my object',ones(1,10),ones(1,10),...
+                'y-axis name',1:10,'x-axis name',false);
+            
+            ds2 = IX_dataset_nd('my object',ones(1,10),ones(1,10),...
+                'y-axis name',1:10,'x-axis name',false);
+            assertEqual(ds, ds2)
+            
+            ax.values = 1:10;
+            ax.axis = 'x-axis name';
+            ax.distribution = false;
+            ds2 = IX_dataset_nd('my object',ones(1,10),ones(1,10),...
+                'y-axis name',ax);
+            assertEqual(ds, ds2)
+        end
+        
         function test_constructor_small(obj)
             % Single point is valid
             ds = IX_dataset_1d(1, 10);

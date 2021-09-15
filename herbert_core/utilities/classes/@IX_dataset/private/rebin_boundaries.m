@@ -1,15 +1,17 @@
-function xout = rebin_boundaries_from_binning_description (xin,...
-    is_descriptor, is_boundaries, varargin)
+function xout = rebin_boundaries (xin, is_descriptor, is_boundaries, varargin)
 % Get new bin boundaries from binning description
 %
 % If binning description is resolved (i.e. no -Inf or +Inf, and no binning
 % interval in a descriptor requires reference values to be retained):
-%   >> xout = rebin_boundaries_from_binning_description ...
-%                                     (xdescr, is_boundaries)
+%   >> xout = rebin_boundaries (xdescr, is_descriptor, is_boundaries)
+%
+%   >> xout = rebin_boundaries (xdescr, is_descriptor, is_boundaries, tol)
 %
 % General case:
-%   >> xout = rebin_boundaries_from_binning_description ...
-%                                     (xdescr, is_boundaries, xref, ishist)
+%   >> xout = rebin_boundaries (xdescr, is_descriptor, is_boundaries,...
+%                                                       xref, ishist)
+%   >> xout = rebin_boundaries (xdescr, is_descriptor, is_boundaries,...
+%                                                       xref, ishist, tol)
 %
 % Input:
 % ------
@@ -17,7 +19,6 @@ function xout = rebin_boundaries_from_binning_description (xin,...
 %
 %       is_descriptor==true
 %       -------------------
-%         [x1, dx1, x2]
 %         [x1, dx1, x2, dx2, x3,...xn]
 %               where -Inf <= x1 < x2 < x3...< xn <= Inf  (n >= 2), and
 %
@@ -40,8 +41,9 @@ function xout = rebin_boundaries_from_binning_description (xin,...
 %                    - true if xdescr defines bin boundaries
 %                    - false if xdescr defines bin centres
 %                  [Note that -Inf and Inf always end up defining bin
-%                   boundaries. This is a statement about the finite values
-%                   of x1, x2,... that appear in a binning description]
+%                   boundaries. The value of is_boundaries is a statement
+%                   about the finite values of [x1,] x2, x3... that appear
+%                   in the descriptor]
 %
 %   xref            Reference axis values.
 %                    - If bin boundaries then there will be at least two
@@ -65,15 +67,15 @@ function xout = rebin_boundaries_from_binning_description (xin,...
 %               the same position along the axis).
 
 
-narg = numel(varargin);
-if narg <= 2
+if numel(varargin) <= 3
     if is_descriptor
-        xout = rebin_boundaries_from_descriptor (xin, is_boundaries, varargin{:});
+        xout = rebin_boundaries_from_descriptor (xin, is_boundaries,...
+            varargin{:});
     else
         xout = rebin_boundaries_from_values (xin, is_boundaries,...
-            varargin{1:min(1,narg)});
+            varargin{1:2:end});
     end
 else
-    error('HERBERT:rebin_boundaries_from_binning_description:invalid_argument',...
+    error('HERBERT:rebin_boundaries:invalid_argument',...
         'Too many input arguments');
 end
