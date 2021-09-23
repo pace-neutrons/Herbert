@@ -16,20 +16,20 @@ narg = nargin - 1;
 if narg<=4 && isstruct(varargin{end})    
     % Final argument is structure: assume arguments form (..., ticks)
     nch = narg - 1;
-    if nch>=1, obj.caption = varargin{1}; end
-    if nch>=2, obj.units = varargin{2};  end
-    if nch>=3, obj.code = varargin{3};  end
-    obj.ticks = varargin{end};
+    if nch>=1, obj.caption_ = varargin{1}; end
+    if nch>=2, obj.units_ = varargin{2};  end
+    if nch>=3, obj.code_ = varargin{3};  end
+    obj.ticks_ = varargin{end};
     
 elseif narg<=4 && isnumeric(varargin{end})   
     % Final argument is numeric array: assume arguments form (..., positions)
     nch=narg - 1;
-    if nch>=1, obj.caption = varargin{1};  end
-    if nch>=2, obj.units = varargin{2};   end
-    if nch>=3, obj.code = varargin{3};   end
+    if nch>=1, obj.caption_ = varargin{1};  end
+    if nch>=2, obj.units_ = varargin{2};   end
+    if nch>=3, obj.code_ = varargin{3};   end
     obj.positions = varargin{end};
     
-elseif narg>1 && narg<=5 && isnumeric(varargin{end-1}) 
+elseif narg>=2 && narg<=5 && isnumeric(varargin{end-1}) 
     % Penultimate argument is numeric array: assume arguments form
     % (..., positions, labels)
     nch = narg - 2;

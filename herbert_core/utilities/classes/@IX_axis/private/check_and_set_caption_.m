@@ -1,16 +1,15 @@
-function obj = check_and_set_caption_(obj, caption)
+function caption = check_and_set_caption_ (val)
 % Check caption and set if valid, converting to column cellstr if needed
 
-if ~isempty(caption)
+if ~isempty(val)
     % Set caption
-    [ok, cout] = str_make_cellstr(caption);
-    if ok
-        obj.caption_ = cout;
-    else
+    [ok, caption] = str_make_cellstr(val);
+    if ~ok
         error('HERBERT:check_and_set_caption_:invalid_argument',...
             'Caption must be character, string array or cell array of strings');
     end
     
 else
-    obj.caption_ = {};
+    % Set caption to default empty value
+    caption = {};
 end

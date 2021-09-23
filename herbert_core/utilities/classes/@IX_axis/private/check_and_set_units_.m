@@ -1,16 +1,20 @@
-function obj = check_and_set_units_(obj, units)
+function units = check_and_set_units_ (val)
 % Check units and set if valid, converting to character string if needed
 
-if isempty(units)
-    obj.units_ = '';
-    
-elseif is_string(units)
-    obj.units_ = units;
-    
-elseif isstring(units) && numel(units)==1     % single string
-    obj.units_ = char(units);
+if ~isempty(val)
+    % Set units
+    if is_string(val)
+        units = val;
+        
+    elseif isstring(val) && numel(val)==1     % single string object
+        units = char(val);
+        
+    else
+        error('HERBERT:check_and_set_units_:invalid_argument',...
+            'Units code must be a character string');
+    end
     
 else
-    error('HERBERT:check_and_set_units_:invalid_argument',...
-        'Units code must be a character string');
+    % Set units to default (empty charater array)
+    units = '';
 end

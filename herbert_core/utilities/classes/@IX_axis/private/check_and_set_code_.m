@@ -1,16 +1,20 @@
-function obj = check_and_set_code_(obj, code)
+function code = check_and_set_code_ (val)
 % Check units code and set if valid, converting to character string if needed
 
-if isempty(code)
-    obj.code_ = '';
-    
-elseif is_string(code)
-    obj.code_ = code;
-    
-elseif isstring(code) && numel(code)==1     % single string
-    obj.code_ = char(code);
+if ~isempty(val)
+    % Set caption
+    if is_string(val)
+        code = val;
+        
+    elseif isstring(val) && numel(val)==1     % single string object
+        code = char(val);
+        
+    else
+        error('HERBERT:check_and_set_code_:invalid_argument',...
+            'Units code must be a character string');
+    end
     
 else
-    error('HERBERT:check_and_set_code_:invalid_argument',...
-        'Units code must be a character string');
+    % Set code to default empty value
+    code = '';
 end

@@ -94,72 +94,95 @@ classdef IX_axis
         end
         
         %------------------------------------------------------------------
+        % Set methods for independent properties
+        %
+        % Set the independent properties, which for this class are the
+        % private properties. We cannot make the set functions depend on
+        % other independent properties (see Matlab documentation). Have to 
+        % devolve any checks on interdependencies to another function.
+        
+        function obj = set.caption_ (obj, val)
+            obj.caption_ = check_and_set_caption_ (val);
+        end
+        
+        function obj = set.units_ (obj, val)
+            obj.units_ = check_and_set_units_ (val);
+        end
+        
+        function obj = set.code_ (obj, val)
+            obj.code_ = check_and_set_code_ (val);
+        end
+        
+        function obj = set.ticks_ (obj, val)
+            obj.ticks_ = check_and_set_ticks_ (val);
+        end
+        
+        %------------------------------------------------------------------
         % Set methods for dependent properties
         
-        function obj = set.caption(obj, caption)
-            obj = check_and_set_caption_(obj, caption);
+        function obj = set.caption (obj, val)
+            obj.caption_ = val;
         end
         
-        function obj = set.units(obj, units)
-            obj = check_and_set_units_(obj, units);
+        function obj = set.units (obj, val)
+            obj.units_ = val;
         end
         
-        function obj = set.code(obj, code)
-            obj = check_and_set_code_(obj, code);
+        function obj = set.code (obj, val)
+            obj.code_ = val;
         end
         
-        function obj = set.positions(obj, positions)
-            obj = check_and_set_positions_(obj, positions);
+        function obj = set.ticks (obj, val)
+            obj.ticks_ = val;
         end
         
-        function obj = set.labels(obj, labels)
-            obj = check_and_set_labels_(obj, labels);
+        function obj = set.positions(obj, val)
+            obj.ticks_ = check_and_set_positions_ (obj.ticks_, val);
         end
         
-        function obj = set.ticks(obj,ticks)
-            obj = check_and_set_ticks_(obj, ticks);
+        function obj = set.labels(obj, val)
+            obj.ticks_ = check_and_set_labels_ (obj.ticks_, val);
         end
         
         %------------------------------------------------------------------
         % Get methods for dependent properties
         
-        function val = get.caption(obj)
+        function val = get.caption (obj)
             val = obj.caption_;
         end
         
-        function val = get.units(obj)
+        function val = get.units (obj)
             val = obj.units_;
         end
         
-        function val = get.code(obj)
+        function val = get.code (obj)
             val = obj.code_;
         end
         
-        function val = get.positions(obj)
+        function val = get.ticks (obj)
+            val = obj.ticks_;
+        end        
+        
+        function val = get.positions (obj)
             val = obj.ticks_.positions;
         end        
         
-        function val = get.labels(obj)
+        function val = get.labels (obj)
             val = obj.ticks_.labels;
         end
-        
-        function val = get.ticks(obj)
-            val = obj.ticks_;
-        end        
         
         %------------------------------------------------------------------
     end
     
     %------------------------------------------------------------------
     methods(Static)
-       function obj = loadobj(data)
+       function obj = loadobj(S)
             % Function to support loading of outdated versions of the class
             % from mat files
-            if isa(data,'IX_axis')
-                obj = data;
+            if isstruct(S)
+                obj = loadobj_private_(S);
             else
-                obj = IX_axis();
-                obj = obj.init_from_structure(data);
+                obj = S;    % must be an instance of the object
             end
         end    
     end

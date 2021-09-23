@@ -1,17 +1,22 @@
-function obj = check_and_set_positions_(obj, positions)
+function ticks_ = check_and_set_positions_(ticks_, val)
 % Check tick label positions, converting to row vector if needed
 
-if isempty(positions)
-    obj.ticks_.positions = [];
-    obj.ticks_.labels = {};
-    
-elseif isnumeric(positions)
-    if ~isequal(obj.ticks_.positions, positions(:)')
-        obj.ticks_.positions = positions(:)';   % row vector
-        obj.ticks_.labels = {};
+% Checks that the new labels are consistent with the number of positions.
+
+if ~isempty(val)
+    % Fill positions, clearing tick labels if positions are changed
+    if isnumeric(val)
+        if ~isequal(ticks_.positions, val(:)')
+            ticks_.positions = val(:)'; % make a row vector
+            ticks_ = check_and_set_labels_ (ticks_, []); % set to default
+        end
+        
+    else
+        error('HERBERT:check_and_set_positions_:invalid_argument',...
+            'Tick positions must be a numeric vector');
     end
     
 else
-    error('HERBERT:check_and_set_positions_:invalid_argument',...
-        'Tick positions must be a numeric vector');
+    % Default empty positions array
+    ticks_.positions = [];
 end

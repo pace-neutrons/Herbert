@@ -1,18 +1,29 @@
-function obj = check_and_set_ticks_(obj, ticks)
+function ticks = check_and_set_ticks_ (val)
 % Method verifies axis ticks properties and sets axis ticks if valid
 
-if isempty(ticks)
-    obj = check_and_set_positions_(obj, []);
-    obj = check_and_set_labels_(obj, {});
+ticks = struct('positions', [], 'labels', []);
+
+if ~isempty(val)
+    % Create ticks structure
+    if isstruct(val) && all(isfield(val,{'positions','labels'}))
+        try
+            ticks = check_and_set_positions_ (ticks, val.positions);
+            ticks = check_and_set_labels_ (ticks, val.labels);
+        catch ME
+            rethrow(ME)
+        end
+        
+    else
+        error('HERBERT:check_and_set_ticks_:invalid_argument',...
+            'Ticks structure must have fields ''positions'' and ''labels''');
+    end
     
-elseif isstruct(ticks) && all(isfield(ticks,{'positions','labels'}))
+else
+    % Fill ticks with default values
     try
-        obj = check_and_set_positions_(obj, ticks.positions);
-        obj = check_and_set_labels_(obj, ticks.labels);
+        ticks = check_and_set_positions_ (ticks, []);
+        ticks = check_and_set_labels_ (ticks, []);
     catch ME
         rethrow(ME)
     end
-else
-    error('HERBERT:check_and_set_ticks_:invalid_argument',...
-        'Ticks structure must have fields ''positions'' and ''labels''');
 end
