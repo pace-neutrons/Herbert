@@ -17,8 +17,8 @@ function obj = set_xyz_axis_(obj, val, iax)
 %           - character string or 2D character array
 %           - string array
 %
-%           Alternatively, an array of IX_axis if caption for more than one
-%           axis is being set, one element for each axis.
+%           If captions for more than one axis is being set, then can be an
+%           array of IX_axis objects, one element for each axis.
 %
 %   iax     Axis index or array of indices that must lie in the
 %           range 1,2,... ndim(). Must be unique.
@@ -46,15 +46,6 @@ else
 end
 
 % Update captions for axes
-if ~isa(val,'IX_axis') && isscalar(iax)
-    obj = check_and_set_x_axis_(obj, val, iax);
-    
-elseif isa(val,'IX_axis') && numel(val)==numel(iax)
-    for i=1:numel(iax)
-        obj = check_and_set_x_axis_(obj, val(i), iax(i));
-    end
-    
-else
-    error('HERBERT:set_xyz_axis_:invalid_argument',...
-        'The number of arrays of axis coordinates must match the number of axes indicies')
-end
+xyz_axis_new = obj.xyz_axis_;
+xyz_axis_new(iax) = check_and_set_x_axis_ (val, iax);
+obj.xyz_axis_ = xyz_axis_new;

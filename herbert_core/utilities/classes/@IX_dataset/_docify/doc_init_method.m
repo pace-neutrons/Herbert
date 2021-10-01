@@ -4,13 +4,13 @@
 %
 % The input arguments are the same as the class constructor.
 %
-% This method exists for two reasons:
+% This method exists for two reasons.
 % - It is not always possible to update an object via the property set
 %   methods because of interdependencies, for example changing the extent
 %   of the signal array as this is coupled to the error array and axis
-%   coordinates; 
+%   coordinates.
 % - It is much more efficient to update many properties at once rather than
-%   repeadedly have consistency check made as each property is updated
+%   repeadedly have consistency checks made as each property is updated.
 %
 % Input:
 % -------

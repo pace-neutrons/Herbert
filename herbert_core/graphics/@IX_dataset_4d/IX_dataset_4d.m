@@ -41,26 +41,40 @@ classdef IX_dataset_4d < IX_data_4d
     %   w_axis              IX_axis          |- same as above but for w-axis
     %   w_distribution      logical         -|
     
-    methods(Static)
-        function obj = loadobj(data)
-            % function to support loading of previous versions of the class
-            % from mat files on hdd
-            if isa(data,'IX_dataset_4d')
-                obj = data;
-            else
-                obj = IX_dataset_4d();
-                obj = obj.init_from_structure(data);
-            end
-        end
-    end
-    
-    
+
     methods
-        %------------------------------------------------------------------
         function obj= IX_dataset_4d(varargin)
             obj = obj@IX_data_4d(varargin{:});
         end
-        %------------------------------------------------------------------
     end
     
+    %======================================================================
+    methods(Access=protected)
+        % Support method for loadobj. This method needs to be accesible
+        % both from loadobj, and from child classes loadobj_protected_
+        % methods so that there is inheritable loadobj
+        function obj = loadobj_protected_ (obj, S)
+            obj = loadobj_protected_@IX_data_4d (obj, S);
+        end
+    end
+        
+    %======================================================================
+    methods(Static)
+        function obj = loadobj (S)
+            % Function to support loading of outdated versions of the class
+            % from mat files
+            if isstruct(S)
+                obj = IX_dataset_4d();
+                obj = arrayfun(@(x)loadobj_protected_(obj, x), S);
+            else
+                obj = S;    % must be an instance of the object
+            end
+            
+            % Check consistency of object - if it is older version then
+            % might not be consistent
+            obj = arrayfun(@isvalid, obj);
+
+        end
+    end
+
 end

@@ -60,62 +60,70 @@ classdef IX_data_2d < IX_dataset
 
             obj = build_IX_dataset_(obj, varargin{:});
         end
-
-        %------------------------------------------------------------------
-        % Get methods for dependent properties
-        
-        function val = get.x(obj)
-            val = obj.xyz_{1};
-        end
-        
-        function val = get.y(obj)
-            val = obj.xyz_{2};
-        end
-        
-        function val = get.x_axis(obj)
-            val = obj.xyz_axis_(1);
-        end
-        
-        function val = get.y_axis(obj)
-            val = obj.xyz_axis_(2);
-        end
-        
-        function val = get.x_distribution(obj)
-            val = obj.xyz_distribution_(1);
-        end
-        
-        function val = get.y_distribution(obj)
-            val = obj.xyz_distribution_(2);
-        end
         
         %------------------------------------------------------------------
         % Set methods for dependent properties
         
-        function obj = set.x(obj, val)
-            obj = set_xyz_(obj, val, 1);
+        function obj = set.x (obj, val)
+            obj = set_xyz_ (obj, val, 1);
         end
         
-        function obj = set.y(obj, val)
-            obj = set_xyz_(obj, val, 2);
+        function obj = set.y (obj, val)
+            obj = set_xyz_ (obj, val, 2);
         end
         
-        function obj = set.x_axis(obj, val)
-            obj = set_xyz_axis_(obj, val, 1);
+        function obj = set.x_axis (obj, val)
+            obj = set_xyz_axis_ (obj, val, 1);
         end
         
-        function obj = set.y_axis(obj, val)
-            obj = set_xyz_axis_(obj, val, 2);
+        function obj = set.y_axis (obj, val)
+            obj = set_xyz_axis_ (obj, val, 2);
         end
         
-        function obj = set.x_distribution(obj, val)
-            obj = set_xyz_distribution_(obj, val, 1);
+        function obj = set.x_distribution (obj, val)
+            obj = set_xyz_distribution_ (obj, val, 1);
         end
         
-        function obj = set.y_distribution(obj, val)
-            obj = set_xyz_distribution_(obj, val, 2);
+        function obj = set.y_distribution (obj, val)
+            obj = set_xyz_distribution_ (obj, val, 2);
+        end
+
+        %------------------------------------------------------------------
+        % Get methods for dependent properties
+        
+        function val = get.x (obj)
+            val = obj.xyz_{1};
+        end
+        
+        function val = get.y (obj)
+            val = obj.xyz_{2};
+        end
+        
+        function val = get.x_axis (obj)
+            val = obj.xyz_axis_(1);
+        end
+        
+        function val = get.y_axis (obj)
+            val = obj.xyz_axis_(2);
+        end
+        
+        function val = get.x_distribution (obj)
+            val = obj.xyz_distribution_(1);
+        end
+        
+        function val = get.y_distribution (obj)
+            val = obj.xyz_distribution_(2);
         end
         
         %-----------------------------------------------------------------
+    end
+    
+    %======================================================================
+    methods(Access=protected)
+        % Support method for loadobj. This method needs to be accesible
+        % both from loadobj, and from child classes loadobj_protected_
+        % methods so that there is inheritable loadobj
+        obj = loadobj_protected_ (obj, S)
     end
     
     %======================================================================
@@ -124,6 +132,21 @@ classdef IX_data_2d < IX_dataset
             % Return the number of class dimensions
             nd = 2;
         end
+        
+        function obj = loadobj(S)
+            % Function to support loading of outdated versions of the class
+            % from mat files
+            if isstruct(S)
+                obj = IX_data_2d();
+                obj = arrayfun(@(x)loadobj_protected_(obj, x), S);
+            else
+                obj = S;    % must be an instance of the object
+            end
+            
+            % Check consistency of object - if it is older version then
+            % might not be consistent
+            obj = arrayfun(@isvalid, obj);
+        end    
     end
     
 end

@@ -180,7 +180,7 @@ classdef IX_axis
             % Function to support loading of outdated versions of the class
             % from mat files
             if isstruct(S)
-                obj = loadobj_private_(S);
+                obj = arrayfun(@(x)loadobj_private_(x), S);
             else
                 obj = S;    % must be an instance of the object
             end

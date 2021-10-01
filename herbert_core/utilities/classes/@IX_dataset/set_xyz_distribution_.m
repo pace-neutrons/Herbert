@@ -12,8 +12,12 @@ function obj = set_xyz_distribution_(obj, val, iax)
 % ------
 %   obj     IX_dataset object
 %
-%   val     Distribution flag(s): logical scalar or array where elements
-%           have value true or false (or 0 or 1)
+%   val     Distribution flag(s): 
+%               - logical true or false, or 1 or 0 (if setting a single axis)
+%               - Logical array (or arry of ones or zeros) (if setting
+%                 more than one axis)
+%               - Cell array of logical scalars (i.e. true or false, 
+%                 or 1 or 0), one per axis
 %
 %   iax     Axis index or array of indices that must lie in the
 %           range 1,2,... ndim(). Must be unique.
@@ -41,12 +45,6 @@ else
 end
 
 % Update distribution flags for the axes
-if islognum(val) && numel(val)==numel(iax)
-    for i=1:numel(iax)
-        obj = check_and_set_x_distribution_(obj, val(i), iax(i));
-    end
-    
-else
-    error('HERBERT:set_xyz_distribution_:invalid_argument',...
-        'The number of arrays of axis coordinates must match the number of axes indicies')
-end
+xyz_distribution_new = obj.xyz_distribution_;
+xyz_distribution_new(iax) = check_and_set_x_distribution_ (val, iax);
+obj.xyz_distribution_ = xyz_distribution_new;

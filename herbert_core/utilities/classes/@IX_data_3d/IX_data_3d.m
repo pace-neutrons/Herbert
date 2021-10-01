@@ -151,11 +151,34 @@ classdef IX_data_3d < IX_dataset
     end
     
     %======================================================================
+    methods(Access=protected)
+        % Support method for loadobj. This method needs to be accesible
+        % both from loadobj, and from child classes loadobj_protected_
+        % methods so that there is inheritable loadobj
+        obj = loadobj_protected_ (obj, S)
+    end
+    
+    %======================================================================
     methods(Static)
         function nd  = ndim()
             % Return the number of class dimensions
             nd = 3;
         end
+        
+        function obj = loadobj(S)
+            % Function to support loading of outdated versions of the class
+            % from mat files
+            if isstruct(S)
+                obj = IX_data_3d();
+                obj = arrayfun(@(x)loadobj_protected_(obj, x), S);
+            else
+                obj = S;    % must be an instance of the object
+            end
+            
+            % Check consistency of object - if it is older version then
+            % might not be consistent
+            obj = arrayfun(@isvalid, obj);
+        end    
     end
     
 end

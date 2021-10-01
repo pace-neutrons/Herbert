@@ -1,34 +1,30 @@
-function [obj,mess] = isvalid(obj)
-% Check common fields for data_array object are consistent between each
-% other
+function [obj, ME] = isvalid (obj)
+% Check consistency of properties
 %
-%   >> [obj, mess] = isvalid (w)
+%   >> obj = isvalid (obj)          % throws error if onput not valid object
+%   >> [obj, ME] = isvalid (obj)    % return with error message if not valid
 %
-% or throwing form:
-%   >> obj = isvalid (w)
-%   >> isvalid(w)
+% Input:
+% ------
+%   obj     Object to be validated
+% 
+% Output:
+% -------
+%   obj     Output object, where properties may have different format to
+%           comply with class requirements (e.g. row vectors turned into
+%           column vector or vice versa as required by the class)
 %
-%   ok      ok=true if valid, =false if not
-%   mess    Message if not a valid object, empty string if is valid.
-%
-%  second (throwing) form should be called from a program after changing
-%  x,signal, error using set operations to make sure the object
-%  was changed properly. Throws IX_dataset:invalid_argument if the
-%  dataset has inconsistent fields or returns validated object otherwise.
-%
-% validated object has valid_ field set up to true to not invoke repetative
-% checks at repetative calls to the objecs.
-%
-%
-% Original author: T.G.Perring
-%
+%   ME      Empty character array if valid object (after any reformatting)
+%           MException object if an error
 
 
-[ok,mess] = obj.check_joint_fields();
-
-obj.valid_ = ok;
-if nargout < 2
-    if ~ok
-        error('IX_dataset:invalid_argument',mess);
+if ~obj.valid_
+    try
+        obj = check_properties_consistency_(obj);
+        ME = '';
+    catch ME
+        if nargout < 2
+            rethrow (ME)
+        end
     end
 end

@@ -1,26 +1,24 @@
-function obj = check_and_set_error_(obj, val)
+function error_ = check_and_set_error_ (val)
 % Set error array
 %
-%   >> obj = check_and_set_error_(obj, val)
+%   >> error_ = check_and_set_error_ (val)
 %
 % Input:
 % ------
-%   obj     IX_dataset object
-%   val     Error array - standrad deviations
+%   val     Error array - standard deviations
 %
 % Output:
 % -------
-%   obj     Updated object. Any negative values of error will be made
-%           positive
+%   error_  Error array verified, and negative values made positive
 
 
 % Leave the check of consistency of extent along each dimension to a
 % method that performs checks that cut across properties
 if isnumeric(val)
     if isa(val,'double')
-        obj.error_ = abs(val);
+        error_ = abs(val);
     else
-        obj.error_ = abs(double(val));
+        error_ = abs(double(val));
     end
 else
     error('HERBERT:check_and_set_error_:invalid_argument',...

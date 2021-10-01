@@ -1,7 +1,7 @@
 function obj = check_properties_consistency_(obj)
 % Check validity of interconnected fields of the object
 %
-%   >> [ok, message] = check_properties_consistency_(obj)
+%   >> obj = check_properties_consistency_(obj)
 %
 % Input:
 % ------
@@ -55,7 +55,7 @@ elseif nd==1 && numel(sz)==2 && sz(1)==1 && sz(2)~=1
     sz = fliplr(sz);
 end
 
-% Check the signal array size consistent with the object dimensionality
+% Check the signal array size is consistent with the object dimensionality
 nd_min = find(sz~=1, 1, 'last');    % trailing singletons not significant
 if isempty(nd_min)
     nd_min = 0;     % case of signal being scalar
@@ -111,3 +111,6 @@ else
         end
     end
 end
+
+% Properties are mutually consistent if got to here
+obj.valid_ = true;

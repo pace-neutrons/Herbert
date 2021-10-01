@@ -66,6 +66,11 @@ classdef (Abstract) IX_dataset
 
     properties (Access=private)
         % True if the object has been initialised
+        % Initial value must be false so that when loading from .mat files
+        % a check of internal consistency and and any necessary reformatting
+        % is performed in loadobj. If valid_ is already true when the object
+        % is read from file then a validation method can detect this and
+        % skip the consistency check.
         valid_ = false
     end
     
@@ -74,6 +79,45 @@ classdef (Abstract) IX_dataset
         % Properties:
         %===================================================================
 
+        % Set methods for independent properties
+        %
+        % Set the independent properties, which for this class are the
+        % private properties. We cannot make the set functions depend on
+        % other independent properties (see Matlab documentation). Have to 
+        % devolve any checks on interdependencies to another function.
+        
+        function obj = set.title_ (obj, val)
+            obj.title_ = check_and_set_title_ (val);
+        end
+        
+        function obj = set.signal_ (obj, val)
+            obj.signal_ = check_and_set_signal_ (val);
+        end
+        
+        function obj = set.error_ (obj,val)
+            obj.error_ = check_and_set_error_ (val);
+        end
+
+        function obj = set.s_axis_ (obj, val)
+            obj.s_axis_ = check_and_set_s_axis_ (val);
+        end
+        
+        function obj = set.xyz_ (obj,val)
+            nd = obj.ndim();
+            obj.xyz_ = check_and_set_x_ (val, 1:nd);
+        end
+
+        function obj = set.xyz_axis_ (obj, val)
+            nd = obj.ndim();
+            obj.xyz_axis_ = check_and_set_x_axis_ (val, 1:nd);
+        end
+        
+        function obj = set.xyz_distribution_ (obj, val)
+            nd = obj.ndim();
+            obj.xyz_distribution_ = check_and_set_x_distribution_ (val, 1:nd);
+        end
+        
+        %------------------------------------------------------------------
         % Set methods for dependent properties
         % Checks on validity of the passed value made in utility routines.
         % These are the same utility routines that are used by the class
@@ -86,39 +130,39 @@ classdef (Abstract) IX_dataset
         % checks as the class constructor. Interfaces for these methods are 
         % declared elsewhere in this classdef
         
-        function obj = set.title(obj, val)
-            obj = check_and_set_title_(obj, val);
+        function obj = set.title (obj, val)
+            obj.title_ = val;
         end
         
-        function obj = set.signal(obj, val)
-            obj = check_and_set_signal_(obj, val);
-            obj = check_properties_consistency_(obj);
+        function obj = set.signal (obj, val)
+            obj.signal_ = val;
+            obj = check_properties_consistency_ (obj);
         end
         
-        function obj = set.error(obj,val)
-            obj = check_and_set_error_(obj, val);
-            obj = check_properties_consistency_(obj);
+        function obj = set.error (obj,val)
+            obj.error_ = val;
+            obj = check_properties_consistency_ (obj);
         end
 
-        function obj = set.s_axis(obj, val)
-            obj = obj.check_and_set_s_axis_(val);
+        function obj = set.s_axis (obj, val)
+            obj.s_axis_ = val;
         end
         
         %------------------------------------------------------------------
         % Get methods for dependent properties
-        function val = get.title(obj)
+        function val = get.title (obj)
             val = obj.title_;
         end
         
-        function val = get.signal(obj)
+        function val = get.signal (obj)
             val = obj.signal_;
         end
         
-        function val = get.error(obj)
+        function val = get.error (obj)
             val = obj.error_;
         end
         
-        function val = get.s_axis(obj)
+        function val = get.s_axis (obj)
             val = obj.s_axis_;
         end
         
@@ -140,12 +184,6 @@ classdef (Abstract) IX_dataset
         
         
         %--- Not yet verified ---------------------------------------------
-
-        % set up object values using object structure. (usually as above)
-        obj = init_from_structure(obj,struct)
-        
-
-        
         % Take absolute value of an IX_dataset_nd object or array of IX_dataset_nd objects
         % wout = abs(w)
         %------------------------------------------------------------------
@@ -211,14 +249,19 @@ classdef (Abstract) IX_dataset
         % These are interfaces to generic methods defined for IX_dataset.
         % However, class-specific implementations of methods can be 
         % provided if requested.
+        %
+        % Mostly, the reason class-specific methods exist is to enable
+        % documentation to be provided that is specific for a particular
+        % dimensionality. Sometimes (e.g. set_xyz_) it is because there is
+        % a class-specific method that calls the generic method.
         
         % Build object
         % ------------
         % Build a new object
-        obj = build_IX_dataset_(obj, varargin)
+        obj = build_IX_dataset_ (obj, varargin)
         
         % Re-initialise an object
-        obj_out = init_(obj, varargin)
+        obj_out = init_ (obj, varargin)
         
         % Set child properties
         % --------------------
@@ -269,14 +312,6 @@ classdef (Abstract) IX_dataset
     % These are interfaces to class-specific implementations of methods.
     % The source code will be found in the folders that defined those
     % classes.
-    %
-    % Notes
-    % - init is actually defined in IX_data_1d.m, IX_data_2d.m rather than
-    %   in a separate. I don't see why this should be the case.
-    %
-    % - dimensions, ishistogram, axis appear here as interfaces, and
-    %   therefore required, but why not a host of other methods e.g.
-    %   func_eval, hist2point ?
     
     
     methods(Abstract)
@@ -298,18 +333,25 @@ classdef (Abstract) IX_dataset
         
         % Create axis annoations
         varargout = make_label(obj)
-        
     end
     
+    
     %======================================================================
-    methods(Abstract,Static)
+    methods(Abstract, Access=protected)
+        % Support method for loadobj. This method needs to be accesible
+        % both from loadobj, and from child classes loadobj_protected_
+        % methods so that there is inheritable loadobj
+        obj = loadobj_protected_ (obj, S)
+    end
+    
+    
+    %======================================================================
+    methods(Abstract, Static)
         % Get number of class dimensions
         nd  = ndim()
 
-        %--- Not yet verified ---------------------------------------------
-        % used to reload old style objects from mat files on hdd
+        % To support loading of outdated versions of the class from mat files
         obj = loadobj(data)
     end
     
-
 end

@@ -28,30 +28,41 @@ classdef IX_dataset_1d < IX_data_1d
     %                   (or char/cellstr    Can also just give caption; multiline input in the form of a
     %                                      cell array or a character array)
     %   x_distribution  logical         Distribution data flag (true is a distribution; false otherwise)
-    %
-    % $Revision:: 840 ($Date:: 2020-02-10 16:05:56 +0000 (Mon, 10 Feb 2020) $)
-    %        
-    methods(Static)
-        function obj = loadobj(data)
-            % function to support loading of outdated versions of the class
-            % from mat files on hdd
-            if isa(data,'IX_dataset_1d')
-                obj = data;
-            else
-                obj = IX_dataset_1d();
-                obj = obj.init_from_structure(data);
-            end
+   
+    
+    methods
+        function obj= IX_dataset_1d(varargin)
+            obj = obj@IX_data_1d (varargin{:});
         end
     end
     
-    
-    methods
-        %------------------------------------------------------------------
-        function obj= IX_dataset_1d(varargin)
-            obj = obj@IX_data_1d(varargin{:});
+    %======================================================================
+    methods(Access=protected)
+        % Support method for loadobj. This method needs to be accesible
+        % both from loadobj, and from child classes loadobj_protected_
+        % methods so that there is inheritable loadobj
+        function obj = loadobj_protected_ (obj, S)
+            obj = loadobj_protected_@IX_data_1d (obj, S);
         end
-        %------------------------------------------------------------------
+    end
+        
+    %======================================================================
+    methods(Static)
+        function obj = loadobj (S)
+            % Function to support loading of outdated versions of the class
+            % from mat files
+            if isstruct(S)
+                obj = IX_dataset_1d();
+                obj = arrayfun(@(x)loadobj_protected_(obj, x), S);
+            else
+                obj = S;    % must be an instance of the object
+            end
+            
+            % Check consistency of object - if it is older version then
+            % might not be consistent
+            obj = arrayfun(@isvalid, obj);
+
+        end
     end
     
 end
-

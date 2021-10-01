@@ -1,9 +1,22 @@
 function obj = build_IX_dataset_(obj, varargin)
 % Construct IX_dataset object with the required dimensionality
 %
+% This is the gateway routine to 
+% - construct a new object, via constructors (IX_data_1d, IX_data_2d etc.)
+% - change multiple properties of an existing object at the same time, via
+%   the methods IX_data_1d/init, IX_data_2d/init etc.
+%
+% The latter is required because it is not always possible to use the set
+% methods to change one property at a time because of a requirement of
+% mutual consistency (e.g. changing the number of bin boundaries along one
+% axis requires the signal and error arrays to also be changed); also it is
+% inefficient to check mutual consistency of properties each time a property
+% is changed when this potentially expensive operation can be performed once
+% at the end.
+% 
 % There are two general formats for arguments:
-% - providing axis information one argument per axis for each time type
-% - providing axis onformation with one argument for all axes for an itme type
+% - providing axis information as one argument per axis
+% - providing axis information with one array argument for all axes at once
 %
 %
 % Individual axes:
@@ -24,7 +37,7 @@ function obj = build_IX_dataset_(obj, varargin)
 %                       x1_distribution, x2_distribution,..., xn_distribution)
 %
 % Older format constructor:
-%   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
+%   >> obj = build_IX_dataset_ (obj, title, signal, error, s_axis,...
 %                       x1, x1_axis, x1_distribution,...
 %                       x2, x2_axis, x2_distribution,...
 %                       xn, xn_axis, xn_distribution)
@@ -46,10 +59,10 @@ function obj = build_IX_dataset_(obj, varargin)
 %                       title, x_axis, s_axis, x_distribution)
 %
 % Older format constructor:
-%   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis,...
+%   >> obj = build_IX_dataset_ (obj, title, signal, error, s_axis,...
 %                       x, x_axis, x_distribution)
 %
-%   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis, ax)
+%   >> obj = build_IX_dataset_ (obj, title, signal, error, s_axis, ax)
 
 
 narg = numel(varargin);
@@ -57,11 +70,10 @@ narg = numel(varargin);
 % Get number of dimensions - comes from the child object
 nd = obj.ndim();
 
-% Determine if array argument input or not.
-% The way to distinguish is:
-% - for nd>=2 the first argument is a cell array of numeric vectors, or, 
+% Determine if array argument input or not. The way to distinguish is:
+% - For nd>=2 the first argument is a cell array of numeric vectors, or, 
 %   if the first argument is the title, the fifth argument is.
-% - the fifth argument is a structure (the axis structure)
+% - The fifth argument is a structure (the axis structure)
 
 if narg==0 || ...
         (narg>=1 && ~isempty(varargin{1}) && iscell(varargin{1}) && ...
@@ -77,7 +89,7 @@ else
     if narg>=nd && narg<=nd+2
         % Default captioning and distribution flags
         x = varargin(1:nd); % as cell array
-        obj = build_IX_dataset_internal_(obj, x, varargin{nd+1:end});
+        obj = build_IX_dataset_internal_ (obj, x, varargin{nd+1:end});
         
     elseif narg==(2*nd+2)
         % Default captioning and custom distribution flags
@@ -85,7 +97,7 @@ else
         signal = varargin{nd+1};
         error = varargin{nd+2};
         x_distribution = varargin(nd+3:2*nd+2); % as cell array
-        obj = build_IX_dataset_internal_(obj, x, signal, error, x_distribution);
+        obj = build_IX_dataset_internal_ (obj, x, signal, error, x_distribution);
         
     elseif narg==(2*nd+4) || (narg==(3*nd+4) && isnumeric(varargin{1}))
         % Custom captioning and default/custom distribution flags
@@ -96,11 +108,11 @@ else
         x_axis = varargin(nd+4:2*nd+3); % as cell array
         s_axis = varargin{2*nd+4};
         if narg==(2*nd+4)
-            obj = build_IX_dataset_internal_(obj, x, signal, error, ...
+            obj = build_IX_dataset_internal_ (obj, x, signal, error, ...
                 title, x_axis, s_axis);
         else
             x_distribution = varargin(2*nd+5:3*nd+4);   % as cell array
-            obj = build_IX_dataset_internal_(obj, x, signal, error, ...
+            obj = build_IX_dataset_internal_ (obj, x, signal, error, ...
                 title, x_axis, s_axis, x_distribution);
         end
         
@@ -113,12 +125,12 @@ else
         x = varargin(5:3:end);  % as cell array
         x_axis = varargin(6:3:end); % as cell array
         x_distribution = varargin(7:3:end); % as cell array
-        obj = build_IX_dataset_internal_(obj, title, signal, error, ...
+        obj = build_IX_dataset_internal_ (obj, title, signal, error, ...
             s_axis, x, x_axis, x_distribution);
         
     else
         % Unrecognised input - pass to get standard error message
-        obj = build_IX_dataset_internal_(obj, varargin{:});
+        obj = build_IX_dataset_internal_ (obj, varargin{:});
     end
 end
 
@@ -207,35 +219,27 @@ nd = obj.ndim();
 % defaults or accepting their current values)
 initialised = obj.valid_;
 
-if ~initialised
-    % Pre-allocate array properties with the correct size and type.
-    % The ontents may not be valid defaults however. These will be filled
-    % as the elements of these properties are populated.
-    obj.xyz_ = cell(1, nd);
-    obj.xyz_distribution_ = true(1, nd);
-    obj.xyz_axis_ = repmat(IX_axis, [1, nd]);
-end
-
+% Populate properties
 if narg==0
     if ~initialised
         % Default object
         % --------------
         % Axis values
-        obj = obj.check_and_set_x_([], 1:nd);
+        obj.xyz_ = cell(1,nd);
         
         % Signal and errors
         sz = cellfun(@numel, obj.xyz_);
         sz = [sz, ones(1,2-numel(sz))];
-        obj = obj.check_and_set_signal_(zeros(sz)); % default for point data
-        obj = obj.check_and_set_error_(zeros(sz));
+        obj.signal_ = zeros(sz); % default for point data
+        obj.error_ = zeros(sz);
         
         % Distributions
-        obj = obj.check_and_set_x_distribution_([], 1:nd);
+        obj.xyz_distribution_ = cell(1,nd);
         
         % Title and captions
-        obj = obj.check_and_set_title_([]);
-        obj = obj.check_and_set_x_axis_([], 1:nd);
-        obj = obj.check_and_set_s_axis_([]);
+        obj.title_ = [];
+        obj.xyz_axis_ = cell(1,nd);
+        obj.s_axis_ = [];
         
     else
         % Nothing to do - leave object unchanged
@@ -252,31 +256,31 @@ elseif narg>=1 && narg<=3
     %   >> obj = build_IX_dataset_ (obj, x, signal, error)
     
     % Axis values
-    obj = obj.check_and_set_x_(varargin{1}, 1:nd);
+    obj.xyz_ = varargin{1};
     
     % Signal and errors
     if narg>=2
-        obj = obj.check_and_set_signal_(varargin{2});
+        obj.signal_ = varargin{2};
     elseif ~initialised
         sz = cellfun(@numel, obj.xyz_);
         sz = [sz, ones(1,2-numel(sz))];
-        obj = obj.check_and_set_signal_(zeros(sz));
+        obj.signal_ = zeros(sz);
     end
     
     if narg>=3
-        obj = obj.check_and_set_error_(varargin{3});
+        obj.error_ = varargin{3};
     elseif ~initialised
-        obj = obj.check_and_set_error_(zeros(size(obj.signal_)));
+        obj.error_ = zeros(size(obj.signal_));
     end
     
     if ~initialised
         % Distributions
-        obj = obj.check_and_set_x_distribution_([], 1:nd);
+        obj.xyz_distribution_ = cell(1,nd);
         
         % Title and captions
-        obj = obj.check_and_set_title_([]);
-        obj = obj.check_and_set_x_axis_([], 1:nd);
-        obj = obj.check_and_set_s_axis_([]);
+        obj.title_ = [];
+        obj.xyz_axis_ = cell(1,nd);
+        obj.s_axis_ = [];
     end
     
     
@@ -286,20 +290,20 @@ elseif narg==4
     %   >> obj = build_IX_dataset_ (obj, x, signal, error, x_distribution)
 
     % Axis values
-    obj = obj.check_and_set_x_(varargin{1}, 1:nd);
+    obj.xyz_ = varargin{1};
     
     % Signal and errors
-    obj = obj.check_and_set_signal_(varargin{2});
-    obj = obj.check_and_set_error_(varargin{3});
+    obj.signal_ = varargin{2};
+    obj.error_ = varargin{3};
     
     % Distributions
-    obj = obj.check_and_set_x_distribution_(varargin{4}, 1:nd);
+    obj.xyz_distribution_ = varargin{4};
     
     if ~initialised
         % Title and captions
-        obj = obj.check_and_set_title_([]);
-        obj = obj.check_and_set_x_axis_([], 1:nd);
-        obj = obj.check_and_set_s_axis_([]);
+        obj.title_ = [];
+        obj.xyz_axis_ = cell(1,nd);
+        obj.s_axis_ = [];
     end
     
 elseif narg==5
@@ -308,22 +312,21 @@ elseif narg==5
     %   >> obj = build_IX_dataset_ (obj, title,  signal, error, s_axis, ax)
     
     % Title
-    obj = obj.check_and_set_title_(varargin{1});
+    obj.title_ = varargin{1};
     
     % Signal and errors
-    obj = obj.check_and_set_signal_(varargin{2});
-    obj = obj.check_and_set_error_(varargin{3});
-    obj = obj.check_and_set_s_axis_(varargin{4});
+    obj.signal_ = varargin{2};
+    obj.error_ = varargin{3};
+    obj.s_axis_ = varargin{4};
     
     % Axis values
     ax = varargin{5};
     if isstruct(ax) && numel(ax)==nd && ...
-            all(isfield(ax,{'values','axis','distribution'}))
-        for i = 1:nd
-            obj = obj.check_and_set_x_(ax(i).values, i);
-            obj = obj.check_and_set_x_axis_(ax(i).axis, i);
-            obj = obj.check_and_set_x_distribution_(ax(i).distribution, i);
-        end
+            all(strcmp(fieldnames(ax),{'values';'axis';'distribution'}))
+        axcell = struct2cell(ax(:));
+        obj.xyz_ = axcell(1,:);
+        obj.xyz_axis_ = axcell(2,:);
+        obj.xyz_distribution_ = axcell(3,:);
     else
         error('HERBERT:build_IX_dataset_internal_:invalid_argument',...
             'Axis structure has incorrect fields or wrong number of elements')
@@ -340,23 +343,23 @@ elseif narg==6 || (narg==7 && iscell(varargin{1}) && ~iscellstr(varargin{1}))
     %                       title, x_axis, s_axis, x_distribution)
 
     % Axis values
-    obj = obj.check_and_set_x_(varargin{1}, 1:nd);
+    obj.xyz_ = varargin{1};
 
     % Signal and errors
-    obj = obj.check_and_set_signal_(varargin{2});
-    obj = obj.check_and_set_error_(varargin{3});
+    obj.signal_ = varargin{2};
+    obj.error_ = varargin{3};
     
     % Distributions
     if narg==7
-        obj = obj.check_and_set_x_distribution_(varargin{7}, 1:nd);
+        obj.xyz_distribution_ = varargin{7};
     elseif ~initialised
-        obj = obj.check_and_set_x_distribution_([], 1:nd);
+        obj.xyz_distribution_ = cell(1,nd);
     end
     
     % Title and captions
-    obj = obj.check_and_set_title_(varargin{4});
-    obj = obj.check_and_set_x_axis_(varargin{5}, 1:nd);
-    obj = obj.check_and_set_s_axis_(varargin{6});
+    obj.title_ = varargin{4};
+    obj.xyz_axis_ = varargin{5};
+    obj.s_axis_ = varargin{6};
 
     
 elseif narg==7
@@ -366,17 +369,17 @@ elseif narg==7
     %                       x, x_axis, x_distribution)
 
     % Title
-    obj = obj.check_and_set_title_(varargin{1});
+    obj.title_ = varargin{1};
     
     % Signal and errors
-    obj = obj.check_and_set_signal_(varargin{2});
-    obj = obj.check_and_set_error_(varargin{3});
-    obj = obj.check_and_set_s_axis_(varargin{4});
+    obj.signal_ = varargin{2};
+    obj.error_ = varargin{3};
+    obj.s_axis_ = varargin{4};
     
     % Axis values
-    obj = obj.check_and_set_x_(varargin{5}, 1:nd);
-    obj = obj.check_and_set_x_axis_(varargin{6}, 1:nd);
-    obj = obj.check_and_set_x_distribution_(varargin{7}, 1:nd);
+    obj.xyz_ = varargin{5};
+    obj.xyz_axis_ = varargin{6};
+    obj.xyz_distribution_ = varargin{7};
     
 else
     error('HERBERT:build_IX_dataset_internal_:invalid_argument',...
@@ -385,8 +388,3 @@ end
 
 % Check consistency between fields
 obj = check_properties_consistency_(obj);
-
-% Set to valid if not yet initialised
-if ~initialised
-    obj.valid_ = true;
-end
