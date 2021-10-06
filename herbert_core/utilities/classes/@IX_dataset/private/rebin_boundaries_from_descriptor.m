@@ -52,11 +52,6 @@ function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
 %               values are the same (for example, descriptor is [5,0,Inf] 
 %               and xref = [5,5,5] i.e. point data where all points have 
 %               the same position along the axis). 
-%
-%
-%               The special case of xdescr = [-Inf,0,Inf] means that the
-%               output bin boundaries are the same as those defined by the 
-%               reference axis values. This will be indicated by xout = []
 
 
 % How the algorithm works
@@ -77,12 +72,14 @@ function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
 % Each descriptor block  [x(m), dx(m), x(m+1)] is filled independently in 
 % turn. The functions that do this for the three cases dx>0, dx<0, dx=0 all
 % return values starting at x(m) and excluding x(m+1), as the next block
-% will provide the value x(m+1) as its starting value.
+% will provide the value x(m+1) as its starting value. At the end of the 
+% loop over all blocks, x(m+1) will be appended to complete the set of bin
+% boundaries.
 %
 % Consider different cases:
 %
-% [x1, dx, x2]  (x1, x2 finite)
-% ------------
+% [x(m), dx, x(m+1)]  (x(m), x(m+1) finite)
+% -------------------
 %   - If dx=0, use reference data. Convert to bin centres or boundaries
 %     as required by value of is_boundaries (here abbreviated to B) from
 %     the reference values which are boundaries or not according to ishist
@@ -99,10 +96,11 @@ function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
 %        (H) or one point value (~H) or an error will have been thrown 
 %        before reaching this function. This is even though a valid
 %        IX_dataset can have a single boundary or no point value. These
-%        cases are no recognised as being valid as a reference x array here.
+%        cases are not recognised as being valid for providing a reference
+%        x array here.
 %
 % [x(n-1), dx, Inf]  (x(n-1) finite)
-% -------------
+% ------------------
 % If dx~=0:     Compute:
 %   B   H     [x(n-1), dx, xhi]
 %   B  ~H     [x(n-1), dx, xhi]
@@ -114,7 +112,7 @@ function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
 %                               less than xhi.
 %                               Replace highest boundary with xhi.
 %                           
-%  ~B  ~H     [x(n-1), dx, xhi]   Convert to bin boundaries at end; the final
+%  ~B  ~H     [x(n-1), dx, xhi] Convert to bin boundaries at end; the final
 %                               boundary will be greater than xhi but the
 %                               next highest less than xhi.
 %                               Replace highest boundary with xhi
@@ -147,13 +145,20 @@ function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
 %                               next highest less than xhi.
 %                               Replace highest boundary with xhi
 %
-% [-Inf, dx, x1]  (x1 finite)
+% [-Inf, dx, x2]  (x2 finite)
 % --------------
 % Treat this in the same way as [x(n-1), 0, Inf], except that:
-% (1) when dx~=0 the computations are done with x1 as the starting point 
-%   (i.e. the higher value) not x(n-1) (i.e. the lower value;
+% (1) when dx~=0 the computations are done with x2 as the starting point 
+%   (i.e. the higher value);
 % (2) when dx=0 the lower boundary is handled in mirror image to how the
 %   upper boundary was above.
+%
+% [-Inf, dx, Inf]  
+% ---------------
+% This is most straightforwardly handled by considering as a special case.
+% We do not need to handle the cases of is_boundaries true and false
+% separately, as we create the bin boundaries directly, with the bin 
+% centres having origin at x=0 (linear bins) or x=1 (logarithmic bins).
 
 
 del_array = xdescr(2:2:end);
@@ -169,6 +174,12 @@ end
 if narg==2 || narg==3
     xref = varargin{1};
     ishist = varargin{2};
+    if numel(xref)<1 || (ishist && numel(xref)<2)
+        % Check on number of elements of xref for both point and histogram
+        error('HERBERT:rebin_boundaries_from_descriptor:invalid_argument',...
+            ['''ref'' must have at least one element (point data) or\n',...
+            'two elements (histogram data)']);
+    end
 end
 
 if narg>3
@@ -185,21 +196,21 @@ if (any(del_array==0) || isinf(xdescr(1)) || isinf(xdescr(end))) &&...
         'is not given']);
 end
 
-% Catch case of [-Inf,del,Inf]
-% Most straightforwardly handled as a special case
-if numel(xdescr)==3 && isinf(xdescr(1)) && isinf(xdescr(3))
-    del = xdescr(2);
-    origin = 'c0';
-    if del > 0
-        [~, xout] = values_equal_steps (xref(1), del, xref(end), origin, tol);
-    elseif del < 0
-        [~, xout] = values_logarithmic_steps (xref(1), abs(del), xref(end),...
-            origin, tol);
-    else
-        xout = [];
-    end
-    return
-end
+% % Catch case of [-Inf,del,Inf]
+% % Most straightforwardly handled as a special case
+% if numel(xdescr)==3 && isinf(xdescr(1)) && isinf(xdescr(3))
+%     del = xdescr(2);
+%     origin = 'c0';
+%     if del > 0
+%         [~, xout] = values_equal_steps (xref(1), del, xref(end), origin, tol);
+%     elseif del < 0
+%         [~, xout] = values_logarithmic_steps (xref(1), abs(del), xref(end),...
+%             origin, tol);
+%     else
+%         xout = [];
+%     end
+%     return
+% end
 
 % Convert reference bin boundaries to centres, or vice versa, if required
 if any(del_array==0)
@@ -234,7 +245,7 @@ end
 
 % Loop over the descriptor intervals. On first pass accumulate the number
 % of points in each interval. On the second pass assign the output array
-% now that the total number of points is knownn, and then fill the output
+% now that the total number of points is known, and then fill the output
 % array.
 
 nout_filled = false;
@@ -248,10 +259,6 @@ while true
     ntot = 0;	% total number of bin boundaries in output array so far
     ndescr = floor(numel(xdescr)/2);    % number of descriptor intervals
     for i = 1:ndescr
-        % Generally, the origin for point generation is the lower interval
-        % limit
-        origin = 'x1';
-        
         % Get the lower and upper limits of the descriptor interval, and
         % the step size.
         % In the case of intervals where one of the bounds is infinite
@@ -261,11 +268,11 @@ while true
         % set of bin centres is turned into boundaries; at that point the
         % extremal values will be reassigned to the true data extrema.
         
-        if i==1 && isinf(xdescr(1)) 
+        first_and_negInf = i==1 && isinf(xdescr(1));
+        if first_and_negInf
             % Case that first descriptor starts with -Inf
-            origin = 'x2';  % origin for point generation is upper limit
             if ~is_boundaries && ishist
-                xlo = xref_tmp(1);
+                xlo = (xref(1) + xref(2))/2;    % use bin centre
             else
                 xlo = xref(1);
             end
@@ -275,15 +282,24 @@ while true
         
         del = xdescr(2*i);
         
-        if i==ndescr && isinf(xdescr(end))
+        last_and_posInf = (i==ndescr && isinf(xdescr(end)));
+        if last_and_posInf
             % Case that last descriptor ends with Inf
             if ~is_boundaries && ishist
-                xhi = xref_tmp(end);
+                xhi = (xref(end-1) + xref(end))/2;  % use bin centre
             else
                 xhi = xref(end);
             end
         else
             xhi = xdescr(2*i+1);
+        end
+        
+        if first_and_negInf && last_and_posInf
+            origin = 'c0';
+        elseif first_and_negInf
+            origin = 'x2';
+        else
+            origin = 'x1';
         end
         
         % Get the values (boundaries or centres; we convert to boundaries
@@ -319,48 +335,49 @@ while true
     end
     
     % Completed the loop over all ranges
-    % - If first pass, set nout and pass through again
-    % - If second pass, fill final point
-    % There are circumstances where a different behaviour is followed on
-    % the first pass.
+    % - If first pass, set nout and then pass through the loop again to
+    %   pre-assign xout and accumulate x values from each descriptor
+    %   interval
+    % - If second pass, accumulate the fill final point in the x array if 
+    %   there is at least one interval, or create a bin of width zero if
+    %   there is not.
     %
-    % Detailed explanation:
+    % Explanation in more detail:
     %
-    % In the case of the final interval being an explicitly finite one,
-    % [xlo,del,xhi], this will contribute at least one point (xlo) to
-    % xout, and the last point should be set to xhi. We end up with
-    % at least two points in xout, and all points are strictly
-    % monotonic increasing.
+    % If a descriptor interval has xlo < xhi then it will generate at least
+    % two points: xlo and xhi, the latter coming either because there is a
+    % following interval that will generate it as its first point, or
+    % because the interval is the last one and so xhi will be accumulated
+    % as the final point. (Recall that each descriptor generates points
+    % in the semi open interval [xlo,xhi) i.e. excludes xhi itself).
     %
-    % However, if one of the descriptor limits is -Inf or Inf it is
-    % possible to have no points from an interval because in these
-    % cases xlo >= xhi can occur if:
-    % (1) the interval is [-Inf,del,xhi] and the lower limit of the
-    %     data range is greater or equal to xhi;
-    % (2) the interval is [xlo,del,Inf] and the data range is less
-    %     than or equal to xlo.
-    % (Note, we consider the case [-Inf,del,Inf] separately elsewhere)
+    % Firstly, consider the case that at least one point has been
+    % generated by descriptor intervals. It follows there will need to be a
+    % last point accumulated from the final interval. This is because 
+    % either:
+    % - the final interval itself has xlo < xhi and so generates x values,
+    %   with xhi needed to be added at the end; or
+    % - if xlo >= xhi for the final interval, then the previous interval
+    % must have generated points (by supposition we have at least one point
+    % generated, and it cannot have come from the final interval).It is
+    % expected that the final point to be added is xhi, which is in fact
+    % xlo for the final interval.
+    % The final point is correctly computed in both cases by max(xlo,xhi)
     %
-    % Consider now the various cases where the final interval in the
-    % descriptor is not an explicitly finite one:
-    %
-    % - If the descriptor is only one semi-infinite interval, then
-    %   xlo > xhi is invalid. If xlo=xhi, this is valid if point data,
-    %   all points have same x (i.e. all x = xlo = xhi).
-    %
-    % - If the descriptor is just both intervals: [-Inf,d1,x0,d2,Inf]
-    %     - There could be no points if all data has x = x0. This will
-    %       be valid under the same circumstances as above for one
-    %       interval.
-    %     - If the data has a non-zero range, there will be one point
-    %       (x0 <= minimum of data, or x0 >= maximum of data), or two
-    %       points (x0 lies within the range of the data). We will get
-    %       the correct interval(s) in all cases if the last point of
-    %       xout is set to max(xlo,xhi) for the second interval.
-    %
-    % Note that max(xlo,xhi) will also correctly give xhi for an
-    % explicitly finite interval. The overall set of possibilities is
-    % covered
+    % Now consider the case where no points have been generated. Because 
+    % any explicitly finite interval [xlo,dx,xhi] must have xlo,xhi by
+    % supposition, this can only be because the full descriptor has one of
+    % the forms:
+    % - [-Inf, dx, Inf] with xlo=xhi
+    % - [-Inf, dx, xhi] with xlo=xhi
+    % - [ xlo, dx, Inf] with xlo=xhi
+    % - [-Inf, dx, x1, dx', Inf] with xlo=x1=xhi.
+    % In the last case, if xlo>x1 or xhi<x1 then one of the two descriptor
+    % intervals will have non-zero interval length and so will have
+    % generated one or more x-values.
+    % The situation of no points therefore only arises if all data points
+    % have the same value of x. This is valid in the case of point data,
+    % and we set the output bin to be [xlo,xhi] (here xlo=xhi of course).
     
     if ntot>0
         % At least one point already determined in xout; there is
@@ -374,7 +391,7 @@ while true
         end
     else
         % Case of no valid rebin range unless point data and all points
-        % have the same x value
+        % have the same x value: set single bin width zero, and return
         if ~ishist && xref(1)==xref(end)
             xout = [xref(1),xref(end)];
             return
@@ -387,7 +404,7 @@ while true
 end
 
 % At this point xout will be an array of at least two points and xout is
-% monotonically increasing.
+% strictly monotonically increasing.
 %
 % If the descriptor defined bin centres, compute the bin boundaries and
 % and then in the case of an original descriptor limit being infinite,

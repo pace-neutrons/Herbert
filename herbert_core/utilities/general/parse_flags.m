@@ -1,11 +1,12 @@
-function flags = parse_flags_simple (flagnames, varargin)
+function flags = parse_flags (flagnames, varargin)
 % Simple verification that argument list has form: flag1, flag2, flag3, ...
 %
-%   >> flags = parse_flags_simple (flagnames, varargin)
+%   >> flags = parse_flags (flagnames, varargin)
 %
 % Input:
 % ------
 %   flagnames       Cell array of strings containing the keywords
+%
 %   flag1, flag2,...Present flagnames
 %
 % Output:
@@ -23,7 +24,7 @@ function flags = parse_flags_simple (flagnames, varargin)
 %   >> flags = cell2struct (num2cell(flag_appeared), flagnames(:));
 
 
-flags = false(numel(flagnames), 1);
+flags = false(1, numel(flagnames));
 for i = 1:numel(varargin)
     name = varargin{i};
     ind = find(strncmpi(name, flagnames, numel(name)));

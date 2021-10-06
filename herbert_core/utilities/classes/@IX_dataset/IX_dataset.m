@@ -231,17 +231,15 @@ classdef (Abstract) IX_dataset
     
     %======================================================================
     methods(Static)
+        % Access internal function for testing purposes
+        varargout = test_gateway (func_name, varargin)
         
         %--- Not yet verified ---------------------------------------------
 
         % Read object or array of objects of an IX_dataset type from
         % a binary matlab file. Inverse of save.
         obj = read(filename);
-        
-        % Access internal function for testing purposes
-        function xout = test_rebin_descriptor_blocks(xdescr, varargin)
-            xout = rebin_values_from_descriptor (xdescr, varargin{:});
-        end
+
     end
     
     %======================================================================

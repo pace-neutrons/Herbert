@@ -52,7 +52,7 @@ if warn_count > 0
         if nargin==1
             fprintf(2, fmt, func_name, func_file);
         else
-            fmt = [fmt, 'Replace with equivalent function: %s\n'];
+            fmt = [fmt, 'Replace with function: %s\n'];
             fprintf(2, fmt, func_name, func_file, func_name_new);
         end
     end

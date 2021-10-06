@@ -2,31 +2,50 @@ function keyval = parse_keyval (keywords, varargin)
 % Simple verification that argument list has form: key1, val1, key2, val2, ...
 %
 %   >> keyval = parse_keyval (keywords, varargin)
+%   >> keyval = parse_keyval (keywords, keyval_default, varargin)
 %
 % Input:
 % ------
 %   keywords        Cell array of strings containing valid keywords
+%
+%   keyval_default  Cell array with default values for keywords that do not
+%                   appear in the list of arguments that follows.
+%                   If not given, then default values are all [].
+%                   [Optional argument - its presence/absence is determined
+%                    by the total number of input arguments being even/odd]
+%
 %   key1, key2, ... Keywords. Unambiguous abbreviations are accepted
 %   val1, val2, ... Associated values
 %
 % Output:
 % -------
-%   keyval          Structure with fields equal to the keywords and values
-%                   given in the argument list. If a keyword did not appear
-%                   its value is set to []
+%   keyval          Cell array with values of keywords. If a keyword is not
+%                   present, then the value is set to []
+%
+% This is a simple parsing utility function for a common task that attempts
+% to be fast by avoiding packaging output in a structure or cell array.
 
-
-keyval = cell2struct(repmat({[]}, numel(keywords), 1), keywords(:));
 
 narg=numel(varargin);
-if rem(narg,2)~=0
+
+if narg>=1 && iscell(varargin{1}) && numel(varargin{1})==numel(keywords)
+    % Default values must have been provided
+    keyval = varargin{1}(:)';
+    offset = 1;
+else
+    % No default values - use the default default
+    keyval = cell(1, numel(keywords));
+    offset = 0;
+end
+
+if rem(narg-offset,2)~=0
     error('HERBERT:parse_keyval:invalid_argument',...
         'Check number of arguments follows the form key1, val1, key2, val2, ...');
 end
 
 keyword_appeared = false(1, numel(keywords));
 for i = 1:narg/2
-    name = varargin{2*i-1};
+    name = varargin{2*i-1+offset};
     ind = find(strncmpi(name, keywords, numel(name)));
     if numel(ind)>1 % more than one match, see if can find an exact length match
         ind = find(strcmpi(name,keywords));
@@ -40,7 +59,7 @@ for i = 1:narg/2
     end
     if numel(ind)==1
         if ~keyword_appeared(ind)
-            keyval.(keywords{ind}) = varargin{2*i};
+            keyval{ind} = varargin{2*i+offset};
             keyword_appeared(ind) = true;
         else
             error('HERBERT:parse_keyval:invalid_argument',...

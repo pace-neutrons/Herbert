@@ -30,12 +30,6 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %                       Single bin over full data range
 %                       Equivalent to [-Inf,Inf]
 %
-%                       hist data: lowest bin boundary to highest boundary.
-%                       point data: lowest point position to highest.
-%                           - 'ave': will average all points; OK if range=0
-%                           - 'int': must have range>0, so will default to
-%                                    'ave' if range=0
-%
 %       Scalar:
 %         0             Leave bin boundaries/point positions as they are.
 %                       That is, make no changes along the axis.
@@ -45,16 +39,6 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %                       over full range of data (dx>0); or logarithmic bins
 %                       centred on x=1 (dx<0)
 %                       Equivalent to [-Inf,dx,Inf]
-% 
-%                       hist data: will encompass outer bin boundaries,
-%                                  even if that means the outer bins have
-%                                  width less than dx
-%                       point data: will encompass outer point positions
-%                                  even if that means the outer bins have
-%                                  width less than dx
-%                           - 'ave': will average all points; OK if range=0
-%                           - 'int': must have range>0, so will default to
-%                                    'ave' if range=0
 %
 %       Pair of values:
 %         [xlo, xhi]- - range_is_one_bin==true:
@@ -66,17 +50,6 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %                       Keep original bin boundaries/point positions in the
 %                       range xlo to xhi.
 %                       Equivalent to [xlo,0,xhi]
-%
-%                       hist data: If the bin boundaries are not coincident
-%                                  with xlo &/or xhi then the outer bin(s)
-%                                  will have width less than dx
-%                       point data: will encompass outer point positions
-%                                  even if that means the outer bins have
-%                                  width less than dx
-%                           - 'ave': simply keeps points unaltered within
-%                                  or at the edges of the range; ok if the
-%                                  range=0
-%                           - 'int': must have range>0
 %
 %                   
 %       Three of more values:
@@ -172,12 +145,12 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %
 % Notes:
 % - 
-% - The input binning descriptions do not include the possibility of asking
-%   for one or two bin centres. This was not a deliberate design decision,
-%   but emerged as a requirement when the prior functionality for bin 
-%   centres was enhanced. Retaining existing syntax is inconsistent with
-%   allowing two bin centres. From a user perspective, this is trivially
-%   overcome by simply supplying the output of the function call:
+% - The input binning descriptions do not include the possibility of
+%   providing two bin centres. This was not a deliberate design decision,
+%   but emerged when the prior functionality for bin centres was enhanced.
+%   Retaining existing syntax is inconsistent with allowing two bin
+%   centres. From a user perspective, this is trivially overcome by simply
+%   supplying the output of the function call:
 %   bin_boundaries([x1,x2])
 
 
@@ -212,14 +185,16 @@ elseif isscalar(xin)
     end
     
 elseif numel(xin) == 2
-    if (xin(1) < xin(2)) || (bin_opts.range_is_one_bin && xin(1)==xin(2))
+    if xin(1) <= xin(2)
         % We allow the special case of a single bin with width zero:
         % - It is valid for the special case of point data where all points
         %   have the same value of x==xin(1)==xin(2)
         % - The case of binning descriptions with -Inf &/or Inf can be 
         %   resolved into this case in a later function if it turns out
         %   that the data has zero range.
-        if bin_opts.range_is_one_bin
+        % We include the case ~range_is_one_bin if the two limits are the
+        % same - we treat it as one bin.
+        if bin_opts.range_is_one_bin || xin(1)==xin(2)
             xout = [xin(1), xin(2)];
             is_descriptor = false;
             resolved = (isfinite(xin(1)) && isfinite(xin(2)));

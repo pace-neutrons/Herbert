@@ -132,7 +132,7 @@ sz_out = [sz(1:idim-1), nx, sz(idim+1:end)];
 
 % Check optional parameters
 flagnames = {'alldata', 'sum', 'integrate'};
-flags = parse_flags_simple (flagnames, varargin{:});
+flags = parse_flags (flagnames, varargin{:});
 alldata = flags(1);
 integrate = flags(2);
 sum_signal = flags(3);

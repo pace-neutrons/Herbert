@@ -30,8 +30,8 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, varargin)
 %
 %   xref            Reference axis values.
 %                    - If bin boundaries then there will be at least two
-%                      values and with bin widths greater than zero (i.e.
-%                      the values are strictly monotonic increasing)
+%                      values and all bin widths are greater than zero
+%                      (i.e. the values are strictly monotonic increasing)
 %                    - If bin centres, then they will be monotonic
 %                      increasing, but there may be repeated values, which
 %                      corresponds to two or more data points that have the
@@ -51,11 +51,11 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, varargin)
 %               values are the same 
 
 if ~(isinf(xin(1)) || isinf(xin(end)))
-    % All input values are all finite
+    % All input values are finite
     if is_boundaries
         xout = xin;
     else
-        xout = bin_boundaries (xin);
+        xout = bin_boundaries (xin);    % there are at least two centres
     end
     
 else
@@ -105,6 +105,11 @@ else
     narg = numel(varargin);
     if narg==1 || narg==2
         xref = varargin{1};
+        if numel(xref)<1
+            % A most basic check to catch serious misuse of xref
+            error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
+                'Reference x values array cannot be empty');
+        end
         if narg==2
             tol = varargin{2};
         else
@@ -130,7 +135,7 @@ else
         % supposition - see input argument description), so
         % we are guaranteed to have at least one, non-zero width bin
         % at the conclusion of this block of code.
-        xout = bin_boundaries(xin(1+isinf(xin(1)):end-isinf(xin(end))));
+        xout = bin_boundaries (xin(1+isinf(xin(1)):end-isinf(xin(end))));
         if xin(1) == -Inf
             if xlo < xout(1)
                 % Data lies outside bin boundaries, so add an extra bin
@@ -184,6 +189,8 @@ else
                         xout = [xlo, xout];
                     end
                 else
+                    % Limit of data greater than outer bin; truncate bin at
+                    % the data minimum or lowest bin boundary
                     xout(1) = min(xlo, xout(1));
                 end
             else
@@ -203,6 +210,8 @@ else
                     xout = [xout, xhi];
                 end
             else
+                % Limit of data less than outer bin; truncate bin at
+                % the data maximum or largest bin boundary
                 xout(end) = max(xhi, xout(end));
             end
         end
