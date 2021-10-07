@@ -28,8 +28,7 @@ classdef MFParallel_Job < JobExecutor
 
             if isfield(data, 'tobyfit_data')
                 for i=1:numel(data.tobyfit_data)
-                    psidisp(['~/dump/dat',num2str(i)], data.tobyfit_data(i), obj.common_data_.pin(i).plist_, obj.common_data_.pin(i).plist_{3})
-                    obj.common_data_.pin(i).plist_{3} = data.tobyfit_data(i);
+                    obj.common_data_.pin(i).plist_{3} = data.tobyfit_data{i};
                 end
             end
 
@@ -50,7 +49,7 @@ classdef MFParallel_Job < JobExecutor
                 obj.common_data_.listing);
 
             % Output some data
-            obj.task_outputs = struct('f', obj.yc, 'v', obj.vc, 'S', S, 'Store', Store);
+            obj.task_outputs = struct('f', {obj.yc}, 'v', {obj.vc}, 'S', S, 'Store', Store);
 
         end
     end

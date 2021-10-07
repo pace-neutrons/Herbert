@@ -106,73 +106,210 @@ function [ycalc,varcalc,S,Store]=multifit_lsqr_func_eval(w,xye,func,bfunc,plist,
 %   points can be implicitly indicated in the object, so that the required method
 %   sigvar_get for the object returns a mask array.
 
+
 % Original author: T.G.Perring
 
 % Initialise store if required
 S=Sin;
 if isempty(S)
     S.store_filled=false;
-    S.pstore=cell(size(plist));
-    S.bpstore=cell(size(bplist));
-    S.fcalc_store=cell(size(w));
-    S.fvar_store=cell(size(w));
-    S.bcalc_store=cell(size(w));
-    S.bvar_store=cell(size(w));
-    S.fstate_store=cell(size(w));
-    S.bfstate_store=cell(size(w));
+    S.pstore=cell(size(plist)); S.bpstore=cell(size(bplist));
+    S.fcalc_store=cell(size(w)); S.fvar_store=cell(size(w));
+    S.bcalc_store=cell(size(w)); S.bvar_store=cell(size(w));
+    S.fstate_store=cell(size(w)); S.bfstate_store=cell(size(w));
 end
-
 Store=Store_in;
 if isempty(Store)
     Store.fore=[];
     Store.back=[];
 end
 
-nw = numel(w);
+fcalc=cell(size(w)); fvar=cell(size(w)); bcalc=cell(size(w)); bvar=cell(size(w));
 
 [p,bp]=ptrans_par(pf,p_info);    % Get latest numerical parameters
 caller.reset_state=~store_calc;
 caller.ind=[];
 
-if all(xye)
-    if ~f_pass_caller_info
-        [fcalc, fvar, fcalc_filled, fcalculated, S.fcalc_store, S.fvar_store] = ...
-            calc_xye(w, p, plist, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled);
-
-        [bcalc, bvar, bcalc_filled, bcalculated, S.bcalc_store, S.bvar_store] = ...
-            calc_xye(w, bp, bplist, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled);
-
+nw=numel(w);
+% Get foreground function calculated values for non-empty functions, and store if required
+if numel(func)==1
+    if ~isempty(func{1})
+        fcalc_filled=true(nw,1);
+        if S.store_filled && all(p{1}==S.pstore{1})
+            fcalc=S.fcalc_store;
+            fvar=S.fvar_store;
+            fcalculated=false(nw,1);
+        else
+            pars=plist_update(plist(1),p{1});
+            for iw=1:nw
+                caller.ind=iw;
+                if xye(iw)
+                    if ~f_pass_caller_info
+                        fcalc{iw}=func{1}(w{iw}.x{:},pars{:});
+                    else
+                        [fcalc{iw},fstate,Store.fore]=func{1}(w{iw}.x{:},caller,...
+                            S.fstate_store(iw),Store.fore,pars{:});
+                    end
+                    fvar{iw}=zeros(size(fcalc{iw}));
+                else
+                    if ~f_pass_caller_info
+                        wcalc=func{1}(w{iw},pars{:});
+                    else
+                        [wcalc,fstate,Store.fore]=func{1}(w{iw},caller,...
+                            S.fstate_store(iw),Store.fore,pars{:});
+                    end
+                    [fcalc{iw},fvar{iw},msk]=sigvar_get(wcalc);
+                    fcalc{iw}=fcalc{iw}(msk);         % remove the points that we are told to ignore
+                    fvar{iw}=fvar{iw}(msk);
+                end
+                fcalc{iw}=fcalc{iw}(:); % make column vector
+                fvar{iw}=fvar{iw}(:);
+                if store_calc
+                    S.fcalc_store{iw}=fcalc{iw};
+                    S.fvar_store{iw}=fvar{iw};
+                    if f_pass_caller_info, S.fstate_store(iw)=fstate; end
+                end
+            end
+            fcalculated=true(nw,1);
+        end
     else
-        [fcalc, fvar, fcalc_filled, fcalculated, S.fcalc_store, S.fvar_store, S.fstate_store] = ...
-            calc_xye_w_info(w, p, plist, caller, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled, S.fstate_store, Store.fore);
-
-        [bcalc, bvar, bcalc_filled, bcalculated, S.bcalc_store, S.bvar_store, S.bstate_store] = ...
-            calc_xye_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bfstate_store, Store.back);
-
+        fcalc_filled=false(nw,1);
+        fcalculated=false(nw,1);
     end
-
-elseif all(~xye)
-    if ~f_pass_caller_info
-        [fcalc, fvar, fcalc_filled, fcalculated, S.fcalc_store, S.fvar_store] = ...
-            calc_sqw(w, p, plist, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled);
-
-        [bcalc, bvar, bcalc_filled, bcalculated, S.bcalc_store, S.bvar_store] = ...
-            calc_sqw(w, bp, bplist, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled);
-
-    else
-
-        [fcalc, fvar, fcalc_filled, fcalculated, S.fcalc_store, S.fvar_store, S.fstate_store] = ...
-            calc_sqw_w_info(w, p, plist, caller, func, S.pstore, S.fcalc_store, S.fvar_store, store_calc, S.store_filled, S.fstate_store, Store.fore);
-
-        [bcalc, bvar, bcalc_filled, bcalculated, S.bcalc_store, S.bvar_store, S.bstate_store] = ...
-            calc_sqw_w_info(w, bp, bplist, caller, bfunc, S.bpstore, S.bcalc_store, S.bvar_store, store_calc, S.store_filled, S.bfstate_store, Store.back);
-
-    end
-
 else
-
-    error('HERBERT:mfclass:badxye', 'Mix of xye and sqw data not implemented')
+    fcalc_filled=false(nw,1);
+    fcalculated=false(nw,1);
+    for iw=1:nw
+        caller.ind=iw;
+        if ~isempty(func{iw})
+            fcalc_filled(iw)=true;
+            if S.store_filled && all(p{iw}==S.pstore{iw})
+                fcalc{iw}=S.fcalc_store{iw};
+                fvar{iw}=S.fvar_store{iw};
+            else
+                pars=plist_update(plist(iw),p{iw});
+                if xye(iw)
+                    if ~f_pass_caller_info
+                        fcalc{iw}=func{iw}(w{iw}.x{:},pars{:});
+                    else
+                        [fcalc{iw},fstate,Store.fore]=func{iw}(w{iw}.x{:},caller,...
+                            S.fstate_store(iw),Store.fore,pars{:});
+                    end
+                    fvar{iw}=zeros(size(fcalc{iw}));
+                else
+                    if ~f_pass_caller_info
+                        wcalc=func{iw}(w{iw},pars{:});
+                    else
+                        [wcalc,fstate,Store.fore]=func{iw}(w{iw},caller,...
+                            S.fstate_store(iw),Store.fore,pars{:});
+                    end
+                    [fcalc{iw},fvar{iw},msk]=sigvar_get(wcalc);
+                    fcalc{iw}=fcalc{iw}(msk);       % remove the points that we are told to ignore
+                    fvar{iw}=fvar{iw}(msk);
+                end
+                fcalc{iw}=fcalc{iw}(:); % make column vector
+                fvar{iw}=fvar{iw}(:);
+                if store_calc
+                    S.fcalc_store{iw}=fcalc{iw};
+                    S.fvar_store{iw}=fvar{iw};
+                    if f_pass_caller_info, S.fstate_store(iw)=fstate; end
+                end
+                fcalculated(iw)=true;
+            end
+        end
+    end
 end
+
+
+% Update background function calculated values for non-empty functions, and store if required
+if numel(bfunc)==1
+    if ~isempty(bfunc{1})
+        bcalc_filled=true(nw,1);
+        if S.store_filled && all(bp{1}==S.bpstore{1})
+            bcalc=S.bcalc_store;
+            bvar=S.bvar_store;
+            bcalculated=false(nw,1);
+        else
+            pars=plist_update(bplist(1),bp{1});
+            for iw=1:nw
+                caller.ind=iw;
+                if xye(iw)
+                    if ~bf_pass_caller_info
+                        bcalc{iw}=bfunc{1}(w{iw}.x{:},pars{:});
+                    else
+                        [bcalc{iw},bfstate,Store.back]=bfunc{1}(w{iw}.x{:},caller,...
+                            S.bfstate_store(iw),Store.back,pars{:});
+                    end
+                    bvar{iw}=zeros(size(bcalc{iw}));
+                else
+                    if ~bf_pass_caller_info
+                        wcalc=bfunc{1}(w{iw},pars{:});
+                    else
+                        [wcalc,bfstate,Store.back]=bfunc{1}(w{iw},caller,...
+                            S.bfstate_store(iw),Store.back,pars{:});
+                    end
+                    [bcalc{iw},bvar{iw},msk]=sigvar_get(wcalc);
+                    bcalc{iw}=bcalc{iw}(msk);           % remove the points that we are told to ignore
+                    bvar{iw}=bvar{iw}(msk);
+                end
+                bcalc{iw}=bcalc{iw}(:); % make column vector
+                bvar{iw}=bvar{iw}(:);
+                if store_calc
+                    S.bcalc_store{iw}=bcalc{iw};
+                    S.bvar_store{iw}=bvar{iw};
+                    if bf_pass_caller_info, S.bfstate_store(iw)=bfstate; end
+                end
+            end
+            bcalculated=true(nw,1);
+        end
+    else
+        bcalc_filled=false(nw,1);
+        bcalculated=false(nw,1);
+    end
+else
+    bcalc_filled=false(nw,1);
+    bcalculated=false(nw,1);
+    for iw=1:nw
+        caller.ind=iw;
+        if ~isempty(bfunc{iw})
+            bcalc_filled(iw)=true;
+            if S.store_filled && all(bp{iw}==S.bpstore{iw})
+                bcalc{iw}=S.bcalc_store{iw};
+                bvar{iw}=S.bvar_store{iw};
+            else
+                pars=plist_update(bplist(iw),bp{iw});
+                if xye(iw)
+                    if ~bf_pass_caller_info
+                        bcalc{iw}=bfunc{iw}(w{iw}.x{:},pars{:});
+                    else
+                        [bcalc{iw},bfstate,Store.back]=bfunc{iw}(w{iw}.x{:},caller,...
+                            S.bfstate_store(iw),Store.back,pars{:});
+                    end
+                    bvar{iw}=zeros(size(bcalc{iw}));
+                else
+                    if ~bf_pass_caller_info
+                        wcalc=bfunc{iw}(w{iw},pars{:});
+                    else
+                        [wcalc,bfstate,Store.back]=bfunc{iw}(w{iw},caller,...
+                            S.bfstate_store(iw),Store.back,pars{:});
+                    end
+                    [bcalc{iw},bvar{iw},msk]=sigvar_get(wcalc);
+                    bcalc{iw}=bcalc{iw}(msk);       % remove the points that we are told to ignore
+                    bvar{iw}=bvar{iw}(msk);
+                end
+                bcalc{iw}=bcalc{iw}(:); % make column vector
+                bvar{iw}=bvar{iw}(:);
+                if store_calc
+                    S.bcalc_store{iw}=bcalc{iw};
+                    S.bvar_store{iw}=bvar{iw};
+                    if bf_pass_caller_info, S.bfstate_store(iw)=bfstate; end
+                end
+                bcalculated(iw)=true;
+            end
+        end
+    end
+end
+
 
 % Update parameters in store
 if store_calc
@@ -198,7 +335,11 @@ if nw==1
     else
         error('Logic error in multifit. See T.G.Perring')
     end
+    ycalc = {ycalc};
+    varcalc = {varcalc};
 else
+    ycalc = cell(iw, 1);
+    varcalc = cell(iw, 1);
     for iw=1:nw
         if ~fcalc_filled(iw) && bcalc_filled(iw)
             fcalc{iw}=zeros(size(bcalc{iw}));
@@ -209,17 +350,15 @@ else
         elseif ~fcalc_filled(iw) && ~bcalc_filled(iw)
             error('Logic error in multifit. See T.G.Perring')
         end
+        ycalc{iw} = fcalc{iw} + bcalc{iw};
+        varcalc{iw} = fvar{iw} + bvar{iw};
     end
-    % Package data for return
-    ycalc = cat(1,fcalc{:}) + cat(1,bcalc{:});    % one long column vector
-    varcalc = cat(1,fvar{:}) + cat(1,bvar{:});    % one long column vector
+
 end
 
 % Write diagnostics to screen, if requested
 if listing>2
     list_calculated_funcs(fcalculated,bcalculated)
-end
-
 end
 
 %------------------------------------------------------------------------------
@@ -232,8 +371,6 @@ if iscell(tmp.plist)
     plist_cell=tmp.plist;           % case of {@func,plist,c1,c2,...}, {p,c1,c2,...}, {c1,c2,...} or {}
 else
     plist_cell={tmp.plist};         % catch case of p or c1<0> (see mfclass_plist)
-end
-
 end
 
 %------------------------------------------------------------------------------
@@ -258,195 +395,3 @@ else
     disp('    Calculated background datasets:  n/a')
 end
 disp(' ')
-
-end
-
-function [calc, var, calc_filled, calculated, pstore, calc_store, var_store] = ...
-        calc_xye(w, p, plist, func, pstore, calc_store, var_store, store_calc, store_filled)
-
-    nw=numel(w);
-    calc_filled=false(nw,1);
-    calculated=false(nw,1);
-    calc = cell(nw, 1);
-    var = cell(nw, 1);
-
-    if numel(func) == 1
-        jw = @()(1);
-    else
-        jw = @() evalin('caller', 'iw');
-    end
-
-
-    for iw=1:nw
-        k = jw();
-        if isempty(func{k})
-            continue;
-        end
-        calc_filled(iw)=true;
-
-        if store_filled && all(p{k}==pstore{k})
-            calc{iw}=calc_store{iw};
-            var{iw}=var_store{iw};
-            continue;
-        end
-        pars=plist_update(plist(k),p{k});
-        calc{iw}=func{k}(w{iw}.x{:},pars{:});
-        var{iw}=zeros(size(calc{iw}));
-        calc{iw}=calc{iw}(:); % make column vector
-        var{iw}=var{iw}(:);
-        calculated(iw)=true;
-
-        if store_calc
-            calc_store{iw}=calc{iw};
-            var_store{iw}=var{iw};
-        end
-
-    end
-end
-
-function [calc, var, calc_filled, calculated, calc_store, var_store] = ...
-        calc_sqw(w, p, plist, func, pstore, calc_store, var_store, store_calc, store_filled)
-
-    nw=numel(w);
-    calc_filled=false(nw, 1);
-    calculated=false(nw, 1);
-    calc = cell(nw, 1);
-    var = cell(nw, 1);
-
-    if numel(func) == 1
-        jw = @()(1);
-    else
-        jw = @() evalin('caller', 'iw');
-    end
-
-    for iw=1:nw
-        k = jw();
-        if isempty(func{k})
-            continue;
-        end
-
-        calc_filled(iw)=true;
-
-        if store_filled && all(p{k}==pstore{k})
-            calc{iw}=calc_store{iw};
-            var{iw}=var_store{iw};
-            continue;
-        end
-
-        pars=plist_update(plist(k),p{k});
-
-        wcalc=func{k}(w{iw},pars{:});
-        [calc{iw},var{iw},msk]=sigvar_get(wcalc);
-
-        calc{iw}=calc{iw}(msk);       % remove the points that we are told to ignore
-        var{iw}=var{iw}(msk);
-        calc{iw}=calc{iw}(:); % make column vector
-        var{iw}=var{iw}(:);
-
-        if store_calc
-            calc_store{iw}=calc{iw};
-            var_store{iw}=var{iw};
-        end
-
-        calculated(iw)=true;
-    end
-
-end
-
-
-function [calc, var, calc_filled, calculated, pstore, calc_store, var_store, state_store] = ...
-        calc_xye_w_info(w, p, plist, caller, func, pstore, calc_store, var_store, store_calc, store_filled, state_store, foreback)
-
-    nw=numel(w);
-    calc_filled=false(nw,1);
-    calculated=false(nw,1);
-    calc = cell(nw, 1);
-    var = cell(nw, 1);
-
-    if numel(func) == 1
-        jw = @()(1);
-    else
-        jw = @() evalin('caller', 'iw');
-    end
-
-    for iw=1:nw
-        k = jw();
-        caller.ind=iw;
-        if isempty(func{k})
-            continue;
-        end
-        calc_filled(iw)=true;
-        if store_filled && all(p{k}==pstore{k})
-            calc{iw}=calc_store{iw};
-            var{iw}=var_store{iw};
-            continue;
-        end
-        pars=plist_update(plist(k),p{k});
-        [calc{iw},state,foreback]=func{k}(w{iw}.x{:},caller,...
-                                                state_store(iw),foreback,pars{:});
-        var{iw}=zeros(size(calc{iw}));
-        calc{iw}=calc{iw}(:); % make column vector
-        var{iw}=var{iw}(:);
-        if store_calc
-            calc_store{iw}=calc{iw};
-            var_store{iw}=var{iw};
-            state_store(iw)=state;
-        end
-        calculated(iw)=true;
-    end
-end
-
-function [calc, var, calc_filled, calculated, calc_store, var_store, state_store] = ...
-        calc_sqw_w_info(w, p, plist, caller, func, pstore, calc_store, var_store, store_calc, store_filled, state_store, foreback)
-
-    nw=numel(w);
-    calc_filled=false(nw, 1);
-    calculated=false(nw, 1);
-    calc = cell(nw, 1);
-    var = cell(nw, 1);
-
-    if numel(func) == 1
-        jw = @()(1);
-    else
-        jw = @() evalin('caller', 'iw');
-    end
-
-    for iw=1:nw
-        k = jw();
-        caller.ind=iw;
-        if isempty(func{k})
-            continue;
-        end
-        calc_filled(iw)=true;
-
-        if store_filled && all(p{k}==pstore{k})
-            calc{iw}=calc_store{iw};
-            var{iw}=var_store{iw};
-            continue;
-        end
-
-        pars=plist_update(plist(k),p{k});
-        try
-% $$$             [wcalc,state,foreback]=func{k}(w{iw},caller,state_store(iw),foreback,pars{:});
-            [wcalc, state] =func{k}(w{iw},caller,state_store(iw),foreback,pars{:});
-        catch ME
-% $$$             psidisp('~/dump/bbb', func{k}, w{iw},caller,state_store(iw),foreback,pars{:});
-            wcalc = func{k}(w{iw},pars{:},caller,state_store(iw),foreback);
-            state = [];
-% $$$             psidisp('~/dump/aaa', a);
-% $$$             rethrow(ME)
-        end
-
-        [calc{iw},var{iw},msk]=sigvar_get(wcalc);
-        calc{iw}=calc{iw}(msk);       % remove the points that we are told to ignore
-        var{iw}=var{iw}(msk);
-        calc{iw}=calc{iw}(:); % make column vector
-        var{iw}=var{iw}(:);
-        if store_calc
-            calc_store{iw}=calc{iw};
-            var_store{iw}=var{iw};
-            state_store(iw)=state;
-        end
-        calculated(iw)=true;
-    end
-end
