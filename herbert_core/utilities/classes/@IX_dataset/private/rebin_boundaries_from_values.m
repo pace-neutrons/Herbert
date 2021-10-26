@@ -3,11 +3,11 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, varargin)
 %
 % If x-axis values are all finite:
 %   >> xout = rebin_boundaries_from_values (xin, is_boundaries)
-%   >> xout = rebin_boundaries_from_values (xin, is_boundaries, tol)
 %
 % General case:
 %   >> xout = rebin_boundaries_from_values (xin, is_boundaries, xref)
 %   >> xout = rebin_boundaries_from_values (xin, is_boundaries, xref, tol)
+%
 %
 % Input:
 % ------
@@ -18,7 +18,7 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, varargin)
 %
 %       The special case of n=2, finite x1, x2 and x1=x2 is permitted (a
 %       bin of zero width, which will be valid if point data, all points
-%       with x=x1)
+%       with x=x1=x2)
 %
 %   is_boundaries   Logical flag:
 %                    - true if xin defines bin boundaries
@@ -50,12 +50,29 @@ function xout = rebin_boundaries_from_values (xin, is_boundaries, varargin)
 %               It is possible to end up with just two bin boundaries whose
 %               values are the same 
 
+
+% Parse input arguments
+tol = 1e-10;    % default
+
+narg = numel(varargin);
+if narg==1
+    xref = varargin{1};
+elseif narg==2
+    xref = varargin{1};
+    tol = varargin{2};
+elseif narg~=0
+    error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
+        'Too many input arguments');
+end
+
+
+% Branch if values are all finite or not
 if ~(isinf(xin(1)) || isinf(xin(end)))
     % All input values are finite
     if is_boundaries
         xout = xin;
     else
-        xout = bin_boundaries (xin);    % there are at least two centres
+        xout = bin_boundaries (xin);    % OK as there are at least two centres
     end
     
 else
@@ -100,29 +117,6 @@ else
     %       principle states. Therefore the lowest bin boundary is set
     %       to 9.5. If The data minimum was 10.5, then it would be set
     %       to 10, as this appeared in the bin centres list.
-    
-    % Parse input arguments
-    narg = numel(varargin);
-    if narg==1 || narg==2
-        xref = varargin{1};
-        if numel(xref)<1
-            % A most basic check to catch serious misuse of xref
-            error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
-                'Reference x values array cannot be empty');
-        end
-        if narg==2
-            tol = varargin{2};
-        else
-            tol = 1e-10;    % default
-        end
-    elseif narg > 2
-        error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
-            'Too many input arguments');
-    else
-        error('HERBERT:rebin_boundaries_from_values:invalid_argument',...
-            ['Reference binning information required to resolve infinities ',...
-            'is not given']);
-    end
     
     xlo = xref(1);
     xhi = xref(end);
@@ -172,9 +166,9 @@ else
     else
         % Bin boundaries, or bin centres with one or no finite value (and
         % so not possible to generate bin boundaries).
-        % It is possible to have a single bin [xlo,xhi] at the end,
-        % This will be valid if the data is point data and all points
-        % have the same value of x == xlo.
+        % It is possible to have a single bin [xlo,xhi] with xlo=xhi at the
+        % end. This will be valid if the data is point data and all points
+        % have the same value of x == xlo == xhi.
         xout = xin(1+isinf(xin(1)):end-isinf(xin(end)));
         if xin(1) == -Inf
             if ~isempty(xout)

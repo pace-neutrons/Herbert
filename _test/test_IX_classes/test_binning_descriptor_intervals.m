@@ -222,7 +222,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_23 (self)
             xref = [];
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 6);
+                3, xref, 6, '[)');
             xout_ref = 3;
             assertEqual (np,1)
             assertEqual (xout, xout_ref)
@@ -232,7 +232,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_24 (self)
             xref = [0,1,2];
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 6);
+                3, xref, 6, '[)');
             xout_ref = 3;
             assertEqual (np,1)
             assertEqual (xout, xout_ref)
@@ -242,7 +242,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_25 (self)
             xref = [0,10];
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 6);
+                3, xref, 6, '[)');
             xout_ref = 3;
             assertEqual (np,1)
             assertEqual (xout, xout_ref)
@@ -252,7 +252,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_26 (self)
             xref = [10,11,12];
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 6);
+                3, xref, 6, '[)');
             xout_ref = 3;
             assertEqual (np,1)
             assertEqual (xout, xout_ref)
@@ -262,7 +262,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_27 (self)
             xref = 1:10;
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 6);
+                3, xref, 6, '[)');
             xout_ref = [3,4,5];
             assertEqual (np,3)
             assertEqual (xout, xout_ref)
@@ -272,7 +272,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_28 (self)
             xref = 1:10;
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 6.1);
+                3, xref, 6.1, '[)');
             xout_ref = [3,4,5,6];
             assertEqual (np,4)
             assertEqual (xout, xout_ref)
@@ -282,7 +282,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_29 (self)
             xref = 1:10;
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                3, xref, 3);
+                3, xref, 3, '[)');
             xout_ref = [];
             assertEqual (np,0)
             assertEqual (xout, xout_ref);
@@ -294,7 +294,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_30 (self)
             xref = [];
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                6, xref, 3);
+                6, xref, 3, '[)');
             xout_ref = [];
             assertEqual (np,0)
             assertEqual (xout, xout_ref)
@@ -304,7 +304,7 @@ classdef test_binning_descriptor_intervals < TestCaseWithSave
         function test_31 (self)
             xref = 1:10;
             [np, xout] = IX_dataset.test_gateway ('values_contained_points',...
-                6, xref, 3);
+                6, xref, 3, '[)');
             xout_ref = [];
             assertEqual (np,0)
             assertEqual (xout, xout_ref)

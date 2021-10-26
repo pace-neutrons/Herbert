@@ -161,5 +161,31 @@ classdef test_binning_from_values < TestCaseWithSave
             assertEqual (xout, [5, 5])
         end
         %--------------------------------------------------------------------------
+        function test_9 (self)
+            % Cases when values outside range of data
+            is_boundaries = true;
+            xout = IX_dataset.test_gateway('rebin_boundaries_from_values',...
+                [6, Inf], is_boundaries, [5,5.5,5.99]);
+            assertEqual (xout, [6,6])
+            
+            is_boundaries = false;
+            xout = IX_dataset.test_gateway('rebin_boundaries_from_values',...
+                [6, Inf], is_boundaries, [5,5.5,5.99]);
+            assertEqual (xout, [6,6])
+        end
+        %--------------------------------------------------------------------------
+        function test_10 (self)
+            % Cases when values outside range of data
+            is_boundaries = true;
+            xout = IX_dataset.test_gateway('rebin_boundaries_from_values',...
+                [-Inf, 4], is_boundaries, [5,5.5,5.99]);
+            assertEqual (xout, [4,4])
+            
+            is_boundaries = false;
+            xout = IX_dataset.test_gateway('rebin_boundaries_from_values',...
+                [-Inf, 4], is_boundaries, [5,5.5,5.99]);
+            assertEqual (xout, [4,4])
+        end
+        %--------------------------------------------------------------------------
     end
 end
