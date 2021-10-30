@@ -109,18 +109,18 @@ if is_descriptor
     del_array = xdescr(2:2:end);
     if (any(del_array==0) || isinf(xdescr(1)) || isinf(xdescr(end))) &&...
             ~xref_present
-        error('HERBERT:rebin_boundaries_from_descriptor:invalid_argument',...
+        error('HERBERT:rebin_values_from_descriptor:invalid_argument',...
             ['Reference binning information required to resolve descriptor ',...
             'is not given']);
     end
     
     % Resolve descriptors and then any infinities
     if xref_present
-        xvals = rebin_boundaries_from_descriptor...
+        xvals = rebin_values_from_descriptor...
             (xdescr, is_boundaries, xref, ishist, tol);
         xout = rebin_boundaries_from_values (xvals, is_boundaries, xref, tol);
     else
-        xvals = rebin_boundaries_from_descriptor (xdescr, is_boundaries, tol);
+        xvals = rebin_values_from_descriptor (xdescr, is_boundaries, tol);
         xout = rebin_boundaries_from_values (xvals, is_boundaries, tol);
     end
     

@@ -61,7 +61,7 @@ function obj_out = rebin_IX_dataset_ (obj, iax, config, varargin)
 %               
 %               Depending on the values of the fields in config.bin_opts
 %               there are a number of different formats and defaults that
-%               are valid. See the function rebin_binning_description_parse
+%               are valid. See the function rebin_parse_binning_description
 %               for details.
 %
 %               If iax is scalar i.e. there is only one integration axis, 
@@ -126,12 +126,12 @@ end
 if ~(numel(varargin)==1 && isa(varargin{1},class(obj))) && ...
         (numel(varargin)>=1 && ~isnumeric(varargin{end}))
     % Last argument is point averaging option
-    point_average_method = rebin_point_averaging_parse (varargin{end}, niax);
+    point_average_method = rebin_parse_point_averaging (varargin{end}, niax);
     args = varargin(1:end-1);
     
 else
     % Use default point averaging method
-    point_average_method = rebin_point_averaging_parse (...
+    point_average_method = rebin_parse_point_averaging (...
         config.point_average_method_default, niax);
     args = varargin;
 end
@@ -183,7 +183,7 @@ else
         resolved = false(1, niax);
         for i = 1:niax
             [xdescr{i}, is_descriptor(i), is_boundaries(i), resolved(i)] = ...
-                rebin_binning_description_parse (args{i}, config.bin_opts);
+                rebin_parse_binning_description (args{i}, config.bin_opts);
         end
         
     elseif niax==1 && all(cellfun(@isscalar, args)) &&...
@@ -191,7 +191,7 @@ else
         % Single axis, all args are numeric scalars: collect as single array
         xdescr = cell(1, 1);
         [xdescr{1}, is_descriptor, is_boundaries, resolved] = ...
-            rebin_binning_description_parse (cell2mat(args), config.bin_opts);
+            rebin_parse_binning_description (cell2mat(args), config.bin_opts);
         
     else
         error('HERBERT:rebin_IX_dataset_:invalid_argument',...

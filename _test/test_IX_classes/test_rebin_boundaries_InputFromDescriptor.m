@@ -1,4 +1,4 @@
-classdef test_binning_rebin_boundaries < TestCaseWithSave
+classdef test_rebin_boundaries_InputFromDescriptor < TestCaseWithSave
     % Test generation of bin boundaries from binning descriptors
     properties
         xref
@@ -9,7 +9,7 @@ classdef test_binning_rebin_boundaries < TestCaseWithSave
     
     methods
         %--------------------------------------------------------------------------
-        function self = test_binning_rebin_boundaries (name)
+        function self = test_rebin_boundaries_InputFromDescriptor (name)
             self@TestCaseWithSave(name);
             
             % Conventional looking xref
@@ -67,7 +67,7 @@ classdef test_binning_rebin_boundaries < TestCaseWithSave
             f = @()IX_dataset.test_gateway('rebin_boundaries',...
                 [6.1,0,6.4], is_descriptor, is_boundaries);
             assertExceptionThrown(f,...
-                'HERBERT:rebin_boundaries_from_descriptor:invalid_argument');
+                'HERBERT:rebin_values_from_descriptor:invalid_argument');
         end
         
         %==========================================================================
@@ -212,7 +212,7 @@ classdef test_binning_rebin_boundaries < TestCaseWithSave
 %             f = @()IX_dataset.test_gateway('rebin_boundaries',...
 %                 [6,0.1,Inf], is_descriptor, is_boundaries, [3,4,5], ishist);
 %             assertExceptionThrown(f,...
-%                 'HERBERT:rebin_boundaries_from_descriptor:invalid_argument');
+%                 'HERBERT:rebin_values_from_descriptor:invalid_argument');
 %         end
         
         %--------------------------------------------------------------------------
@@ -222,6 +222,39 @@ classdef test_binning_rebin_boundaries < TestCaseWithSave
             ishist = false;
             xout = IX_dataset.test_gateway('rebin_boundaries',...
                 [5, 0, Inf], is_descriptor, is_boundaries, [5,5,5], ishist);
+            tol = [1e-14,1e-14];
+            assertEqualToTol (xout, [5, 5], tol)
+        end
+        
+        %--------------------------------------------------------------------------
+        function test_i11 (self)
+            is_descriptor = true;
+            is_boundaries = false;
+            ishist = false;
+            xout = IX_dataset.test_gateway('rebin_boundaries',...
+                [-Inf, 0, 5, 0, Inf], is_descriptor, is_boundaries, [5,5,5], ishist);
+            tol = [1e-14,1e-14];
+            assertEqualToTol (xout, [5, 5], tol)
+        end
+        
+        %--------------------------------------------------------------------------
+        function test_i12 (self)
+            is_descriptor = true;
+            is_boundaries = false;
+            ishist = false;
+            xout = IX_dataset.test_gateway('rebin_boundaries',...
+                [-Inf, 0, 5, 0, Inf], is_descriptor, is_boundaries, [6,6,6], ishist);
+            tol = [1e-14,1e-14];
+            assertEqualToTol (xout, [5, 6], tol)
+        end
+        
+        %--------------------------------------------------------------------------
+        function test_i13 (self)
+            is_descriptor = true;
+            is_boundaries = false;
+            ishist = false;
+            xout = IX_dataset.test_gateway('rebin_boundaries',...
+                [-Inf, 0, 5, 0, Inf], is_descriptor, is_boundaries, [5,5,5], ishist);
             tol = [1e-14,1e-14];
             assertEqualToTol (xout, [5, 5], tol)
         end

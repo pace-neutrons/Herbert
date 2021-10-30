@@ -1,9 +1,9 @@
 function [xout, is_descriptor, is_boundaries, resolved] = ...
-    rebin_binning_description_parse(xin, bin_opts)
+    rebin_parse_binning_description(xin, bin_opts)
 % Checks binning description has valid format, and returns in standard form
 %
 %   >> [xout, is_descriptor, resolved] = ...
-%                       rebin_binning_description_parse (xin, bin_opts)
+%                       rebin_parse_binning_description (xin, bin_opts)
 %
 % Input:
 % ------
@@ -41,7 +41,7 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 %                       Equivalent to [-Inf,dx,Inf]
 %
 %       Pair of values:
-%         [xlo, xhi]- - range_is_one_bin==true:
+%         [xlo, xhi]  - range_is_one_bin==true:
 %                       Single bin
 %
 %                           *OR*
@@ -157,7 +157,7 @@ function [xout, is_descriptor, is_boundaries, resolved] = ...
 % Ensure xvals is empty, or is a numeric vector without NaNs
 % (First pass of clearing out globally erroneous formats)
 if ~isempty(xin) && (~isnumeric(xin) || ~isvector(xin) || any(isnan(xin)))
-    error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+    error('HERBERT:rebin_parse_binning_description:invalid_argument',...
         'Binning description must be numeric vector without NaNs, or empty')
 end
 
@@ -204,14 +204,14 @@ elseif numel(xin) == 2
             resolved = false;
         end
     else
-        error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+        error('HERBERT:rebin_parse_binning_description:invalid_argument',...
             'Upper limit must be greater than lower limit in a binning descriptor');
     end
     
 elseif numel(xin) >= 3
     % Check -Inf and +Inf are being used correctly
     if xin(1) == Inf || xin(end) == -Inf || any(isinf(xin(2:end-1)))
-        error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+        error('HERBERT:rebin_parse_binning_description:invalid_argument',...
             ['Improper use of Inf in binning description: the first element can be -Inf,\n',...
             'the final element can be +Inf, and all in between must be finite']);
     end
@@ -240,15 +240,15 @@ elseif numel(xin) >= 3
                     resolved = (isfinite(xin(1)) && isfinite(xin(2)) &&...
                         all(dx~=0));
                 else
-                    error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+                    error('HERBERT:rebin_parse_binning_description:invalid_argument',...
                         'Rebin descriptor cannot have logarithmic bins for negative axis values');
                 end
             else
-                error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+                error('HERBERT:rebin_parse_binning_description:invalid_argument',...
                     'Bin ranges in rebin descriptor must be strictly monotonic increasing');
             end
         else
-            error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+            error('HERBERT:rebin_parse_binning_description:invalid_argument',...
                 'Rebin descriptor must have the form: [x1,dx1,x2, dx2,...xn]');
         end
         
@@ -260,7 +260,7 @@ elseif numel(xin) >= 3
             is_descriptor = false;
             resolved = (isfinite(xin(1)) && isfinite(xin(2)));
         else
-            error('HERBERT:rebin_binning_description_parse:invalid_argument',...
+            error('HERBERT:rebin_parse_binning_description:invalid_argument',...
                 ['Rebin values must be a strictly monotonic increasing vector ',...
                 'i.e. all bin widths > 0']);
         end

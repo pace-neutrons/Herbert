@@ -1,7 +1,7 @@
-function method = rebin_point_averaging_parse(option, nax)
+function method = rebin_parse_point_averaging(option, nax)
 % Check point rebinning option: trapezoidal integration or point averaging
 %
-%   >> method = rebin_point_averaging_parse (option, nax)
+%   >> method = rebin_parse_point_averaging (option, nax)
 %
 % Input:
 % ------
@@ -26,17 +26,17 @@ if ok
         if all(ind>0)
             method = valid_options(repmat(ind(:)',[1,nax/numel(ind)]));
         else
-            error('HERBERT:rebin_point_averaging_parse:invalid_argument',...
+            error('HERBERT:rebin_parse_point_averaging:invalid_argument',...
                 ['An ambiguous abbreviation or an invalid point ',...
                 'averaging option has been given']);
         end
     else
-        error('HERBERT:rebin_point_averaging_parse:invalid_argument',...
+        error('HERBERT:rebin_parse_point_averaging:invalid_argument',...
             ['Must give just one point averaging method, or one for ',...
             'each of the %d rebinning axes'], nax);
     end
 else
-    error('HERBERT:rebin_point_averaging_parse:invalid_argument',...
+    error('HERBERT:rebin_parse_point_averaging:invalid_argument',...
         'Point averaging option has incorrect format');
 end
 

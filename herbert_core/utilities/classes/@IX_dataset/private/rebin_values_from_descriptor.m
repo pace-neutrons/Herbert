@@ -1,17 +1,17 @@
-function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
+function xout = rebin_values_from_descriptor (xdescr, is_boundaries,...
     varargin)
 % Get new x values from a bin boundary descriptor
 %
 % If no retained input values and descriptor ranges are all finite:
-%   >> xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries)
+%   >> xout = rebin_values_from_descriptor (xdescr, is_boundaries)
 %
-%   >> xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries, tol)
+%   >> xout = rebin_values_from_descriptor (xdescr, is_boundaries, tol)
 %
 % General case:
-%   >> xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
+%   >> xout = rebin_values_from_descriptor (xdescr, is_boundaries,...
 %                                                       xref, ishist)
 %
-%   >> xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
+%   >> xout = rebin_values_from_descriptor (xdescr, is_boundaries,...
 %                                                       xref, ishist, tol)
 %
 % Input:
@@ -68,103 +68,27 @@ function xout = rebin_boundaries_from_descriptor (xdescr, is_boundaries,...
 %         [x1, dx1, x2, dx2, x3,...xn]
 %               where -Inf <= x1 < x2 < x3...< xn <= Inf  (n >= 2)
 %
-% The descriptors define bin boundaries or bin centres according as
-% is_boundaries. At the end generated bin centres are converted to bin
-% boundaries as the return argument xout is always bin boundaries.
+% The descriptors define bin boundaries or bin centres according to the
+% value of is_boundaries.
 %
 % Inf and -Inf are resolved into the extremes of the data, that is
-% xhi = xref(end) and xlo = xref(1), regardless of whether xref is point
-% or histogram data. That is because these are the true extremes of the
-% data.
+% xn = xref(end) and x1 = xref(1), regardless of whether xref originates
+% from point data, or defines bin centres or bin boundaries for histogram
+% data. That is because these are the true extremes of the data.
 %
-% Each descriptor block  [x(m), dx(m), x(m+1)] is filled independently in
-% turn. The functions that do this for the three cases dx>0, dx<0, dx=0 all
-% return values starting at x(m) and excluding x(m+1), as the next block
-% will provide the value x(m+1) as its starting value. The exceptions are
-% the first and last descriptor blocks:
+% The values defined by each descriptor block  [x(m), dx(m), x(m+1)] that
+% satisfy x(m) < {x} < x(m+1) are accumulated into the output array xout, 
+% interleaved by the terminal values for the blocks x2, x3...x(n-2),
+% x(n-1). The first and last values of xout are set to the original values
+% of x1 and xn, that is, if x1 was -Inf it will be set to that in xout 
+% rather than the resolved value xref(1).
 %
-% - if generating boundaries, then the first block will include x(1) (if it
-%   generates any points at all: if x(1) and/or x(2) is resolved from
-%   -Inf &/or Inf then we could have x(1) >= x(2) in which case there will
-%   be no points generated at all)
-%
-% - if generating bin centres, then the last block will *not* include x(n)
-%
-%
-%
-% Consider different cases:
-%
-% [x(m), dx, x(m+1)]  (x(m), x(m+1) finite)
-% -------------------
-%   - If dx=0, use reference data. Convert to bin centres or boundaries
-%     as required by value of is_boundaries (here abbreviated to B) from
-%     the reference values which are boundaries or not according to ishist
-%     (here abbreviated to H).
-%
-%   - If (B & ~H) then get unique values of xref before converting to bin
-%     boundaries (as point data may have several points at the same value
-%     of x); if only one point, then use this as a boundary (i.e. treat the
-%     data as having two identical bin boundaries, but recognise that for
-%     a valid IX_dataset bin boundaries must be strictly monotonic
-%     increasing).
-%
-%   - If (~B & H) then we may end up with just one bin centre. That is OK.
-%
-% *Note: by supposition xref will have to have at least two bin boundaries
-%        (H) or one point value (~H) or an error will have been thrown
-%        before reaching this function. This is even though a valid
-%        IX_dataset can have a single boundary or no point value. These
-%        cases are not recognised as being valid for providing a reference
-%        x array for bin boundary generation.
-%
-% [x(n-1), dx, Inf]  (x(n-1) finite)
-% ------------------
-% If dx~=0:     Compute:
-%   B   H     [x(n-1), dx, xhi]
-%   B  ~H     [x(n-1), dx, xhi]
-%  ~B   H     [x(n-1), dx, xhi] Convert to bin boundaries at end
-%                               Then replace final boundary with xhi, or
-%                               append xhi if
-%
-%  ~B  ~H     [x(n-1), dx, xhi) Convert to bin boundaries at end; the final
-%                               boundary will be greater than xhi but the
-%                               next highest less than xhi.
-%                               Replace highest boundary with xhi
-%
-% *Note: in the case of ~B, we perform the generation of bin boundaries
-% once all descriptors have been computed and concatenated. This is
-% because the final boundaries are dependent on the entire set of bin
-% centres.
-%
-% If dx=0:
-%   B   H     [x(n-1), 0, xhi]  Use xref for reference points
-%
-%   B  ~H     [x(n-1), 0, xhi]  Use bin boundaries computed from xref as
-%                               reference points
-%
-%  ~B   H     [x(n-1), 0, chi]  Use bin centres computed from xref as
-%                               reference points.
-%                               chi is highest bin centre, which will
-%                               satisfy chi < xhi
-%                               Convert to bin boundaries at end; the final
-%                               boundary will be greater than chi but the
-%                               next highest less than chi and therefore
-%                               less than xhi.
-%                               Replace highest boundary with xhi.
-%
-%  ~B  ~H     [x(n-1), 0, xhi]  Use xref for reference points
-%                               Convert to bin boundaries at end; the final
-%                               boundary will be greater than xhi but the
-%                               next highest less than xhi.
-%                               Replace highest boundary with xhi
-%
-% [-Inf, dx, x2]  (x2 finite)
-% --------------
-% Treat this in the same way as [x(n-1), 0, Inf], except that:
-% (1) when dx~=0 the computations are done with x2 as the starting point
-%   (i.e. the higher value);
-% (2) when dx=0 the lower boundary is handled in mirror image to how the
-%   upper boundary was above.
+% The final resolution of xout (converting bin centres to boundaries if
+% is_boundaries is false, and handling -Inf &/or Inf as the extremal
+% values) needs to be performed by the function 
+% rebin_boundaries_from_values. This ensures complete consistency of the
+% treatment of values generated by this function and the case when rebin
+% methods are passed x-values directly.
 
 
 % Parse input arguments
@@ -179,7 +103,7 @@ if narg==2 || narg==3
     xref = varargin{1};
     ishist = varargin{2};
 elseif narg>3
-    error('HERBERT:rebin_boundaries_from_descriptor:invalid_argument',...
+    error('HERBERT:rebin_values_from_descriptor:invalid_argument',...
         'Too many input arguments');
 end
 
@@ -187,32 +111,49 @@ end
 % Convert reference bin boundaries to centres, or vice versa, if required
 del_array = xdescr(2:2:end);
 if any(del_array==0)
-    if is_boundaries && ~ishist
-        % Descriptor of bin boundaries, reference data is centres or points
-        % but need to fill an interval with reference bin boundaries
+    if ~ishist
+        % We need to find unique values of the reference array. While it is
+        % monotonic increasing (by supposition), it may have repeated x
+        % values if it originates from true point data as opposed to bin
+        % centres of a histogram.
         %
         % If there is only one unique point value; retain this as a single
         % value as cannot have a final output set of bin boundaries where
-        % there are two equal bin boundaries
-        if numel(xref)==1
-            xref_tmp = xref;
-        else
-            xref_unique = xref(diff(xref)~=0);
+        % there are two equal bin boundaries.
+        if is_boundaries
+            % Descriptor is of bin boundaries, and the reference data is bin
+            % centres or points. However, there is at least one interval that
+            % needs to be filled with reference bin boundaries; therefore we
+            % need to generate bin boundaries from the reference bin centres
+            % or point data.
+            %
+            % If there is only one unique point value; retain this as a single
+            % value as cannot have a final output set of bin boundaries where
+            % there are two equal bin boundaries.
+            xref_unique = xref([true, diff(xref)~=0]);
             if numel(xref_unique)==1
                 xref_tmp = xref_unique;
             else
                 xref_tmp = bin_boundaries (xref_unique);
             end
+        else
+            % Descriptor is for bin centres, so just need to retain unique
+            % values
+            xref_tmp = xref([true, diff(xref)~=0]);
         end
         
-    elseif ~is_boundaries && ishist
-        % Descriptor of bin centres, reference data is bin boundaries but
-        % need to fill up an interval with reference centres
-        xref_tmp = bin_centres (xref);  % OK as at least two elements of xref
-        
     else
-        % Use xref unchanged
-        xref_tmp = xref;
+        if ~is_boundaries
+            % Descriptor is of bin centres, and the reference data is bin
+            % boundaries. However, there is at least one interval that
+            % needs to be filled with reference bin centres; therefore we
+            % need to generate bin centres from the reference bin boundaries.
+            xref_tmp = bin_centres (xref);  % OK as numel(xref)>=2 by supposition
+            
+        else
+            % Use xref unchanged
+            xref_tmp = xref;
+        end
     end
 end
 
@@ -263,7 +204,9 @@ while ~xout_allocated
             xhi = xdescr(2*i+1);
         end
         
-        % Get origin for values
+        % Get origin for values, and set the interval as being open
+        % The end points of the descriptor intervals will be interleaved
+        % explicitly.
         if first_and_Inf && last_and_Inf
             if is_boundaries
                 type = '(c0)';
@@ -286,8 +229,7 @@ while ~xout_allocated
         end
         ntot = ntot + 1;
         
-        % Get the values (boundaries or centres; we convert to boundaries
-        % at the end)
+        % Get the values
         if del > 0
             % Equally spaced bins
             np = values_equal_steps (xlo, del, xhi, type, tol);

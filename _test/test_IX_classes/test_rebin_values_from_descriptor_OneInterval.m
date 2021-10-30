@@ -1,10 +1,10 @@
-classdef test_binning_descriptor_intervals < TestCaseWithSave
+classdef test_rebin_values_from_descriptor_OneInterval < TestCaseWithSave
     % Test the individual descriptor generators in a full binning
     % description
     
     methods
         %--------------------------------------------------------------------------
-        function self = test_binning_descriptor_intervals (name)
+        function self = test_rebin_values_from_descriptor_OneInterval (name)
             self@TestCaseWithSave(name);
             
             self.save()

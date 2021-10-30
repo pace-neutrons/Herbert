@@ -1,14 +1,14 @@
 function keyval = parse_keyval (keywords, varargin)
-% Simple verification that argument list has form: key1, val1, key2, val2, ...
+% Parse keyword-argument list of form: key1, val1, key2, val2, ...
 %
-%   >> keyval = parse_keyval (keywords, varargin)
-%   >> keyval = parse_keyval (keywords, keyval_default, varargin)
+%   >> val = parse_keyval (keywords, varargin)
+%   >> val = parse_keyval (keywords, defaults, key1, val1, key2, val2, ...)
 %
 % Input:
 % ------
 %   keywords        Cell array of strings containing valid keywords
 %
-%   keyval_default  Cell array with default values for keywords that do not
+%   defaults        Cell array with default values for keywords that do not
 %                   appear in the list of arguments that follows.
 %                   If not given, then default values are all [].
 %                   [Optional argument - its presence/absence is determined
@@ -54,7 +54,7 @@ for i = 1:narg/2
                 'Ambiguous abbreviation of a keyword - check input arguments');
         elseif numel(ind)>1
             error('HERBERT:parse_keyval:invalid_argument',...
-                'List of keywords is in error - problem in calling program');
+                'List of keywords is in error - problem in caller function');
         end
     end
     if numel(ind)==1

@@ -19,13 +19,18 @@ function [hh_1d_gau,hp_1d_gau,pp_1d_gau]=make_testdata_IX_dataset_1d (nx0, nw, v
 %               Each IX_dataset_1d will have between nx0 and (1+nfrac)*nx0
 %              data points, where nfrac is by default 0.2 (but can be set to
 %              another value with option '-nfrac' below)
+%
 %   nw          Number of workspaces in the output IX_dataset_1d arrays
+%
 %   height      Peak of Gaussian
 %                   Default: 10
+%
 %   cent        Centre of Gaussian
 %                   Default: 5
+%
 %   sig         Standard deviations along x and y axes [sigx, sigy]
 %                   Default: 2.5
+%
 %   range       Range of data, centred on cent_xy
 %                   Default: 10
 %
@@ -34,6 +39,7 @@ function [hh_1d_gau,hp_1d_gau,pp_1d_gau]=make_testdata_IX_dataset_1d (nx0, nw, v
 %               datasets to be regenerated.
 %               Positive integer
 %                   Default: the current value on entry (so random)
+%
 %   '-nfrac',val Maximum number of additional points as a fraction of nx0.
 %               A random number of additional point points is chosen with a
 %              hat distribution. Can be set to zero by putting val=0.

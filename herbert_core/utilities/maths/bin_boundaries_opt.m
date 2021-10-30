@@ -1,6 +1,17 @@
 function [xb,ok,mess]=bin_boundaries_opt(xc)
 % Get best estimate of bin boundaries as a row vector
 %
+%**************************************************************************
+% 2021-08-03:
+%
+% This function is marked for deprecation. Please replace with a call to
+% the function:   bin_boundaries
+%
+% This function will be removed at some point a year after the date of this
+% message.
+%
+%**************************************************************************
+%
 %   >> [xb,ok,mess]=bin_boundaries_opt(xc)
 %
 % Input:
@@ -17,11 +28,6 @@ function [xb,ok,mess]=bin_boundaries_opt(xc)
 %   mess    Message; ='' if OK
 %
 % If one point only, then bin boundaries are set to row vector [x-0.5,x+0.5]
-%
-% *****************************************************************
-% Deprecated function (2021-08-03)
-%   Likely to be removed at some point in the future
-%   Replace with function: bin_boundaries
 
 
 %--------------------------------------------------------------------------

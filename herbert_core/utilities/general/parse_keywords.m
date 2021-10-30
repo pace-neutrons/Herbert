@@ -2,8 +2,13 @@ function [ok,mess,ind,val]=parse_keywords(keywords,varargin)
 % Simple verification that argument list has form: key1, val1, key2, val2, ...
 %
 %**************************************************************************
+% 2021-10-30:
 %
-% This function is marked for deprecation. Please do not use
+% This function is marked for deprecation. Please replace with a call to
+% the function:   parse_keyval
+%
+% This function will be removed at some point a year after the date of this
+% message.
 %
 %**************************************************************************
 %
@@ -28,6 +33,16 @@ function [ok,mess,ind,val]=parse_keywords(keywords,varargin)
 
 % T.G.Perring 20/3/11: Changes w.r.t. Libisis and mgenie version
 %  - now check for unambiguous abbreviations
+
+%--------------------------------------------------------------------------
+% Deprecated function warning
+persistent warn_count
+if isempty(warn_count), warn_count = 3; end
+
+new_fun = 'parse_keyval';
+warn_count = warning_deprecated_function (warn_count, new_fun);
+%--------------------------------------------------------------------------
+
 
 narg=numel(varargin);
 if rem(narg,2)~=0

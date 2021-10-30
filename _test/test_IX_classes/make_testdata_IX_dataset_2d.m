@@ -16,13 +16,18 @@ function [hh_gau, hp_gau, ph_gau, pp_gau] = make_testdata_IX_dataset_2d...
 % Input:
 % ------
 %   nx          Number of data points along x axis
+%
 %   ny          Number of data points along y axis
+%
 %   height      Peak of 2D Gaussian
 %                   Default: 10
+%
 %   cent_xy     Centre of 2D Gaussian [x,y]
 %                   Default: [5, 3]
+%
 %   sig_xy      Standard deviations along x and y axes [sigx, sigy]
 %                   Default: [2.5, 1.5]
+%
 %   range_xy    Range of data, centred on cent_xy
 %                   Default: [10, 6]
 %

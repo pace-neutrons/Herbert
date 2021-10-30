@@ -36,7 +36,6 @@ function warn_count = warning_deprecated_function (warn_count, func_name_new)
 %               :
 
 
-
 % Default is to print out the message 100 times
 if isempty(warn_count)
     warn_count = 100;

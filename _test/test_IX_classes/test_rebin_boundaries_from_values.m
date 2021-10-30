@@ -1,9 +1,9 @@
-classdef test_binning_from_values < TestCaseWithSave
+classdef test_rebin_boundaries_from_values < TestCaseWithSave
     % Test generation of bin boundaries from binning descriptors
     
     methods
         %--------------------------------------------------------------------------
-        function self = test_binning_from_values (name)
+        function self = test_rebin_boundaries_from_values (name)
             self@TestCaseWithSave(name);            
             
             self.save()
