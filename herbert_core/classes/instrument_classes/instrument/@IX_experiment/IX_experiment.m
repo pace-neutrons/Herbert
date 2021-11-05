@@ -35,7 +35,6 @@ classdef IX_experiment < serializable
             % return the version of the IX-experiment class
             ver = 1;
         end
-        
         %
         function is = isempty(obj)
             is = false(size(obj));
@@ -48,6 +47,7 @@ classdef IX_experiment < serializable
                 end
             end
         end
+        %
         function obj = IX_experiment(varargin)
             if nargin==0
                 return
@@ -66,7 +66,7 @@ classdef IX_experiment < serializable
                     obj = input ;
                     return
                 elseif isstruct(input)
-                    flds = obj.indepFields();                    
+                    flds = obj.indepFields();
                     for i=1:numel(flds)
                         fld = flds{i};
                         obj.(fld) = input.(fld);
