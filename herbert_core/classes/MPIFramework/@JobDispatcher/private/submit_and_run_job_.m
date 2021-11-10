@@ -43,7 +43,7 @@ function [outputs,n_failed,task_ids,obj] = submit_and_run_job_(obj,...
 
 
     % wait until the job finishes
-    waiting_time = 0.1;
+    waiting_time = obj.task_wait_time;
 
     % Checks between prints
     nWait = obj.task_check_time / waiting_time;
