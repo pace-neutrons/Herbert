@@ -275,7 +275,7 @@ classdef JobExecutor
             %              ['-synchronous'|'-asynchronous']);
             %
             % Where the first form waits until all workers return
-            %'completed' message to the lab == 1,
+            % 'completed' message to the lab == 1,
             % The second form if message is not empty,
             % return of SomeMessage (usually 'failed' message)
             % asynchronous.

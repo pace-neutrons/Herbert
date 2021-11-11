@@ -5,18 +5,18 @@ classdef ClusterHerbertStateTester < ClusterHerbert
     % Overloads init method to communicate via reflective framework
     % and sets up job control to return state from the inputs, provided to
     % init_state propetry
-    
+
     properties(Dependent)
         % the state, fake cluster comes into after initialization
         init_state
     end
     properties
-        
+
     end
     properties(Access=protected)
         init_state_ = 'running';
     end
-    
+
     methods
         function obj = ClusterHerbertStateTester(n_workers,log_level)
             % Constructor, which initiates fake MPI wrapper
@@ -37,11 +37,11 @@ classdef ClusterHerbertStateTester < ClusterHerbert
             % log_level    if present, defines the verbosity of the
             %              operations over the framework
             obj = obj@ClusterHerbert();
-            
+
             if nargin < 1
                 return;
             end
-            
+
             if ~exist('log_level', 'var')
                 log_level = -1;
             end
@@ -56,19 +56,19 @@ classdef ClusterHerbertStateTester < ClusterHerbert
                 'test_ClusterMPIexecStates',...
                 'MessagesFilebased', 0,n_workers,'test_mode');
             meexch = MessagesFileBasedMPI_mirror_tester(control_struc);
-            
+
             obj = init@ClusterWrapper(obj,n_workers,meexch,log_level);
-            
+
             obj.tasks_handles_ = cell(1,n_workers);
             for i=1:n_workers
                 obj.tasks_handles_{i} = fake_handle_for_test();
             end
-            
+
             obj.init_state = obj.init_state_;
-            
+
             % check if job control API reported failure
             obj.check_failed();
-            
+
         end
         %
         function state=get.init_state(obj)
@@ -102,10 +102,10 @@ classdef ClusterHerbertStateTester < ClusterHerbert
                 running = false;
                 mess = CompletedMessage('Successful completion');
             end
-            
+
         end
         %
-        
+
     end
-    
+
 end

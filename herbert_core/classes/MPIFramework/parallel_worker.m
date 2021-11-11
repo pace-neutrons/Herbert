@@ -42,6 +42,8 @@ if ~exist('do_html_profiling', 'var')
     do_html_profiling = false;
 end
 
+%DO_LOGGING = true;
+
 try
 
     % Check current state of mpi framework and set up deployment status
@@ -133,8 +135,10 @@ while keep_worker_running
             mess = FailedMessage(err_mess);
             fbMPI.send_message(0,mess);
             ok = MESS_CODES.runtime_error;
-            if exit_at_the_end;     quit(254);
-            else;                   return;
+            if exit_at_the_end
+                quit(254);
+            else
+                return;
             end
         else
             worker_init_data = mess.payload;
@@ -209,7 +213,7 @@ while keep_worker_running
     try
         if do_logging; log_init_je_finished();  end
         if ~isempty(mess)
-            err = sprinft(' Error sending ''started'' message from task N%d',...
+            err = sprintf(' Error sending ''started'' message from task N%d',...
                 fbMPI.labIndex);
             error('WORKER:init_worker',err);
         end
