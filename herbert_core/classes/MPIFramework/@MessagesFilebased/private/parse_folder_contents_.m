@@ -80,23 +80,12 @@ if numel(mess_files) ==0
         varargout{1}  = {};
     end
     return;
-    
+
 end
 % Sort messages according to their access date, the most recent come first
 if isfield(mess_files,'datenum')
     mess_date = arrayfun(@extract_datenum,mess_files,'UniformOutput',true);
-    invalid = isnan(mess_date);
-    if any(invalid)
-        mess_date = mess_date(~invalid);
-        if isempty(mess_date)
-            [mess_names,mid_from,mid_to]=set_empty();
-            if nargout > 3
-                varargout{1}  = {};
-            end
-            return;
-        end
-        mess_files = mess_files(~invalid);
-    end
+
     %[~,ind] = sort(mess_date,'descend');
     [~,ind] = sort(mess_date); %  dos command sorts files with oldest coming last
     mess_files = mess_files(ind);
@@ -199,4 +188,3 @@ else
     is_lock = false;
 end
 end
-

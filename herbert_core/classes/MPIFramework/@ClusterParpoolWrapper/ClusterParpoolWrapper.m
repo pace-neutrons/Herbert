@@ -32,7 +32,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
         %Unavailable ( 'unavailable' , 102 )
         %Destroyed   ( 'deleted'     , 103 )
     end
-    
+
     methods
         function obj = ClusterParpoolWrapper(n_workers,mess_exchange_framework)
             % Constructor, which initiates wrapper around Matlab Parallel
@@ -62,7 +62,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             obj.started_info_message_  = ...
                 '*** Matlab MPI job started                                 ***\n';
             obj.cluster_config_ = 'default';
-            
+
             % The default name of the messages framework, used for communications
             % between the nodes of the parallel job
             obj.pool_exchange_frmwk_name_ = 'MessagesParpool';
@@ -92,12 +92,12 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             if ~exist('log_level', 'var')
                 log_level = -1;
             end
-            
+
             obj = init@ClusterWrapper(obj,n_workers,mess_exchange_framework,log_level);
             assert(~obj.is_compiled_script_, ...
                 'HERBERT:ClusterParpoolWrapper:invalid_argument', ...
                 'Parpool cluster does not work with compiled workers')
-            
+
             % delete interactive parallel cluster if any exist
             cl = gcp('nocreate');
             if ~isempty(cl)
@@ -109,11 +109,11 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             cs = obj.mess_exchange_.get_worker_init(obj.pool_exchange_frmwk_name);
             obj.common_env_var_('WORKER_CONTROL_STRING')=cs;
             pc = parallel_config;
-            
-            
+
+
             cl  = parcluster();
             cl.JobStorageLocation = pc.working_directory;
-            
+
             % By default Matlab only utilises physical cores; enable use of
             % logical cores if required
             n_requested_workers = obj.n_workers;
@@ -123,7 +123,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
                     cl.NumWorkers = n_requested_workers;
                 end
             end
-            
+
             num_labs = cl.NumWorkers;
             if num_labs < obj.n_workers
                 error('HERBERT:ClusterParpoolWrapper:invalid_argument',...
@@ -131,7 +131,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
                     obj.job_id,obj.n_workers,num_labs);
             end
             cjob = createCommunicatingJob(cl,'Type','SPMD');
-            
+
             if n_workers > 0
                 cjob.NumWorkersRange  = obj.n_workers;
             end
@@ -142,18 +142,18 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             obj.set_env();
             h_worker = str2func(obj.worker_name_);
             task = createTask(cjob,h_worker,0,{cs});
-            
+
             obj.cluster_ = cl;
             obj.current_job_  = cjob;
             obj.task_ = task;
-            
+
             %actually submit the job
             submit(cjob);
             %wait(cjob);
-            
+
             % check if job control API reported failure
             obj.check_failed();
-            
+
         end
         %
         function obj=finalize_all(obj)
@@ -164,7 +164,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
                 delete(obj.current_job_);
                 obj.current_job_ = [];
             end
-            
+
         end
         %
         function check_availability(obj)
@@ -185,7 +185,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             is = ~isempty(obj.task_);
         end
         %------------------------------------------------------------------
-        
+
     end
     methods(Access = protected)
         function ex = exit_worker_when_job_ends_(~)
@@ -198,7 +198,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             %
             cljob = obj.current_job_;
             state = cljob.State;
-            
+
             code = obj.cluster_name2code(state);
             if code == 3 % job is running
                 running = true;
@@ -225,14 +225,14 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             paused = false;
             running= false;
             failed = true;
-            
+
             %ErrorMessage	Message from task error
             err = obj.task_.Error;
             %Error	Task error information
             messer_txt = obj.task_.ErrorMessage;
             %ErrorIdentifier	Task error identifier
             err_id = obj.task_.ErrorIdentifier;
-            
+
             fail_text = sprintf('Cluster job: %s failed. Message: %s, Code: %d',obj.job_id,messer_txt,err_id);
             if isa(err,'MException')
                 rep_err = err;
@@ -249,5 +249,5 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             mess   = FailedMessage(fail_text,rep_err);
         end
     end
-    
+
 end

@@ -50,9 +50,11 @@ end
 %% =====================================================================================================================
 %  Perform tests
 % ======================================================================================================================
+
 pin=[100,50,7,0,0];
 
 tol = [1e-10,1e-8];
+
 
 % Single dataset
 % ----------------
@@ -83,7 +85,6 @@ pars=[fs1b.bp,fs1b.p];
 [ok,mess]=equal_to_tol(pars, fs1_ref.p, tol);
 if ~ok, assertTrue(false,mess), end
 
-
 % Two datasets
 % ----------------
 % Legacy syntax - retain for future use
@@ -105,6 +106,7 @@ pars_ref=[fm4_ref.bp{1},fm4_ref.bp{2}];
 pars=[fm4.p{1},fm4.bp{1},fm4.p{2},fm4.bp{2}];
 [ok,mess]=equal_to_tol(pars, pars_ref, tol);
 if ~ok, assertTrue(false,mess), end
+
 
 
 %---------------------------------------------
@@ -264,10 +266,10 @@ if ~ok, assertTrue(false,mess), end
 % ======================================================================================================================
 if ~save_output
     output_file=fullfile(rootpath,results_filename);
-    
+
     warning('off','MATLAB:unknownObjectNowStruct');
     clob = onCleanup(@()(warning('on','MATLAB:unknownObjectNowStruct')));
-    
+
     old=load(output_file);
     nam=fieldnames(old);
     tol=[1e-10,1e-8];
@@ -292,7 +294,7 @@ if save_output
     disp('===========================')
     disp('    Save output')
     disp('===========================')
-    
+
     output_file=fullfile(tmp_dir,results_filename);
     save(output_file,...
         'ws1_ref','fs1_ref','ws1a','fs1a','ws1b','fs1b',...
@@ -302,9 +304,8 @@ if save_output
         'wm7_ref','fm7_ref','wm7a','fm7a','wm7b','fm7b',...
         'wm8_ref','fm8_ref','wm8','fm8',...
         'wm9_ref','fm9_ref','wm9','fm9');
-    
+
     disp(' ')
     disp(['Output saved to ',output_file])
     disp(' ')
 end
-

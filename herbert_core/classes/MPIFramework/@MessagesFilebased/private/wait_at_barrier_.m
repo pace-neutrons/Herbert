@@ -2,11 +2,12 @@ function [ok,err,all_present]=wait_at_barrier_(obj,nothrow)
 % inplement barrier for file-based messages by sending/receiving special
 % barrier  messages
 %
+
 if obj.labIndex == 1
     tasks = 2:obj.numLabs;
     [ok,err,~,task_present] = list_messages_wrapper(obj,tasks,nothrow);
     if ~ok; return; end
-    
+
     all_present = all(ismember(tasks,task_present));
     t0 = tic;
     % wait unill all barrier messages from slaves would appear
@@ -14,7 +15,7 @@ if obj.labIndex == 1
         pause(obj.time_to_react_);
         [ok,err,~,task_present] = list_messages_wrapper(obj,tasks,nothrow);
         if ~ok; return; end
-        
+
         all_present = all(ismember(tasks,task_present));
         if ~all_present
             ttl = toc(t0);
@@ -36,7 +37,7 @@ if obj.labIndex == 1
         [ok,err]=file_delete_wrapper(reply ,nothrow);
         if ~ok; return; end
     end
-    
+
     % send reply to slaves to report barrier release
     mess = aMessage('barrier');
     for i=1:numel(tasks)
@@ -50,13 +51,13 @@ else
     % wait for master replying with barrier message
     [ok,err,reply_present] = list_messages_wrapper(obj,1,nothrow);
     if ~ok; return; end
-    
+
     t0 = tic;
     while ~reply_present
         pause(obj.time_to_react_);
         [ok,err,reply_present] = list_messages_wrapper(obj,1,nothrow);
         if ~ok; return; end
-        
+
         if ~reply_present
             ttl = toc(t0);
             if ttl> obj.time_to_fail
@@ -75,7 +76,7 @@ else
     reply = obj.mess_file_name(obj.labIndex,'barrier',1);
     [ok,err]=file_delete_wrapper(reply,nothrow);
     all_present = true;
-    
+
 end
 
 function [ok,err]=file_delete_wrapper(filename,nothrow)
