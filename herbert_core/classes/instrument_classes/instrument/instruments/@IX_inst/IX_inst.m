@@ -1,4 +1,4 @@
-classdef IX_inst < matlab.mixin.Heterogeneous
+classdef (Abstract) IX_inst < matlab.mixin.Heterogeneous
     % Defines the base instrument class. This superclass must be
     % inherited by all instrument classes to unsure that they are
     % discoverable as instruments using isa(my_obj,'IX_inst')
@@ -287,6 +287,7 @@ classdef IX_inst < matlab.mixin.Heterogeneous
         end
     end
     methods(Sealed)
+        %{
         function is = isempty(obj)
             % Assume that inst is empty if it was created with
             % empty constructor and has not been modified
@@ -306,7 +307,7 @@ classdef IX_inst < matlab.mixin.Heterogeneous
                 end
             end
         end
-        
+        %}
     end
     
     %======================================================================

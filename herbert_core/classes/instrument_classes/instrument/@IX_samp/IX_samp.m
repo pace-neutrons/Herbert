@@ -1,4 +1,4 @@
-classdef IX_samp  < matlab.mixin.Heterogeneous
+classdef (Abstract) IX_samp  < matlab.mixin.Heterogeneous
     % Base class for samples to include the null sample case defined from a
     % struct with no fields (IX_null_sample) and the standard IX_sample
     
@@ -117,7 +117,7 @@ classdef IX_samp  < matlab.mixin.Heterogeneous
         end
     end
     methods(Sealed)
-        %
+        %{
         function is = isempty(obj)
             % Assume that sample is empty if it was created with
             % empty constructor and has not been modified
@@ -136,7 +136,7 @@ classdef IX_samp  < matlab.mixin.Heterogeneous
                 end
             end
         end
-        %
+        %}
     end
     
     %======================================================================

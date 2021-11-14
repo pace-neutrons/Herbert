@@ -73,9 +73,9 @@ classdef rundata
         oriented_lattice_ =[];
         
         % instrument model holder;
-        instrument_ = IX_inst();
+        instrument_ = IX_null_inst();
         % sample model holder
-        sample_ = IX_samp();
+        sample_ = IX_null_sample();
         %
         run_id_ = [];
     end
@@ -463,7 +463,7 @@ classdef rundata
             if isa(val,'IX_samp')
                 this.sample_ = val;
             elseif isempty(val)
-                this.sample_  = IX_samp();
+                this.sample_  = IX_null_sample();
             else
                 error('HERBERT:rundata:invalid_argument',...
                     'only instance of IX_samp class can be set as rundata sample. You are setting %s',...

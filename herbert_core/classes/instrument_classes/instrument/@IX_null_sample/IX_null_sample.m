@@ -1,4 +1,4 @@
-classdef IX_null_sample < IX_samp
+classdef IX_null_sample < IX_samp & serializable
     %IX_NULL_SAMPLE Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -7,6 +7,14 @@ classdef IX_null_sample < IX_samp
     end
     
     methods
+        function ver = classVersion(~)
+            ver = 1;
+        end
+        
+        function flds = indepFields(~)
+            flds = {'name','alatt','angdeg'};
+        end
+        
         function obj = IX_null_sample()
             
             obj = obj@IX_samp(''); %[1.0 1.0 1.0],[90 90 90]);

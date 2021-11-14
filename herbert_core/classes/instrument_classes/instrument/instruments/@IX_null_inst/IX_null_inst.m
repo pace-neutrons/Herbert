@@ -1,4 +1,4 @@
-classdef IX_null_inst < IX_inst
+classdef IX_null_inst < IX_inst & serializable
     % An instrument constructed from a struct with no fields
     % As the new Experiment class has an array of IX_inst, we need
     % something derived from IX_inst to hold the case where the file from
@@ -10,6 +10,16 @@ classdef IX_null_inst < IX_inst
     end
     
     methods
+        function ver = classVersion(~)
+            ver = 1;
+        end
+        
+        function flds = indepFields(~)
+            flds = {'name','source'};
+        end
+        
+
+        
         function obj = IX_null_inst()
             % constructs a vanilla instance based on IX_inst
             obj = obj@IX_inst();
