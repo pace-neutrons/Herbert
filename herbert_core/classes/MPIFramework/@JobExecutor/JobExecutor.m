@@ -12,6 +12,7 @@ classdef JobExecutor
     %-------------------------------------
     % Abstract methods to overload:
     %
+    % setup        - Pre-do_job-loop setup called once before entering main loop.
     % do_job       - Do chunk of the job independent on other parallel executors
     % reduce_data  - Receive partial results from neighbors and combine them on the head worker
     % is_completed - Check if the job completed and return true if it is.
