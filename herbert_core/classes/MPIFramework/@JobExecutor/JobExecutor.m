@@ -20,6 +20,7 @@ classdef JobExecutor
     % JobExecutor Properties:
     %
     % labIndex          - The number of the running task.
+    % numLabs           - The number of running tasks.
     % mess_framework    - Access to messages framework used for messages
     %                     exchange between the parallel tasks.
     % control_node_exch - The instance of the framework used to exchange
@@ -34,11 +35,13 @@ classdef JobExecutor
     % Communicator methods i.e. convenience methods, operating over defined
     % messages frameworks:
     %
-    % init                -  Initialize JobExecutor's communications
+    % init                - Initialize JobExecutor's communications
     %                        capabilities
-    % reduce_send_message -  collect similar messages send from all nodes and
+    % reduce_send_message - collect similar messages send from all nodes and
     %                        send final message to the head node
     %                        (node 1 for nodes with N>1 or logon node for node 1)
+    % send_message        - shortcut wrapper to message framework equivalent method
+    % receive_message     - shortcut wrapper to message framework equivalent method
     % log_progress        - log progress of the job execution and report
     %                       it to the logon node.
     % labBarrier          - synchronize parallel workers execution,
@@ -51,6 +54,9 @@ classdef JobExecutor
         % The id(number) of the running task. Worker Number in filebased,
         % labNum in Matlab or MPI rank for MPI
         labIndex;
+
+        % Number of running tasks.
+        numLabs;
 
         % Access to messages framework used for messages exchange between
         % the parallel tasks.
@@ -85,7 +91,6 @@ classdef JobExecutor
         % processing exception, as the barrier after do_job have been
         % bypassed.
         do_job_completed
-        %
     end
 
     properties(Hidden=true)
@@ -207,6 +212,16 @@ classdef JobExecutor
                 id  = -1;
             else
                 id = obj.mess_framework_.labIndex;
+            end
+        end
+
+        function id = get.numLabs(obj)
+            % get number of currently running jobs
+            if isempty(obj.mess_framework_)
+                % class has not been initiated properly
+                id  = -1;
+            else
+                id = obj.mess_framework_.numLabs;
             end
         end
 
@@ -341,6 +356,18 @@ classdef JobExecutor
         function [ok,err]=send_message(obj,message)
             % Wrapper to send_message to ease writing
             [ok,err] = obj.mess_framework_.send_message(message);
+        end
+
+        function [ok,err,message]=receive_message(obj,from_task_id,varargin)
+            % Wrapper to receive_message to ease writing
+            [ok,err,message] = obj.mess_framework_.receive_message(from_task_id,varargin{:});
+        end
+
+        function obj = setup(obj)
+            % Function called one before entering do_job loop
+            % to give opportunity to initialise JobExecutor data
+            % with access to parallel comms.
+            continue
         end
 
         function [cancelled,reas] = is_job_cancelled(obj)
