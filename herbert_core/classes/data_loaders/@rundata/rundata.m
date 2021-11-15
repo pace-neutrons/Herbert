@@ -447,7 +447,7 @@ classdef rundata
             if isa(val,'IX_inst')
                 this.instrument_ = val;
             elseif isempty(val)
-                this.instrument_  = IX_inst();
+                this.instrument_  = IX_null_inst();
             else
                 error('HERBERT:rundata:invalid_argument',...
                     'only instance of IX_inst class can be set as rundata instrument. You are setting %s',...
