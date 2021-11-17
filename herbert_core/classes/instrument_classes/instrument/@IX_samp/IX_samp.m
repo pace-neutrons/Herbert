@@ -1,4 +1,4 @@
-classdef (Abstract) IX_samp  < matlab.mixin.Heterogeneous
+classdef (Abstract) IX_samp  < matlab.mixin.Heterogeneous & serializable
     % Base class for samples to include the null sample case defined from a
     % struct with no fields (IX_null_sample) and the standard IX_sample
     
@@ -26,6 +26,7 @@ classdef (Abstract) IX_samp  < matlab.mixin.Heterogeneous
     end
     
     methods
+        
         %------------------------------------------------------------------
         % Constructor
         %------------------------------------------------------------------
@@ -40,7 +41,20 @@ classdef (Abstract) IX_samp  < matlab.mixin.Heterogeneous
                 obj.name_ = thename;
             end
         end
-        %
+        
+        % SERIALIZABLE interface
+        %------------------------------------------------------------------
+        function vers = classVersion(~)
+            vers = 0; % base class function, dummy value
+        end
+        
+        function flds = indepFields(~)
+            flds = {'name', 'alatt', 'angdeg'};
+        end
+        
+%
+        % other methods
+        %------------------------------------------------------------------
         function iseq = eq(obj1, obj2)
             iseq = strcmp(obj1.name, obj2.name);
             if numel(obj1.alatt)==3 && numel(obj2.alatt)==3

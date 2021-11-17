@@ -1,4 +1,4 @@
-classdef IX_null_sample < IX_samp & serializable
+classdef IX_null_sample < IX_samp
     %IX_NULL_SAMPLE Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -7,21 +7,23 @@ classdef IX_null_sample < IX_samp & serializable
     end
     
     methods
-        function ver = classVersion(~)
-            ver = 1;
-        end
         
-        function flds = indepFields(~)
-            flds = {'name','alatt','angdeg'};
-        end
-        
+        % Constructor
+        %------------
         function obj = IX_null_sample()
-            
             obj = obj@IX_samp(''); %[1.0 1.0 1.0],[90 90 90]);
         end
         
+        % ?
+        %-----
         function str = null_struct(~)
             str = struct();
+        end
+        
+        % SERIALIZABLE interface
+        %------------------------------------------------------------------
+        function ver = classVersion(~)
+            ver = 1;
         end
     end
 

@@ -40,6 +40,7 @@ classdef IX_sample < IX_samp
     end
 
     methods
+        
         %------------------------------------------------------------------
         % Constructor
         %------------------------------------------------------------------
@@ -157,6 +158,16 @@ classdef IX_sample < IX_samp
             end
         end
 
+        % SERIALIZABLE interface
+        %------------------------------------------------------------------
+        function vers = classVersion(~)
+            vers = 1;
+        end
+        
+        function flds = indepFields(~)
+            flds = {'hall_symbol', 'single_crystal', 'xgeom', 'ygeom', 'shape', 'ps', 'eta', 'temperature'};
+        end
+        
         %------------------------------------------------------------------
         % Set methods
         %
