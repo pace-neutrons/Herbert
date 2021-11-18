@@ -13,6 +13,7 @@ classdef JobExecutor
     % Abstract methods to overload:
     %
     % setup        - Pre-do_job-loop setup called once before entering main loop.
+    % finalise     - Post-do_job-loop finalisation called once after leaving main loop.
     % do_job       - Do chunk of the job independent on other parallel executors
     % reduce_data  - Receive partial results from neighbors and combine them on the head worker
     % is_completed - Check if the job completed and return true if it is.
@@ -369,13 +370,14 @@ classdef JobExecutor
             % to give opportunity to initialise JobExecutor data
             % with access to parallel comms.
 
-            end
+        end
 
         function obj = finalise(obj)
             % Function called once after leaving do_job loop
             % to give opportunity to finalise JobExecutor data
             % with access to parallel comms.
-            end
+
+        end
 
         function [cancelled,reas] = is_job_cancelled(obj)
             % check all available framework for the job cancellation state.
