@@ -223,6 +223,8 @@ while keep_worker_running
         if DO_LOGGING; log_disp_message('Logging start and checking for job cancellation before loop je.is_completed loop\n'); end
         mis.do_logging(0,n_steps);
         %%
+
+        % Call initial setup function of JobExecutor
         je = je.setup()
 
         while ~je.is_completed()
@@ -258,6 +260,7 @@ while keep_worker_running
             je = je.reduce_data();
         end
 
+        % Call final function of JobExecutor
         je = je.finalise();
 
         % Sent final running message. Implicitly check for cancellation.
