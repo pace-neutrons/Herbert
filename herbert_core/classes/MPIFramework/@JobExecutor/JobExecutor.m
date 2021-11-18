@@ -368,15 +368,14 @@ classdef JobExecutor
             % Function called once before entering do_job loop
             % to give opportunity to initialise JobExecutor data
             % with access to parallel comms.
-            continue
-        end
+
+            end
 
         function obj = finalise(obj)
             % Function called once after leaving do_job loop
             % to give opportunity to finalise JobExecutor data
             % with access to parallel comms.
-            continue
-        end
+            end
 
         function [cancelled,reas] = is_job_cancelled(obj)
             % check all available framework for the job cancellation state.
