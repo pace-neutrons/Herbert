@@ -258,6 +258,8 @@ while keep_worker_running
             je = je.reduce_data();
         end
 
+        je = je.finalise();
+
         % Sent final running message. Implicitly check for cancellation.
         % The node 1 waits for other nodes to send these this kind of messages
         mis.do_logging(n_steps,n_steps);

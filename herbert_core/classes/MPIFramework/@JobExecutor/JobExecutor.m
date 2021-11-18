@@ -365,8 +365,15 @@ classdef JobExecutor
         end
 
         function obj = setup(obj)
-            % Function called one before entering do_job loop
+            % Function called once before entering do_job loop
             % to give opportunity to initialise JobExecutor data
+            % with access to parallel comms.
+            continue
+        end
+
+        function obj = finalise(obj)
+            % Function called once after leaving do_job loop
+            % to give opportunity to finalise JobExecutor data
             % with access to parallel comms.
             continue
         end
