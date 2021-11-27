@@ -91,5 +91,5 @@ for i = 1:niax
     end
 end
 
-% Create output object using input object as a template (retain captions)
-obj_out = init (obj, xout, sout, eout, xdistout);
+% Create output object using input object as a template (retains captions)
+obj_out = obj.init (xout, sout, eout, xdistout);

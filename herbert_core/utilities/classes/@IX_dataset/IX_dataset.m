@@ -203,23 +203,6 @@ classdef (Abstract) IX_dataset
         sz = sigvar_size(w)
         
 
-
-        % *** ONLY USED BY rebin_IX_dataset_nd:
-        function xyz = get_xyz(obj,nd)
-            % get x (y,z) values without checking for their validity
-            if ~exist('nd', 'var')
-                xyz  = obj.xyz_;
-            else
-                xyz  = obj.xyz_{nd};
-            end
-        end
-        
-        % *** ONLY USED BY rebin_IX_dataset_nd
-        function dis = get_isdistribution(obj)
-            % get boolean array informing if the state of distribution
-            % along all axis
-            dis= obj.xyz_distribution_;
-        end
         
         % *** ONLY USED BY rebin_IX_dataset_single_:
         % Set signal, error and selected axes in a single instance of an IX_dataset object
