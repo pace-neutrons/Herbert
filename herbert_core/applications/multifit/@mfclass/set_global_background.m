@@ -8,7 +8,7 @@ function obj = set_global_background(obj,set_global)
 % then the background fit functions and any previously set constraints are
 % cleared
 %
-% See also: set_local_background set_local_foreground 
+% See also: set_local_background set_local_foreground
 
 % -----------------------------------------------------------------------------
 % <#doc_def:>
