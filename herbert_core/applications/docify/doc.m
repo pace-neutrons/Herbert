@@ -16,6 +16,12 @@ function doc(varargin)
     % be docified and appear as a line of dashes.
     % If you click on the link, it calls `doc` again on that file and it
     % will then be docified.
+    %
+    % Finally, another limitation is that inherited methods in separate
+    % files e.g. IX_data_1d/acosh which is inherited from IX_dataset
+    % are not processed (they are not resolved).
+    % E.g. `doc IX_dataset/acosh` returns the docified version
+    % but  `doc IX_data_1d/acosh` returns the raw docify code.
 
     % Create a handle to the original Matlab help function
     persistent builtin_doc;

@@ -9,6 +9,12 @@ function [out, docTopic] = help(varargin)
     % E.g. `help mfclass/fun` will produce the docstring in the original
     % mfclass.m file and *not* the docified version.
     % However, docify does not support such substitution in any case.
+    %
+    % Another limitation is that inherited methods in separate files
+    % e.g. IX_data_1d/acosh which is inherited from IX_dataset
+    % are not processed (they are not resolved).
+    % E.g. `help IX_dataset/acosh` returns the docified version
+    % but  `help IX_data_1d/acosh` returns the raw docify code.
 
     % Create a handle to the original Matlab help function
     persistent builtin_help;
