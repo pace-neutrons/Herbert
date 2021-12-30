@@ -1,5 +1,5 @@
 function obj = set_xyz_axis_(obj, val, iax)
-% Method to change axis information for a single axis
+% Method to change axis information for one or more axes
 %
 %   >> obj = set_xyz_axis_(obj, val, iax)
 %

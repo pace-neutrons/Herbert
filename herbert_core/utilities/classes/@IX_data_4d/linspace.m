@@ -1,14 +1,19 @@
 function obj_out = linspace (obj, n)
-% Make a IX_dataset_1d with the same axis ranges but with a uniform grid of values
+% Make a IX_dataset_4d with the same axis ranges but with a uniform grid of values
 %
 %   >> obj_out = linspace (obj, n)
 %
 % Input:
 % ------
-%   obj     IX_dataset_1d object or array of objects
+%   obj     IX_dataset_4d object or array of objects
 %
-%   n       Number of data points in which to divide the axis
-%               e.g.  >> wout = linspace (win, 1000);
+%   n       Number of data points in which to divide the axes
+%           - n is a scalar: each axis divided into the same number of points
+%               e.g.  >> wout = linspace (win, 100);
+%           - n is a vector with length 4: each axis divided differently
+%               e.g.  >> wout = linspace (win, [50,200,40,40]);
+%             Use zero  where you want an axis to remain unchanged
+%               e.g.  >> wout = linspace (win, [50,0,40,40]);
 %
 %           The number of bin boundaries in the output object is n+1 for a
 %           histogram axis, which corresponds to n data points on that axis.
@@ -19,7 +24,7 @@ function obj_out = linspace (obj, n)
 %
 % Output:
 % -------
-%   obj_out Output IX_dataset_1d or array of IX_dataset_1d.
+%   obj_out Output IX_dataset_4d or array of IX_dataset_4d.
 %           The signal and error arrays are set to zeros.
 %
 % Useful, for example, when plotting the result of a fit: often one wants
@@ -28,9 +33,9 @@ function obj_out = linspace (obj, n)
 %
 %   >> kk = multifit (wdata);
 %   >>      :
-%   >> [wfit, fitdata] = kk.fit (wdata, @gauss, p_init);
-%   >> wtmp = linspace(wdata, 1000);
-%   >> wcalc = func_eval (wtmp ,@gauss, fitdata.p);
+%   >> [wfit, fitdata] = kk.fit (wdata, @gauss4d, p_init);
+%   >> wtmp = linspace(wdata, 100);
+%   >> wcalc = func_eval (wtmp ,@gauss4d, fitdata.p);
 %   >> plot (wcalc)
 
 % -----------------------------------------------------------------------------
@@ -39,14 +44,16 @@ function obj_out = linspace (obj, n)
 %
 %   doc_file = fullfile(doc_dir,'doc_linspace_method.m')
 %
-%   object = 'IX_dataset_1d'
+%   object = 'IX_dataset_4d'
 %   method = 'linspace'
-%   axis_or_axes = 'axis'
-%   ndim = '1'
-%   one_dim = 1
-%       nval_scalar = '1000'
-%   multi_dim = 0
-%   func = 'gauss'
+%   axis_or_axes = 'axes'
+%   ndim = '4'
+%   one_dim = 0
+%       nval_scalar = '100'
+%   multi_dim = 1
+%       nval_vector = '[50,200,40,40]'
+%       nval_vector0 = '[50,0,40,40]'
+%   func = 'gauss4d'
 % -----------------------------------------------------------------------------
 % <#doc_beg:> IX_dataset
 %   <#file:> <doc_file>

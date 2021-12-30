@@ -1,8 +1,15 @@
-function wout = sigvar (w)
+function sigvarobj = sigvar (obj)
 % Create sigvar object
 % 
-%   >> wout = sigvar (w)
+%   >> sigvarobj = sigvar (obj)
+%
+% Input:
+% ------
+%   obj         Input object
+%
+% Output:
+% -------
+%   sigvarobj   Output sigvar object created from input object. 
+%               <a href="matlab:help('sigvar');">Click here</a> for details.
 
-% Original author: T.G.Perring
-
-wout = sigvar(w.signal_, (w.error_).^2);
+sigvarobj = sigvar(obj.signal_, (obj.error_).^2, ~isnan(obj.signal_));

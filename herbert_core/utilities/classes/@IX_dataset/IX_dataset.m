@@ -170,71 +170,70 @@ classdef (Abstract) IX_dataset
     
     %======================================================================
     methods
-        % Publicly accessible methods. They have their interface defined
-        % here, but I do not know why, as they are public.
+        % Publicly accessible methods. Although it is not necesary for 
+        % their interfaces to be defined here, their explicit appearance
+        % documents their purpose.
         %
-        %------------------------------------------------------------------
-        % Methors, which use unary/binary operation manager are stored
-        % in the class folder only. Their signatures are not presented
-        % here.
-        %
-        % Note that abs stands out because it does not involve the error
-        % array.
-        %------------------------------------------------------------------
+        % Methods that define unary or binary operations are not presented
+        % here. They use binary_op_manager, binary_op_manager_single and
+        % unary_op_manager in the private folder and methods of the sigvar
+        % class. They also use the IX_dataset sigvar methods for which the
+        % interfaces are given below.
+        % 
+        % Note that abs does not use unary_op_manager or sigvar methods
+        % because its functionality does not involve the error array.
         
         
-        %--- Not yet verified ---------------------------------------------
-        % Take absolute value of an IX_dataset_nd object or array of IX_dataset_nd objects
-        % wout = abs(w)
-        %------------------------------------------------------------------
-
+        % Methods related to sigvar class
+        % -------------------------------
+        % - Needed by unary and binary arithmetic
+        %   -------------------------------------
+        % Create sigvar object from the dataset
+        sigvarobj = sigvar (obj)
         
-        % Save object or array of objects of class type to binary file.
-        % Inverse of read.
-        save(w,file)
+        % Set output object signal and variance from an input sigvar object
+        obj_out = sigvar_set (obj, sigvarobj)
         
-        % get sigvar object from the dataset
-        wout = sigvar (w)
-        %Get signal and variance from object, and a logical array of which values to keep
-        [s,var,msk] = sigvar_get (w)
-        % Set output object signal and variance fields from input sigvar object
-        w = sigvar_set(w,sigvarobj)
-        %Matlab size of signal array
-        sz = sigvar_size(w)
+        % Size of signal array in sigvar object created from the input object
+        sz = sigvar_size (obj)
         
-
+        % - Needed in addition by multifit
+        %   ------------------------------
+        % Get signal and variance from object, and a logical mask array
+        [s, var, msk] = sigvar_get (obj)
+        
+        % Get bin centres for the object
+        x = sigvar_getx (obj)
+        
+        
+        % Deprecated set/get methods
+        % --------------------------
         
         % *** ONLY USED BY rebin_IX_dataset_single_:
         % Set signal, error and selected axes in a single instance of an IX_dataset object
         wout=set_simple_xsigerr(win,iax,x,signal,err,xdistr)
         
 
-        
-    end
-    
-    %======================================================================
-    methods(Static)
-        % Access internal function for testing purposes
-        varargout = test_gateway (func_name, varargin)
+
         
         %--- Not yet verified ---------------------------------------------
-
-        % Read object or array of objects of an IX_dataset type from
-        % a binary matlab file. Inverse of save.
-        obj = read(filename);
-
+        % Save object or array of objects of class type to binary file.
+        % Inverse of read.
+        save(w,file)        
     end
-    
+
     %======================================================================
     methods(Access=protected)
         % These are interfaces to generic methods defined for IX_dataset.
         % However, class-specific implementations of methods can be 
-        % provided if requested.
+        % provided if necessary.
         %
-        % Mostly, the reason class-specific methods exist is to enable
-        % documentation to be provided that is specific for a particular
-        % dimensionality. Sometimes (e.g. set_xyz_) it is because there is
-        % a class-specific method that calls the generic method.
+        % Mostly, the reason class-specific public methods exist is to
+        % enable documentation to be provided that is specific for a 
+        % particular dimensionality (e.g. IX_dataset_2d/axis calls 
+        % IX_datset/axis_). Sometimes it is because there is a class-
+        % specific method that calls the generic method (e.g. setters for
+        % the IX_datset_2d properties x and y, which call IX_datset/set_xyz_) 
         
         % Build object
         % ------------
@@ -264,6 +263,9 @@ classdef (Abstract) IX_dataset
         % Get dimensionality and signal size
         [nd, sz] = dimensions_ (obj)
 
+        % Evaluate a function
+        obj_out = func_eval_ (obj, funchandle, pars, varargin)
+
         % Convert histogram axes to point axes
         obj_out = hist2point_ (obj, iax)
 
@@ -274,18 +276,40 @@ classdef (Abstract) IX_dataset
         % Determine histogram or point status for axes
         status = ishistogram_ (obj, iax)
         
+        % Create an object by performing linspace on the axes
+        obj_out = linspace_ (obj, n)
+        
         % Create plot labels
         [x_label, s_label] = make_label_ (obj)
         
+        % Add random noise to an object
+        obj_out = noisify_ (obj, varargin)
+        
+        % Convert point axes to histogram axes
+        obj_out = point2hist_ (obj, iax)
+
         % Rebin an IX_dataset object or array of IX_dataset objects along
         % one or more axes
         obj_out = rebin_ (obj, iax, array_is_descriptor, varargin)
         
         % Remove dimensions of length one dimensions in an IX_dataset object
         obj_out = squeeze_ (obj, iax)
-        
     end
     
+    %======================================================================
+    methods(Static)
+        % Test utilities
+        % --------------
+        % Access internal function for testing purposes
+        varargout = test_gateway (func_name, varargin)
+
+        
+        %--- Not yet verified ---------------------------------------------
+
+        % Read object or array of objects of an IX_dataset type from
+        % a binary matlab file. Inverse of save.
+        obj = read(filename);
+    end
     
     %======================================================================
     % Abstract interface:
@@ -294,28 +318,56 @@ classdef (Abstract) IX_dataset
     % The source code will be found in the folders that defined those
     % classes.
     
-    
     methods(Abstract)
         % Get axis information for one or more axes
-        [ax, hist] = axis(obj, iax)
+        [ax, hist] = axis (obj, iax)
 
-        % Return dimensionality and extent of signal along the dimensions
-        [nd, sz] = dimensions(obj)
+        % Cut an object or array of objects along one or more axes
+        obj_out = cut (obj, varargin)
         
+        % Return dimensionality and extent of signal along the dimensions
+        [nd, sz] = dimensions (obj)
+        
+        % Evaluate a function
+        obj_out = func_eval (obj, funchandle, pars, varargin)
+
         % Convert all or selected histogram axes to point axes
-        obj_out = hist2point(obj, iax)
+        obj_out = hist2point (obj, iax)
         
         % Re-initialize object using class constructor code
-        obj_out = init(obj, varargin);
+        obj_out = init (obj, varargin);
+        
+        % Integrate object or array of objects along one or more axes
+        obj_out = integrate (obj, varargin)
+        
+        % Integrate object or array of objects along one or more axes
+        obj_out = integrate2 (obj, varargin)
         
         % Return array containing true or false depending on dataset being
         % histogram or point;
-        status = ishistogram(obj, iax)
+        status = ishistogram (obj, iax)
+        
+        % Create an object by performing linspace on the axes
+        obj_out = linspace (obj, n)
         
         % Create axis annoations
-        varargout = make_label(obj)
+        varargout = make_label (obj)
+        
+        % Add random noise to an object
+        obj_out = noisify (obj, varargin)
+        
+        % Convert point axes to histogram axes
+        obj_out = point2hist (obj, iax)
+
+        % Rebin object or array of objects along one or more axes
+        obj_out = rebin (obj, varargin)
+        
+        % Rebin object or array of objects along one or more axes
+        obj_out = rebin2 (obj, varargin)
+        
+        % Remove dimensions of length one dimensions in an IX_dataset object
+        obj_out = squeeze (obj, iax)
     end
-    
     
     %======================================================================
     methods(Abstract, Access=protected)
@@ -325,7 +377,6 @@ classdef (Abstract) IX_dataset
         obj = loadobj_protected_ (obj, S)
     end
     
-    
     %======================================================================
     methods(Abstract, Static)
         % Get number of class dimensions
@@ -334,5 +385,4 @@ classdef (Abstract) IX_dataset
         % To support loading of outdated versions of the class from mat files
         obj = loadobj(data)
     end
-    
 end

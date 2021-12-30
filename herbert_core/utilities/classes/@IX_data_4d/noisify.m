@@ -1,5 +1,5 @@
 function obj_out = noisify (obj, varargin)
-% Adds random noise to an IX_dataset_1d object or array of IX_dataset_1d objects
+% Adds random noise to an IX_dataset_4d object or array of IX_dataset_4d objects
 %
 %   >> obj_out = noisify (obj)
 %           Add noise with Gaussian distribution, with standard deviation
@@ -19,7 +19,7 @@ function obj_out = noisify (obj, varargin)
 %
 %   doc_file = fullfile(doc_dir,'doc_noisify_method.m')
 %
-%   object = 'IX_dataset_1d'
+%   object = 'IX_dataset_4d'
 %   method = 'noisify'
 % -----------------------------------------------------------------------------
 % <#doc_beg:> IX_dataset

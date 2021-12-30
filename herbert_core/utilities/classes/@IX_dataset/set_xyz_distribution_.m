@@ -1,5 +1,5 @@
 function obj = set_xyz_distribution_(obj, val, iax)
-% Method to change the distribution flag for a single axis
+% Method to change the distribution flag for one or more axes
 %
 %   >> obj = set_xyz_distribution_(obj, val, iax)
 %

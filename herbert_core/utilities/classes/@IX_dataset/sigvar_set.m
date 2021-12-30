@@ -1,13 +1,29 @@
-function w = sigvar_set(w,sigvarobj)
+function obj_out = sigvar_set (obj, sigvarobj)
 % Set output object signal and variance fields from input sigvar object
 %
-%   >> w = sigvar_set(w,sigvarobj)
+%   >> obj_out = sigvar_set (obj, sigvarobj)
+%
+% Input:
+% ------
+%   obj         Input object
+%   sigvarobj   Input sigvar object
+%
+% Output:
+% -------
+%   obj_out     Output object
+%               Signal is masked wherever the signal in the sigvar object
+%               is masked or isnan.
 
-% Original author: T.G.Perring
-
-if ~isequal(size(w.signal),size(sigvarobj.s))
-    error('IX_dataset:invalid_argument',...
-        '%s and sigvar object have inconsistent sizes',class(w))
+if ~isequal(size(obj.signal), size(sigvarobj.s))
+    error('HERBERT:sigvar_set:invalid_argument',...
+        '%s and sigvar object have inconsistent sizes', class(obj))
 end
-w.signal=sigvarobj.s;
-w.error=sqrt(sigvarobj.e);
+
+% Output object with updated signal and error arrays
+obj_out = obj;
+obj_out.signal_ = sigvarobj.s;
+obj_out.error_ = sqrt(sigvarobj.e);
+
+% Explicitly mask signal, as sigvar does not 
+msk = (~isnan(sigvarobj.s) | sigvarobj.msk);
+obj_out = mask_(obj_out, msk);    

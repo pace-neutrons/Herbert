@@ -1,8 +1,10 @@
-function sz = sigvar_size(w)
-% Matlab size of signal array
+function sz = sigvar_size (obj)
+% Size of the signal array in the sigvar object created from the input object
 %
-%   >> sz = sigvar_size(w)
+%   >> sz = sigvar_size(obj)
+%
+% Exists to return the size without the overheads of actually creating the
+% sigvar object.
 
-% Original author: T.G.Perring
 
-sz = size(w.signal_);
+sz = size(obj.signal_);     % is just the matlab size of the IX_dataset signal

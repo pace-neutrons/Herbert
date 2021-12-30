@@ -1,20 +1,31 @@
-function wout = noisify (w,varargin)
-% Adds random noise to an IX_dataset_2d or array of IX_dataset_2d
+function obj_out = noisify (obj, varargin)
+% Adds random noise to an IX_dataset_3d object or array of IX_dataset_3d objects
 %
-% Syntax:
-%   >> wout = noisify (w)
+%   >> obj_out = noisify (obj)
 %           Add noise with Gaussian distribution, with standard deviation
 %           = 0.1*(maximum y value)
 %
-%   >> wout = noisify (w,factor)
+%   >> obj_out = noisify (obj, factor)
 %           Add noise with Gaussian distribution, with standard deviation
 %           = factor*(maximum y value)
 %
-%   >> wout = noisify (w,'poisson')
+%   >> obj_out = noisify (obj, 'poisson')
 %           Add noise with Poisson distribution, where the mean value at
-%           a point is the value y.
+%           a point is the value y
+
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
 %
-wout=w;
-for i=1:numel(w)
-    [wout(i).signal,wout(i).error]=noisify(w(i).signal,w(i).error,varargin{:});
-end
+%   doc_file = fullfile(doc_dir,'doc_noisify_method.m')
+%
+%   object = 'IX_dataset_3d'
+%   method = 'noisify'
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
+
+
+obj_out = noisify_ (obj);

@@ -1,59 +1,64 @@
-function wout=linspace(win,n)
-% Make a datset with the same x and y ranges but with a uniform grid of values
+function obj_out = linspace (obj, n)
+% Make a IX_dataset_2d with the same axis ranges but with a uniform grid of values
 %
-%   >> wout = linspace(win,n)
+%   >> obj_out = linspace (obj, n)
 %
-%   win     IX_dataset_2d or array of IX_dataset_2d
-%   n       Number of points in which to divide the x- and y-axes e.g.
-%               >> wout=linspace(win,1000);         % 1000 points along both axes
-%               >> wout=linspace(win,[100,200]);    % 100 along x, 200 along y
+% Input:
+% ------
+%   obj     IX_dataset_2d object or array of objects
 %
-%   wout    Output IX_datset_2d or array of IX_datset_2d. The signal and
-%           error arrays are set to zeros.
+%   n       Number of data points in which to divide the axes
+%           - n is a scalar: each axis divided into the same number of points
+%               e.g.  >> wout = linspace (win, 200);
+%           - n is a vector with length 2: each axis divided differently
+%               e.g.  >> wout = linspace (win, [100,200]);
+%             Use zero  where you want an axis to remain unchanged
+%               e.g.  >> wout = linspace (win, [100,0]);
 %
-% Useful e.g. when plotting the result of a fit: often one wants a dataset
-% with a fine grid of x- and y-values over the range of the data to create a fine
-% plot of the calculated function
+%           The number of bin boundaries in the output object is n+1 for a
+%           histogram axis, which corresponds to n data points on that axis.
 %
-%   >> [wfit,fitdata]=multifit(wdata,@gauss2d_bkgd,p_init);
-%   >> wtmp = linspace(wdata,200);
-%   >> wcalc = func_eval(wtmp,@gauss2d_bkgd,fitdata.p);
-%   >> ds(wcalc)
+%           If the extent of an axis is zero (e.g. the data is point data
+%           and there is only one point along that axis), then the
+%           axis is not subdivided.
+%
+% Output:
+% -------
+%   obj_out Output IX_dataset_2d or array of IX_dataset_2d.
+%           The signal and error arrays are set to zeros.
+%
+% Useful, for example, when plotting the result of a fit: often one wants
+% a dataset with a fine grid over the range of the data to create a fine
+% plot of the calculated function:
+%
+%   >> kk = multifit (wdata);
+%   >>      :
+%   >> [wfit, fitdata] = kk.fit (wdata, @gauss2d, p_init);
+%   >> wtmp = linspace(wdata, 200);
+%   >> wcalc = func_eval (wtmp ,@gauss2d, fitdata.p);
+%   >> plot (wcalc)
 
-nd=dimensions(win(1));
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_linspace_method.m')
+%
+%   object = 'IX_dataset_2d'
+%   method = 'linspace'
+%   axis_or_axes = 'axes'
+%   ndim = '2'
+%   one_dim = 0
+%       nval_scalar = '200'
+%   multi_dim = 1
+%       nval_vector = '[100,200]'
+%       nval_vector0 = '[100,0]'
+%   func = 'gauss2d'
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
-if nargin==1 || isempty(n)
-    wout=win;   % do nothing if not given n
-    return
-elseif isnumeric(n) && all(rem(n,1)==0) && all(n>0)
-    if isscalar(n)
-        n=n*ones(1,nd);
-    elseif numel(n)~=nd
-        error(['Check requested number of subdisivions is a scalar or =',num2str(nd)])
-    end
-    
-else
-    error('Check number(s) of sub-divisions is(are) integer(s) bigger than zero')
-end
 
-wout=win;
-status=ishistogram(win);
-for i=1:numel(wout)
-    [nd,sz0]=dimensions(win(i));
-    sz=n-status(:,i)';
-    if numel(win(i).x)>1
-        xtmp=linspace(win.x(1),win.x(end),n(1));
-    else
-        xtmp=win(i).x;
-        sz(1)=sz0(1);
-    end
-    if numel(win(i).y)>1
-        ytmp=linspace(win.y(1),win.y(end),n(2));
-    else
-        ytmp=win(i).y;
-        sz(2)=sz0(2);
-    end
-    stmp=zeros(sz);
-    etmp=zeros(sz);
-    wout(i).x=xtmp; wout(i).y=ytmp; wout(i).signal=stmp; wout(i).error=etmp;
-end
+obj_out = linspace_ (obj, n);
