@@ -1,18 +1,35 @@
-function wout = scale_y(w,yscale)
-% Rescale the y-axis for an IX_dataset_2d object or array of IX_dataset_2d objects
+function obj_out = scale_y (obj, x)
+% Rescale an IX_dataset_2d or array of objects along the y-axis
 %
-%   >> wout = scale(w,yscale)
+%   >> obj_out = scale_y (obj, val)
 %
-%   w   IX_dataset_2d object or array of IX_dataset_2d objects
-%   y   Rescaling factor: scalar or array of values with size matching that of array w
+% Input:
+% ------
+%   obj         IX_dataset_2d object or array of objects
+%
+%   val         Scalar giving the rescaling factor along the the y-axis
+%
+% Output:
+% -------
+%   obj_out     Output IX_dataset_2d or array of IX_dataset_2d.
 
-wout=w;
-if numel(w)>1 && numel(yscale)==1
-    yscale=repmat(yscale,size(w));
-elseif numel(w)~=numel(yscale)
-    error('Check number of elements in IX_dataset_2d and scale arrays')
-end
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_scale_method.m')
+%
+%   object = 'IX_dataset_2d'
+%   method = 'scale_y'
+%   axis_or_axes = 'the y-axis'
+%   ndim = '1'
+%   one_dim = 1
+%   multi_dim = 0
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
-for i=1:numel(w)
-    wout(i).y = w(i).y * yscale(i);
-end
+
+obj_out = scale_ (obj, x, 2);

@@ -1,17 +1,17 @@
-function obj_out = shift_y (obj, x)
-% Shift an IX_dataset_2d or array of objects along the y-axis
+function obj_out = shift_z (obj, x)
+% Shift an IX_dataset_4d or array of objects along the z-axis
 %
-%   >> obj_out = shift_y (obj, val)
+%   >> obj_out = shift_z (obj, val)
 %
 % Input:
 % ------
-%   obj         IX_dataset_2d object or array of objects
+%   obj         IX_dataset_4d object or array of objects
 %
-%   val         Scalar giving the shift along the the y-axis
+%   val         Scalar giving the shift along the the z-axis
 %
 % Output:
 % -------
-%   obj_out     Output IX_dataset_2d or array of IX_dataset_2d.
+%   obj_out     Output IX_dataset_4d or array of IX_dataset_4d.
 
 % -----------------------------------------------------------------------------
 % <#doc_def:>
@@ -19,9 +19,9 @@ function obj_out = shift_y (obj, x)
 %
 %   doc_file = fullfile(doc_dir,'doc_shift_method.m')
 %
-%   object = 'IX_dataset_2d'
-%   method = 'shift_y'
-%   axis_or_axes = 'the y-axis'
+%   object = 'IX_dataset_4d'
+%   method = 'shift_z'
+%   axis_or_axes = 'the z-axis'
 %   ndim = '1'
 %   one_dim = 1
 %   multi_dim = 0
@@ -32,4 +32,4 @@ function obj_out = shift_y (obj, x)
 % -----------------------------------------------------------------------------
 
 
-obj_out = shift_ (obj, x, 2);
+obj_out = shift_ (obj, x, 3);

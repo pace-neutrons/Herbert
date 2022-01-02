@@ -1,18 +1,35 @@
-function wout = shift_x(w,x)
-% Shift an IX_dataset_2d object or array of IX_dataset_2d objects along the x-axis
+function obj_out = shift_x (obj, x)
+% Shift an IX_dataset_2d or array of objects along the x-axis
 %
-%   >> wout = shift_x(w,x)
+%   >> obj_out = shift_x (obj, val)
 %
-%   w   IX_dataset_2d object or array of IX_dataset_2d objects
-%   x   scalar shift, or array of shifts with size matching that of array w
+% Input:
+% ------
+%   obj         IX_dataset_2d object or array of objects
+%
+%   val         Scalar giving the shift along the the x-axis
+%
+% Output:
+% -------
+%   obj_out     Output IX_dataset_2d or array of IX_dataset_2d.
 
-wout=w;
-if numel(w)>1 && numel(x)==1
-    x=repmat(x,size(w));
-elseif numel(w)~=numel(x)
-    error('Check number of IX_dataset_2d objects and elements in the shift array')
-end
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_shift_method.m')
+%
+%   object = 'IX_dataset_2d'
+%   method = 'shift_x'
+%   axis_or_axes = 'the x-axis'
+%   ndim = '1'
+%   one_dim = 1
+%   multi_dim = 0
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
-for i=1:numel(w)
-    wout(i).x = w(i).x + x(i);
-end
+
+obj_out = shift_ (obj, x, 1);

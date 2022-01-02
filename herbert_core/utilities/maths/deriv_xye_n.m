@@ -1,22 +1,27 @@
-function [yd,ed] = deriv_xye_n(iax,x,y,e)
-% Numerical first derivative of xye points along indicated axis
+function [yd,ed] = deriv_xye_n (iax, x, y, e)
+% Numerical first derivative of x-y-e data along te indicated axis
 %
-%   >> [yd,ed] = deriv_xye(x,y,e)
+%   >> [yd,ed] = deriv_xye_n (x, y, e)
 %
 % Input:
 % ------
-%   iax axis along which to perform numerical derivative
-%   x   x values
-%   y   array of signal values; size along dimension iax must match length of x
-%   e   standard deviations on signal: same size as signal array
+%   iax     Axis index along which to perform the numerical derivative.
+%
+%   x       x values along the indicated axis.
+%
+%   y       Array of signal values; the size along dimension iax must match
+%           the length of x.
+%
+%   e       Standard deviations on signal: same size as signal array.
 %
 % Output:
 % -------
-%   yd  Derivative of signal along axis iax
-%   ed  Standard deviation
+%   yd      Derivative of signal along axis iax
+%           If there is only one point along the axis, the derivative is
+%           returned as NaN.
 %
-% 
-% If there is only one point along the axis, the derivative is returned as zero.
+%   ed      Standard deviation.
+
 
 % Check sizes of arrays
 sz=size(y);
@@ -24,10 +29,12 @@ sze=size(e);
 if ~(numel(sz)==numel(sze) && all(sz==sze))
     error('Check y, e array sizes are the same')
 end
+
 nax=numel(sz);
 if iax<1 || iax>nax || round(iax)~=iax
     error(['Axis number to unspike must lie in range 1-',num2str(nax)])
 end
+
 if numel(x)~=sz(iax)
     error('Number of points along axis to be differentiated does not match size of signal and error arrays along that axis')
 end

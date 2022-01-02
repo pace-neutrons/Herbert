@@ -30,7 +30,7 @@ function obj = set_xyz_distribution_(obj, val, iax)
 nd = obj.ndim();
 
 % Check the validity of the axis indices
-if nargin==1
+if nargin==2
     iax = 1:nd;
 else
     if isempty(iax) || ~isnumeric(iax) || any(rem(iax,1)~=0) ||...

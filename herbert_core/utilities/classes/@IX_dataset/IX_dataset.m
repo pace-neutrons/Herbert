@@ -206,15 +206,11 @@ classdef (Abstract) IX_dataset
         x = sigvar_getx (obj)
         
         
-        % Deprecated set/get methods
-        % --------------------------
+        % xye method
+        % ----------
+        % Return a structure containing unmasked x,y,e data
+        S = xye (obj)
         
-        % *** ONLY USED BY rebin_IX_dataset_single_:
-        % Set signal, error and selected axes in a single instance of an IX_dataset object
-        wout=set_simple_xsigerr(win,iax,x,signal,err,xdistr)
-        
-
-
         
         %--- Not yet verified ---------------------------------------------
         % Save object or array of objects of class type to binary file.
@@ -233,7 +229,7 @@ classdef (Abstract) IX_dataset
         % particular dimensionality (e.g. IX_dataset_2d/axis calls 
         % IX_datset/axis_). Sometimes it is because there is a class-
         % specific method that calls the generic method (e.g. setters for
-        % the IX_datset_2d properties x and y, which call IX_datset/set_xyz_) 
+        % the IX_dataset_2d properties x and y, which call IX_datset/set_xyz_) 
         
         % Build object
         % ------------
@@ -292,8 +288,14 @@ classdef (Abstract) IX_dataset
         % one or more axes
         obj_out = rebin_ (obj, iax, array_is_descriptor, varargin)
         
+        % Scale an object along its axes
+        obj_out = scale_ (obj, xscale, iax)
+        
         % Remove dimensions of length one dimensions in an IX_dataset object
         obj_out = squeeze_ (obj, iax)
+        
+        % Shift an object along its axes
+        obj_out = shift_ (obj, xshift, iax)
     end
     
     %======================================================================
@@ -365,8 +367,14 @@ classdef (Abstract) IX_dataset
         % Rebin object or array of objects along one or more axes
         obj_out = rebin2 (obj, varargin)
         
+        % Rescale an object along its axes
+        obj_out = scale (obj, xscale)
+        
         % Remove dimensions of length one dimensions in an IX_dataset object
         obj_out = squeeze (obj, iax)
+        
+        % Shift an object along its axes
+        obj_out = shift (obj, xshift)
     end
     
     %======================================================================

@@ -1,28 +1,28 @@
-function obj_out = scale (obj, x)
-% Rescale an IX_dataset_3d or array of objects along the axes
+function obj_out = shift (obj, x)
+% Shift an IX_dataset_4d or array of objects along the axes
 %
-%   >> obj_out = scale (obj, val)
+%   >> obj_out = shift (obj, val)
 %
 % Input:
 % ------
-%   obj         IX_dataset_3d object or array of objects
+%   obj         IX_dataset_4d object or array of objects
 %
-%   val         Vector length 3 giving the rescaling factor along the axes
+%   val         Vector length 4 giving the shift along the axes
 %
 % Output:
 % -------
-%   obj_out     Output IX_dataset_3d or array of IX_dataset_3d.
+%   obj_out     Output IX_dataset_4d or array of IX_dataset_4d.
 
 % -----------------------------------------------------------------------------
 % <#doc_def:>
 %   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
 %
-%   doc_file = fullfile(doc_dir,'doc_scale_method.m')
+%   doc_file = fullfile(doc_dir,'doc_shift_method.m')
 %
-%   object = 'IX_dataset_3d'
-%   method = 'scale'
+%   object = 'IX_dataset_4d'
+%   method = 'shift'
 %   axis_or_axes = 'the axes'
-%   ndim = '3'
+%   ndim = '4'
 %   one_dim = 0
 %   multi_dim = 1
 % -----------------------------------------------------------------------------
@@ -32,4 +32,4 @@ function obj_out = scale (obj, x)
 % -----------------------------------------------------------------------------
 
 
-obj_out = scale_ (obj, x, 1:3);
+obj_out = shift_ (obj, x, 1:4);

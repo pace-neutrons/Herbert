@@ -1,24 +1,21 @@
-function [yd,ed] = deriv_xye(x,y,e)
-% Numerical first derivative of xye points
+function [yd, ed] = deriv_xye (x, y, e)
+% Numerical first derivative of x-y-e data
 %
-%   >> [yd,ed] = deriv_xye(x,y,e)
+%   >> [yd, ed] = deriv_xye (x, y, e)
 %
 % Input:
 % ------
-%   x   x values
-%   y   signal
-%   e   standard deviations on signal
+%   x   x values (vector)
+%   y   Signal (vector same length as x)
+%   e   Standard deviations on signal (vector same length as signal)
 %
 % Output:
 % -------
 %   yd  Derivative of signal
+%       If there is only one point along the axis, the derivative is
+%       returned as NaN.
 %   ed  Standard deviation
-%
-% 
-% If there is only one point in the input arrays, the derivative is returned as zero.
-%
-% Input arrays will be converted to vectors internally, and then reshaped to original 
-% shape on exit.
+
 
 % Check lengths of input arrays
 np=numel(x);

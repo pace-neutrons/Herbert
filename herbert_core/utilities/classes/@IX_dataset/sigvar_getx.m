@@ -9,9 +9,9 @@ function x = sigvar_getx (obj)
 %
 % Output:
 % -------
-%   x       Arrays with bin centres for each coordinate axis. Each array
+%   x       Arrays with point positions for each coordinate axis. Each array
 %           has the same size as the signal array.
-%           - one-dimensional object: column vector of bin centres
+%           - one-dimensional object: column vector of point positions
 %           - two or more dimensions: cell array of arrays, one per axis
 
 

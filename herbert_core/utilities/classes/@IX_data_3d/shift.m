@@ -1,40 +1,35 @@
-function wout = shift(w,x)
-% Shift an IX_dataset_3d object or array of IX_dataset_3d objects along the x, y and z axes
+function obj_out = shift (obj, x)
+% Shift an IX_dataset_3d or array of objects along the axes
 %
-%   >> wout = shift_x(w,x)
+%   >> obj_out = shift (obj, val)
 %
-%   w   IX_dataset_3d object or array of IX_dataset_3d objects
-%   x   Vector length two giving shift along x and y axes
-%      OR
-%       Array with outer dimension length two and whose inner dimensions
-%       have number of elements matching that of array w
-%        e.g. numel(w)=12, and size(x)=[12,2]; x(:,1) give shifts along
-%             x-axis and x(:,2) give shifts along y axes.
+% Input:
+% ------
+%   obj         IX_dataset_3d object or array of objects
+%
+%   val         Vector length 3 giving the shift along the axes
+%
+% Output:
+% -------
+%   obj_out     Output IX_dataset_3d or array of IX_dataset_3d.
 
-wout=w;
-sz=size(x);
-nd=dimensions(w(1));
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_shift_method.m')
+%
+%   object = 'IX_dataset_3d'
+%   method = 'shift'
+%   axis_or_axes = 'the axes'
+%   ndim = '3'
+%   one_dim = 0
+%   multi_dim = 1
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
 
-% Check input: this is independent of dimensionality once nd and sz are given
-if isvector(x)
-    if numel(x)==nd
-        x=repmat(x(:)',[numel(w),1]);   % n x 2 array
-    else
-        error(['Check number of components of shift vector equals ',num2str(nd)])
-    end
-elseif sz(end)==nd
-    if prod(sz(1:end-1))==numel(w)
-        x=reshape(x,[prod(sz(1:end-1)),nd]);
-    else
-        error(['Check number of IX_dataset_',num2str(nd),'d objects and elements in the shift array'])
-    end
-else
-    error('Check number of components of shift vectors')
-end
 
-% Perform shift
-for i=1:numel(w)
-    wout(i).x = w(i).x + x(i,1);
-    wout(i).y = w(i).y + x(i,2);
-    wout(i).z = w(i).z + x(i,3);
-end
+obj_out = shift_ (obj, x, 1:3);

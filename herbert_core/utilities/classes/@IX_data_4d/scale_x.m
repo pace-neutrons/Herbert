@@ -1,17 +1,17 @@
-function obj_out = scale_y (obj, x)
-% Rescale an IX_dataset_3d or array of objects along the y-axis
+function obj_out = scale_x (obj, x)
+% Rescale an IX_dataset_4d or array of objects along the x-axis
 %
-%   >> obj_out = scale_y (obj, val)
+%   >> obj_out = scale_x (obj, val)
 %
 % Input:
 % ------
-%   obj         IX_dataset_3d object or array of objects
+%   obj         IX_dataset_4d object or array of objects
 %
-%   val         Scalar giving the rescaling factor along the the y-axis
+%   val         Scalar giving the rescaling factor along the the x-axis
 %
 % Output:
 % -------
-%   obj_out     Output IX_dataset_3d or array of IX_dataset_3d.
+%   obj_out     Output IX_dataset_4d or array of IX_dataset_4d.
 
 % -----------------------------------------------------------------------------
 % <#doc_def:>
@@ -19,9 +19,9 @@ function obj_out = scale_y (obj, x)
 %
 %   doc_file = fullfile(doc_dir,'doc_scale_method.m')
 %
-%   object = 'IX_dataset_3d'
-%   method = 'scale_y'
-%   axis_or_axes = 'the y-axis'
+%   object = 'IX_dataset_4d'
+%   method = 'scale_x'
+%   axis_or_axes = 'the x-axis'
 %   ndim = '1'
 %   one_dim = 1
 %   multi_dim = 0
@@ -32,4 +32,4 @@ function obj_out = scale_y (obj, x)
 % -----------------------------------------------------------------------------
 
 
-obj_out = scale_ (obj, x, 2);
+obj_out = scale_ (obj, x, 1);

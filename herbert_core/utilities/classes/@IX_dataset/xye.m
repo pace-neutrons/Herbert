@@ -1,12 +1,23 @@
 function S = xye (obj)
-% Return a structure containing unmasked x,y,e arrays for an array of IX_dataset_2d objects
+% Return a structure containing unmasked x,y,e data
 %
-%   >> d=xye(w)
+%   >> S = xye (obj)
 %
-% Fields are:
-%   d.x     x values: a cell array of arrays, one for each x dimension
-%   d.y     y values
-%   d.e     standard deviations
+% Input:
+% ------
+%   obj     Input object
+%
+% Output:
+% -------
+%   S       Structure containing x-y-e data with the following fields:
+%               x   Arrays with point positions for each coordinate axis.
+%                   - one-dimensional object: column vector
+%                   - two or more dimensions: cell array of column vectors
+%                     one vector per axis.
+%
+%               y   Signal values. Column vector
+%
+%               e   Standard deviation on signal values. Column vector
 
 
 if numel(obj)==1
