@@ -82,7 +82,6 @@ end
 
 % If requested, store and set random number generator status
 if ~isempty(keyval.seed)
-    s = rng;
     rng(keyval.seed);
 end
 
@@ -133,11 +132,6 @@ err = height*(ebar_frac*rand(nx,ny));
 pp_gau = IX_dataset_2d(x, y, signal, err, 'pnt-pnt',...
     IX_axis('Energy transfer','meV','$w'), 'Temperature', 'Counts', true, true);
 
-
-% Recover randon number generator state
-if ~isempty(keyval.seed)
-    rng(s);
-end
 
 %--------------------------------------------------------------------------
 function a = ax_vals (cent, range, n)

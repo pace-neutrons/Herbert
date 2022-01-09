@@ -1,5 +1,5 @@
 function [yd,ed] = deriv_xye_n (iax, x, y, e)
-% Numerical first derivative of x-y-e data along te indicated axis
+% Numerical first derivative of x-y-e data along the indicated axis
 %
 %   >> [yd,ed] = deriv_xye_n (x, y, e)
 %

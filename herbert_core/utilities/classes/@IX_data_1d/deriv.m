@@ -1,24 +1,34 @@
-function wout = deriv(w)
-% Calculate numerical first derivative of an IX_dataset_1d or array of IX_datasset_1d
+function obj_out = deriv(obj)
+% Differentiate an IX_dataset_1d or array of objects along the x-axis
 %
-%   >> wd = deriv (w)
+%   >> obj_out = deriv (obj)
 %
 % Input:
 % ------
-%   w   input IX_dataset_1d
+%   obj         IX_dataset_1d object or array of objects
 %
 % Output:
 % -------
-%   wd  output IX_dataset_1d
+%   obj_out     Output IX_dataset_1d or array of IX_dataset_1d.
+%
+%
+% Identical to deriv_x
 
-wout=w;
-for i=1:numel(w)
-    if numel(w(i).signal)>0    % if empty data, don't do anything
-        if ishistogram(w(i),1)
-            xc=0.5*(w(i).x(1:end-1)+w(i).x(2:end));
-            [wout(i).signal,wout(i).error]=deriv_xye(xc,w(i).signal,w(i).error);
-        else
-            [wout(i).signal,wout(i).error]=deriv_xye(w(i).x,w(i).signal,w(i).error);
-        end
-    end
-end
+% -----------------------------------------------------------------------------
+% <#doc_def:>
+%   doc_dir = fullfile(fileparts(which('IX_dataset')),'_docify')
+%
+%   doc_file = fullfile(doc_dir,'doc_deriv_method.m')
+%
+%   object = 'IX_dataset_1d'
+%   method = 'deriv'
+%   axis = 'x-axis'
+%   is_deriv = 1
+% -----------------------------------------------------------------------------
+% <#doc_beg:> IX_dataset
+%   <#file:> <doc_file>
+% <#doc_end:>
+% -----------------------------------------------------------------------------
+
+
+obj_out = deriv_ (obj, 1);

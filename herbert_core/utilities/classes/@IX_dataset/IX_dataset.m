@@ -211,6 +211,11 @@ classdef (Abstract) IX_dataset
         % Return a structure containing unmasked x,y,e data
         S = xye (obj)
         
+        % Other methods
+        % -------------
+        % Mask data
+        obj_out = mask (obj, mask_array)
+        
         
         %--- Not yet verified ---------------------------------------------
         % Save object or array of objects of class type to binary file.

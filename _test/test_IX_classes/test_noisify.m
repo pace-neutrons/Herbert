@@ -25,12 +25,10 @@ classdef test_noisify <  TestCaseWithSave
             w = IX_dataset_1d (x, rand(size(x)), rand(size(x)), ...
                 'A title', 'x-axis', 'signal axis', true);
             
-            s = rng;    % get rng state
             rng(0);     % set random number generator seed
             ws = noisify (w);
             rng(0);
             [signal_new, variance_new] = noisify (w.signal, (w.error).^2);
-            rng(s)      % reset rng state
             ws_ref = w;
             ws_ref.signal = signal_new;
             ws_ref.error = sqrt(variance_new);
@@ -46,12 +44,10 @@ classdef test_noisify <  TestCaseWithSave
             w = IX_dataset_2d (x1, x2, rand(100,50), rand(100,50), ...
                 'A title', 'x-axis', 'y-axis', 'signal axis', true, false);
             
-            s = rng;    % get rng state
             rng(0);     % set random number generator seed
             ws = noisify (w);
             rng(0);
             [signal_new, variance_new] = noisify (w.signal, (w.error).^2);
-            rng(s)      % reset rng state
             ws_ref = w;
             ws_ref.signal = signal_new;
             ws_ref.error = sqrt(variance_new);
@@ -68,12 +64,10 @@ classdef test_noisify <  TestCaseWithSave
                 'A title', 'x-axis', 'y-axis', 'z-axis','signal axis',...
                 true, false, true);
             
-            s = rng;    % get rng state
             rng(0);     % set random number generator seed
             ws = noisify (w);
             rng(0);
             [signal_new, variance_new] = noisify (w.signal, (w.error).^2);
-            rng(s)      % reset rng state
             ws_ref = w;
             ws_ref.signal = signal_new;
             ws_ref.error = sqrt(variance_new);
@@ -90,12 +84,10 @@ classdef test_noisify <  TestCaseWithSave
                 'A title', 'x-axis', 'y-axis', 'z-axis', 'w-axis',...
                 'signal axis', true, false,false,true);
             
-            s = rng;    % get rng state
             rng(0);     % set random number generator seed
             ws = noisify (w);
             rng(0);
             [signal_new, variance_new] = noisify (w.signal, (w.error).^2);
-            rng(s)      % reset rng state
             ws_ref = w;
             ws_ref.signal = signal_new;
             ws_ref.error = sqrt(variance_new);
@@ -115,7 +107,6 @@ classdef test_noisify <  TestCaseWithSave
             w(3) = IX_dataset_1d (1:5000, rand(5000,1), rand(5000,1), ...
                 'A title', 'x-axis', 'signal axis', true);
             
-            s = rng;    % get rng state
             rng(0);     % set random number generator seed
             ws = noisify (w);
             
@@ -126,7 +117,6 @@ classdef test_noisify <  TestCaseWithSave
                 ws_ref(i).signal = signal_new;
                 ws_ref(i).error = sqrt(variance_new);
             end
-            rng(s)      % reset rng state
             
             assertEqual (ws_ref, ws)
         end

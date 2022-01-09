@@ -16,7 +16,7 @@ function [xave, sout, eout, npnt, kept] = average_points (x, s, e, idim,...
 %   x       Positions of points to be averaged in bins (row or column
 %          vector).
 %           It is assumed that the values of x are monotonic increasing.
-%          They need not be structly monotonic i.e. there can be points
+%          They need not be strictly monotonic i.e. there can be points
 %          with zero spacing.
 %
 %   s       Signal array. The extent along dimension idim must match the
@@ -86,7 +86,7 @@ function [xave, sout, eout, npnt, kept] = average_points (x, s, e, idim,...
 %           - alldata==true:  All retained: kept = true(1,numel(xout))
 %           - alldata==false: 
 
-% The rebinning is performed by permuting and reshaping the signal and
+% The averaging is performed by permuting and reshaping the signal and
 % error arrays to size = [n,mx] where mx is the number of bins along the
 % axis to be rebinned, and n = prod(size(s))/mx. The loop over bins for
 % array sections in this 2D array turns out to be optimised by the Matlab
@@ -102,7 +102,7 @@ if mx<1
         'The input point position array must have at least one value')
 end
 
-if numel(size(s))~=numel(size(s)) || ~all(size(s)==size(e))
+if numel(size(s))~=numel(size(e)) || ~all(size(s)==size(e))
     error('HERBERT:average_points:invalid_argument',...
         'The sizes of signal array (=[%s]) and error array (=[%s]) do not match',...
         str_compress(num2str(size(s)),','),...

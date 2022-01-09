@@ -101,7 +101,6 @@ end
 
 % If requested, store and set random number generator status
 if ~isempty(keyval.seed)
-    s = rng;
     rng(keyval.seed);
 end
 
@@ -167,11 +166,6 @@ for i=1:nw
         IX_axis('Energy transfer','meV','$w'), 'Counts', true);
 end
 
-
-% Recover randon number generator state
-if ~isempty(keyval.seed)
-    rng(s);
-end
 
 %--------------------------------------------------------------------------
 function a = ax_vals (cent, range, n)

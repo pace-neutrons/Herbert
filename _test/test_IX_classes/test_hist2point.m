@@ -59,11 +59,9 @@ classdef test_hist2point < TestCaseWithSave
             x2p = 0.5*(x2h(2:end)+x2h(1:end-1));
             n2 = numel(x2p);
             
-            s=rng;  % Store random number state
             rng(0); % Set seed for reproducible 'random' numbers
             s2 = rand(n1,n2);
             e2 = rand(n1,n2);
-            rng(s); % reset state
             
             d2n_1 = repmat(dx1(:),1,n2);    % distribution to non-distribution for axis 1
             d2n_2 = repmat(dx2,n1,1);       % distribution to non-distribution for axis 2
@@ -106,11 +104,9 @@ classdef test_hist2point < TestCaseWithSave
             x3p = 0.5*(x3h(2:end)+x3h(1:end-1));
             n3 = numel(x3p);
             
-            s=rng;  % Store random number state
             rng(0); % Set seed for reproducible 'random' numbers
             s3 = rand(n1,n2,n3);
             e3 = rand(n1,n2,n3);
-            rng(s); % reset state
             
             d2n_1 = repmat(dx1(:),1,n2,n3);     % distribution to non-distribution for axis 1
             d2n_2 = repmat(dx2,n1,1,n3);        % distribution to non-distribution for axis 2

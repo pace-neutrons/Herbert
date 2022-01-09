@@ -44,10 +44,9 @@ classdef test_bin_boundaries <  TestCaseWithSave
             obj.xc1_0 = [-5, -2, 1, 5, 9, 10, 15];
             
             % Big set of exact bin boundaries and centres
-            s = rng; rng(0);    % set random number generator seed
+            rng(0);    % set random number generator seed
             obj.xb2_0 = 2*sort(round(200000*rand(1,50000)));  % many bin widths = 0
             obj.xb2 = unique(obj.xb2_0);    % all bins widths > 0
-            rng(s); % reset seed
             
             obj.xc2_0 = (obj.xb2_0(1:end-1)+obj.xb2_0(2:end))/2;
             obj.xc2 = (obj.xb2(1:end-1)+obj.xb2(2:end))/2;

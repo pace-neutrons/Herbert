@@ -16,7 +16,7 @@ function [sout, eout] = integrate_points (x, s, e, idim, xout, distr)
 %          vector).
 %           There must be at least two points.
 %           It is assumed that the values of x are strictly monotonic
-%          increasing i.e. all bins have width greater than zero.
+%          increasing.
 %
 %   s       Signal array. The extent along dimension idim must match the
 %          number of points i.e. numel(x).
@@ -54,7 +54,7 @@ function [sout, eout] = integrate_points (x, s, e, idim, xout, distr)
 % the bins can recombined to yield the same standard deviations as
 % integrating the whole bins.
 
-% The rebinning is performed by permuting and reshaping the signal and 
+% The integration is performed by permuting and reshaping the signal and 
 % error arrays to size = [n,mx] where mx is the number of bins along the
 % axis to be rebinned, and n = prod(size(s))/mx. The loop over bins for
 % array sections in this 2D array turns out to be optimised by the Matlab
@@ -70,7 +70,7 @@ if mx<1
         'The input point position array must have at least two values')
 end
 
-if numel(size(s))~=numel(size(s)) || ~all(size(s)==size(e))
+if numel(size(s))~=numel(size(e)) || ~all(size(s)==size(e))
     error('HERBERT:integrate_points:invalid_argument',...
         'The sizes of signal array (=[%s]) and error array (=[%s]) do not match',...
         str_compress(num2str(size(s)),','),...
