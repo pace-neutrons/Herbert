@@ -16,11 +16,8 @@ function process = docify_help(topic, filepath, n_out, n_in)
     rmtmp = onCleanup(@()remove_tempfile(output_file, tmp_dir));
     % Calls docify on the file
     [ok, mess, ~, has_changes, outfile] = docify_single(filepath, output_file, false);
-    if ~ok
-        error(cell2mat(join([{''}; mess], newline)));
-    elseif ~isempty(mess)
-        warning(cell2mat(join([{''}; mess], newline)));
-    end
+    assert(ok, 'HERBERT:Docify:runtime_error', mess);
+    if ~isempty(mess), warning(mess); end
     % Only use the docified output if there has been changes
     if has_changes
         % Uses built-in Matlab documentation functions to pretty-print docify text

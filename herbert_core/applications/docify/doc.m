@@ -26,7 +26,7 @@ function doc(varargin)
     % Create a handle to the original Matlab help function
     persistent builtin_doc;
     if isempty(builtin_doc)
-        builtin_doc = get_builtin_handle('doc');
+        builtin_doc = get_shadowed_function_handle('doc', mfilename('fullpath'));
     end
     
     if nargin == 1

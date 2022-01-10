@@ -19,7 +19,7 @@ function [out, docTopic] = help(varargin)
     % Create a handle to the original Matlab help function
     persistent builtin_help;
     if isempty(builtin_help)
-        builtin_help = get_builtin_handle('help');
+        builtin_help = get_shadowed_function_handle('help', mfilename('fullpath'));
     end
     
     if nargin == 0 && isscalar(dbstack)
