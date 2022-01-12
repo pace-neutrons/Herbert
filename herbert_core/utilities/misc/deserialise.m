@@ -10,23 +10,27 @@ function [ser,nbytes] = deserialise(a,pos)
 % nbytes -- the extend, deserialized data were occupied in the input array
 %
 %
+
 if nargin<2
     pos = 1;
 end
 [use_mex,fm] = config_store.instance().get_value('herbert_config',...
-    'use_mex','force_mex_if_use_mex');
+                                                 'use_mex','force_mex_if_use_mex');
+% Temporary disabled mex, #394
+use_mex = false;
 
 if use_mex
     try
         [ser,nbytes] = c_deserialise(a,pos);
-        return
     catch ME
         if fm
-            rethrow(ME);
+                rethrow(ME);
         else
             warning(ME.identifier,'%s',ME.message);
         end
     end
+else
+    [ser,nbytes] = hlp_deserialise(a,pos);
 end
 
-[ser,nbytes] = hlp_deserialise(a,pos);
+end

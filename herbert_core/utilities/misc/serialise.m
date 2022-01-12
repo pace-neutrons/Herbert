@@ -6,14 +6,17 @@ function ser = serialise(a)
 if use_mex
     try
         ser = c_serialise(a);
-        return
     catch ME
         if fm
             rethrow(ME);
         else
             warning(ME.identifier,'%s',ME.message);
+            ser = hlp_serialise(a);
         end
     end
+
+else
+    ser = hlp_serialise(a);
 end
 
-ser = hlp_serialise(a);
+end

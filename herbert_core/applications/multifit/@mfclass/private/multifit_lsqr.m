@@ -188,12 +188,12 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pi
     %   end
 
 
-    is_parallel = false;
+    is_parallel = true;
     if is_parallel
-
+        nWorkers = 1;
         [p_best,sig,cor,chisqr_red,converged] = multifit_lsqr_par(w,xye,func,bfunc,pin,bpin,...
                                                           f_pass_caller_info,bf_pass_caller_info,...
-                                                          pfin,p_info,listing,fcp,perform_fit);
+                                                          pfin,p_info,listing,fcp,perform_fit, nWorkers);
     else
         [p_best,sig,cor,chisqr_red,converged] = multifit_lsqr_ser(w,xye,func,bfunc,pin,bpin,...
                                                           f_pass_caller_info,bf_pass_caller_info,...

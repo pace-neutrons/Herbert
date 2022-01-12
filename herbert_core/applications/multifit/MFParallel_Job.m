@@ -56,6 +56,7 @@ classdef MFParallel_Job < JobExecutor
 
         function obj = setup(obj)
             data = obj.loop_data_{1};
+            psidisp('~/dump/f', data)
 
             if isfield(data, 'tobyfit_data')
                 for i=1:numel(data.tobyfit_data)
@@ -129,10 +130,11 @@ classdef MFParallel_Job < JobExecutor
                 0);
 
             f = obj.reduce(1, yc, @merge_section, 'cell', common.merge_data);
+            psidisp('~/dump/f', f)
 
             if obj.is_root
                 resid=obj.wt.*(obj.yval-f);
-
+                psidisp('~/dump/f', f)
                 obj.f_best = f; % Function values at start
                 obj.c_best=resid'*resid; % Un-normalised chi-squared
 
@@ -269,6 +271,7 @@ classdef MFParallel_Job < JobExecutor
             if obj.is_root
                 % If chisqr lowered, but not to goal, so converged; or chisqr==0 i.e. perfect fit; then exit loop
 
+                psidisp('~/dump/debug', obj.c_best, c_goal)
                 if (obj.c_best>c_goal) || (obj.c_best==0)
                     obj.converged=true;
                     obj.finished = true;
@@ -554,14 +557,6 @@ function out = merge_section(in, merge_data)
             if merge_data{iw}(iWorker).nomerge
                 out{iw} = cat(1, out{iw}, in{iWorker}{iw}(1:end));
             else
-                psidisp('~/dump/mergey',iw, iWorker)
-                psidisp('~/dump/mergey', merge_data)
-                psidisp('~/dump/mergey', merge_data{iWorker-1}(iw*2))
-                psidisp('~/dump/mergey', out{iw}(end)*merge_data{iWorker-1}(iw*2).nelem, ...
-                        in{iWorker}{iw}(1)*merge_data{iWorker}(iw*2-1).nelem)
-                psidisp('~/dump/mergey', out{iw}(end), merge_data{iWorker-1}(iw*2).nelem, ...
-                        in{iWorker}{iw}(1), merge_data{iWorker}(iw*2-1).nelem)
-
                 out{iw}(end) = out{iw}(end)*merge_data{iWorker-1}(iw*2).nelem(2) + in{iWorker}{iw}(1)*merge_data{iWorker}(iw*2-1).nelem(1);
                 out{iw}(end) = out{iw}(end) / (merge_data{iWorker-1}(iw*2).nelem(2) + merge_data{iWorker}(iw*2-1).nelem(1));
                 out{iw} = cat(1, out{iw}, in{iWorker}{iw}(2:end));

@@ -1,5 +1,5 @@
 function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfunc,pin,bpin,...
-                                                      f_pass_caller_info,bf_pass_caller_info,pfin,p_info,listing,fcp,perform_fit)
+                                                      f_pass_caller_info,bf_pass_caller_info,pfin,p_info,listing,fcp,perform_fit,nWorkers)
     % Perform least-squares minimisation
     %
     %   >> [p_best,sig,cor,chisqr_red,converged]=...
@@ -225,7 +225,8 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
     addOptional(p, 'listing', 0, @isnumeric);
     addOptional(p, 'fcp', [0.0001, 20, 0.001], @(n)(validateattributes(n,{'numeric'},{'vector','numel',3})));
     addOptional(p, 'perform_fit', 1, @islognumscalar);
-    parse(p, listing,fcp,perform_fit);
+    addOptional(p, 'nWorkers', 1, @isnumeric);
+    parse(p, listing,fcp,perform_fit,nWorkers);
 
     listing = p.Results.listing;
     fcp = p.Results.fcp;
@@ -250,14 +251,13 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
     split_bins = any(cellfun(@(x) strcmp(x, '-ave'), pars)) || ...
         any(cellfun(@(x) isa(x, 'dndbase'), w));
 
-    nWorkers = 4;
-
     % Potential issues follow if parallelism is used
     % Special casing for Tobyfit where arguments need to be distributed
     % as well as data. If functions require arguments distributing
     % these will fail in parallel
 
-    if any(cellfun(@(x)(startsWith(functions(x).function, 'tobyfit')), func))
+    tmp = cellfun(@functions, func);
+    if any(arrayfun(@(x) startsWith(x.function, 'tobyfit'), tmp))
             [loop_data, merge_data] = split_data(w, xye, [], [], nWorkers, split_bins, arrayfun(@(x)(x.plist{3}), pin, 'UniformOutput', false));
     else
         [loop_data, merge_data] = split_data(w, xye, [], [], nWorkers, split_bins);
@@ -282,6 +282,7 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
         if iscell(outputs)
             celldisp(outputs)
             outputs{1}.error
+% $$$             struct2table(outputs{1}.error.stack_r)
             struct2table(outputs{1}.error.stack)
             rethrow(outputs{1}.error)
             failure = cellfun(@(x)isa(x, 'MException'), outputs);
