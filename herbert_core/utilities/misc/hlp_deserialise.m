@@ -279,15 +279,17 @@ else
         case 1 % Serialise as saveobj (must have loadobj)
             [conts, pos] = deserialise_value(m, pos);
             % Preallocate
-            v = arrayfun(@(cont) feval([class_name '.loadobj'], cont), conts)
-% $$$             v(1:totalElem) = feval(class_name);
-% $$$             for i=1:totalElem
-% $$$                 v(i) = eval([class_name '.loadobj(conts(' num2str(i) '))']);
-% $$$             end
+            v(1:totalElem) = feval(class_name);
+            for i=1:totalElem
+                v(i) = eval([class_name '.loadobj(conts(' num2str(i) '))']);
+            end
         case 2 % Serialise as struct
             [conts, pos] = deserialise_value(m, pos);
             % Preallocate
-            v = arrayfun(@(cont) feval(class_name, cont), conts)
+            v(1:totalElem) = feval(class_name);
+            for i=1:totalElem
+                v(i) = eval([class_name '(conts(' num2str(i) '))']);
+            end
     end
 end
 
