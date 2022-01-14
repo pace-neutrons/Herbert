@@ -188,7 +188,7 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pi
     %   end
 
 
-    is_parallel = true;
+    is_parallel = false;
     if is_parallel
         nWorkers = 1;
         [p_best,sig,cor,chisqr_red,converged] = multifit_lsqr_par(w,xye,func,bfunc,pin,bpin,...
