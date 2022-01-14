@@ -102,6 +102,9 @@ classdef test_MException_her < TestCase
             rep2 = getReport(MEser);
             rep3 = getReport(MErec);
             %
+            rep1
+            rep2
+            rep3
 
             assertEqual(rep1, rep2)
             assertEqual(rep1, rep3)
