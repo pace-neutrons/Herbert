@@ -105,6 +105,9 @@ classdef test_MException_her < TestCase
             if verLessThan('matlab', '9.8')
                 rep1 = rep1(35:end)
             end
+            rep1
+            rep2
+            rep3
 
             assertEqual(rep1, rep2)
             assertEqual(rep1, rep3)
