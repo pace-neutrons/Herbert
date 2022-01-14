@@ -103,14 +103,15 @@ classdef test_MException_her < TestCase
             rep3 = getReport(MErec);
             % Strip "error line" [Error using mex_Thrower (line 29)]
             if verLessThan('matlab', '9.8')
-                rep1 = rep1(35:end)
+                assertEqual(rep2, rep3)
+                assertEqual(rep1(35:60), rep2(1:25))
+                ind1 = strfind(rep1, 'Caused');
+                ind2 = strfind(rep2, 'Caused');
+                assertEqual(rep1(ind:end), rep2(ind:end))
+            else
+                assertEqual(rep1, rep2)
+                assertEqual(rep1, rep3)
             end
-            rep1
-            rep2
-            rep3
-
-            assertEqual(rep1, rep2)
-            assertEqual(rep1, rep3)
         end
         %
         function test_get_report(~)
