@@ -281,7 +281,18 @@ function [v, pos] = deserialise_object(m, pos)
             v = arrayfun(@(cont) feval([class_name '.loadobj'], cont), conts);
           case 2 % Serialise as struct
             [conts, pos] = deserialise_value(m, pos);
-            v = arrayfun(@(cont) feval(class_name, cont), conts);
+
+            try
+                v = arrayfun(@(cont) feval(class_name, cont), conts);
+            catch ME
+                switch class_name
+                  case 'MException'
+                    v = arrayfun(@(cont) feval('MException_her', cont), conts);
+                    v = arrayfun(@(x) x.build_MException(x), v);
+                  otherwise
+                    rethrow(ME)
+                end
+            end
         end
     end
 
