@@ -42,8 +42,6 @@ if ~exist('do_html_profiling', 'var')
     do_html_profiling = false;
 end
 
-%DO_LOGGING = true;
-
 try
 
     % Check current state of mpi framework and set up deployment status

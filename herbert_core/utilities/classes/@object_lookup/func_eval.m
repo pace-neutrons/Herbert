@@ -39,7 +39,7 @@ function varargout = func_eval (obj, varargin)
 %
 %               [X1, X2, X3...] = my_function (object, p1, p2,...)
 %
-%              where X1, X2,... are the output arguments, which can be
+%              where X1, X2,... are the output arguments, which can be 
 %              scalars or arrays of any objects that can be concantenated
 %              and reshaped.
 %
@@ -84,6 +84,7 @@ else
     error('Insufficient number of input arguments')
 end
 
+
 [varargout{1:nargout}] = func_eval_private (obj.object_store_, obj.indx_{iarray}(ind), funchandle, arg);
 
 
@@ -115,17 +116,17 @@ if numel(indu)>1
             X{j}(:,i) = Xtmp{j}(:);
         end
     end
-
+    
     % Expand according to the repetitions in indx
     ix = zeros(1,N);
     ix(indu) = 1:numel(indu);
     indu_expand = ix(ind);
     X = cellfun (@(x,y)(x(:,indu_expand)), X, 'UniformOutput', false);
-
+    
     % Reshape output
     varargout = cellfun (@(x,y)(reshape(x, size_array_stack(y, size(ind)))),...
         X, sz, 'UniformOutput', false);
-
+    
 else
     varargout = cellfun (@(x,y)(reshape(repmat(x(:),[1,numel(ind)]),...
         size_array_stack(y,size(ind)))), Xtmp, sz, 'UniformOutput', false);

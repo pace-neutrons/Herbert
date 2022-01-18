@@ -213,7 +213,7 @@ classdef TestCaseWithSave < TestCase & oldTestCaseWithSaveInterface
 
     properties(Access=protected)
         % Structure containing test results
-        % - If save_output is false (i.e. in test mode) the structure contains
+        % - If save_outptu is false (i.e. in test mode) the structure contains
         %   the contents of the file in test_results_file_, if it exists
         % - If save_output is true, it contains tests results to save in
         %   a temporary file whose name is constructed from test_results_file_

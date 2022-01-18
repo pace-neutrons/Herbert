@@ -1,6 +1,8 @@
 function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pin,bpin,...
                                                       f_pass_caller_info,bf_pass_caller_info,pfin,p_info,listing,fcp,perform_fit)
     % Perform least-squares minimisation
+    % now handled by either multifit_lsqr_par or multifit_lsqr_ser
+    % depending on parallelisation options
     %
     %   >> [p_best,sig,cor,chisqr_red,converged]=...
     %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing)
@@ -187,8 +189,12 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr(w,xye,func,bfunc,pi
     %        :
     %   end
 
+    if exist('hpc_config', 'var')
+        hc = hpc_config;
+    else
+        hc = struct('parallel_multifit', false)
+    end
 
-    hc = hpc_config;
     if hc.parallel_multifit
         [p_best,sig,cor,chisqr_red,converged] = multifit_lsqr_par(w,xye,func,bfunc,pin,bpin,...
                                                           f_pass_caller_info,bf_pass_caller_info,...

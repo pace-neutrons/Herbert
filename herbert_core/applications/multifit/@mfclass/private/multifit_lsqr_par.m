@@ -3,13 +3,16 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
     % Perform least-squares minimisation
     %
     %   >> [p_best,sig,cor,chisqr_red,converged]=...
-    %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing)
+    %       multifit_lsqr_par(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing)
     %
     %   >> [p_best,sig,cor,chisqr_red,converged]=...
-    %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp)
+    %       multifit_lsqr_par(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp)
     %
     %   >> [p_best,sig,cor,chisqr_red,converged]=...
-    %       multifit_lsqr(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp,perform_fit)
+    %       multifit_lsqr_par(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp,perform_fit)
+    %
+    %   >> [p_best,sig,cor,chisqr_red,converged]=...
+    %       multifit_lsqr_par(w,xye,func,bkdfunc,pin,bpin,pfin,p_info,listing,fcp,perform_fit,nWorkers)
     %
     % Input:
     % ------
@@ -76,6 +79,8 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
     %
     %   perform_fit Logical scalar = true if a fit is required, =false if
     %              just need the value of chisqr. [Default: True]
+    %
+    %   nWorkers    Integer number of parallel workers to use. [Default: 1]
     %
     %
     % Output:
@@ -153,7 +158,7 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
     %              different from the state: the values of store should not affect
     %              the values of the calculated function, only the speed at which the
     %              values are calculated.
-    %               The first call from multifit_lsqr it will be set to [].
+    %               The first call from multifit_lsqr_par it will be set to [].
     %               If no storage is needed, then it can be ignored.
     %
     %   state_out   Cell array containing internal states to be saved for a future call.
@@ -191,27 +196,10 @@ function [p_best,sig,cor,chisqr_red,converged]=multifit_lsqr_par(w,xye,func,bfun
     % History
     % ---------------------------------------------------------------------------------------
     %
-    % T.G.Perring Jan 2016:
+    % J. Wilkins  Jan 2021:
     % ------------------------
-    % Change calls to fit functions so that caller information is passed direcetly rather than
-    % via a function that stores persistent information. Makes cleanup easier and future
-    % refactoring onto multiple cores more straightforward.
-    %
-    % T.G.Perring Jan 2009:
-    % ------------------------
-    % Generalise to arbitrary data objects which have a certain set of methods defined on them (see
-    % notes elsewhere for details)
-    %
-    % T.G.Perring 11-Jan-2007:
-    % ------------------------
-    % Core Levenberg-Marquardt minimisation method inspired by speclsqr.m from spec1d, but massively
-    % edited to make more memory efficient, remove redundant code, and especially rewrite the *AWFUL*
-    % estimation of errors on the parameter values (which needed a temporary
-    % array of size m^2, where m is the number of data values - 80GB RAM
-    % for m=100,000!). The error estimates were also a factor sqrt(ndat/(ndat-npfree))
-    % too large - as determined by comparing with analytical result for fitting to
-    % a straight line, from e.g. G.L.Squires, Practical Physics, (CUP ~1980). The
-    % current routine gives correct result.
+    % Initial development of parallel version
+    % Developed based on T.G.Perring's multifit_lsqr
     %
     % Previous history:
     % -----------------

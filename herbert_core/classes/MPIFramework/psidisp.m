@@ -1,4 +1,17 @@
 function psidisp(filename, varargin)
+% Parallel state independent display (Easily memorable palindrome from disp)
+% Quick dump to logging file on system tagged with parent process ID
+%
+% Usage:
+%    psidisp('~/dump/debug', 'hello', a)
+%
+%    psidisp('c:\dump\debug', 'hello', a)
+%
+% Produces, for example:
+% ~/dump/debug0  % Root process
+% ~/dump/debug1  % Worker 1
+% etc.
+
 
     mpi = MPI_State.instance();
 
