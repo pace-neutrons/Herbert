@@ -370,12 +370,16 @@ classdef JobExecutor
             % to give opportunity to initialise JobExecutor data
             % with access to parallel comms.
 
+        % Function is empty with intent to be overridden by subclasses
+
         end
 
         function obj = finalise(obj)
             % Function called once after leaving do_job loop
             % to give opportunity to finalise JobExecutor data
             % with access to parallel comms.
+
+        % Function is empty with intent to be overridden by subclasses
 
         end
 

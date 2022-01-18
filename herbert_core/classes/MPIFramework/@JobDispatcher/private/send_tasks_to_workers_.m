@@ -127,7 +127,7 @@ function n_wk = check_loop_param(loop_param,n_workers)
 % Available number of workers
     n_wk = n_workers;
 
-    if ~isscalar(loop_param) || iscell(loop_param)
+    if ~isscalar(loop_param)
         n_jobs = numel(loop_param);
     elseif isscalar(loop_param) && isnumeric(loop_param)
         n_jobs = loop_param;
