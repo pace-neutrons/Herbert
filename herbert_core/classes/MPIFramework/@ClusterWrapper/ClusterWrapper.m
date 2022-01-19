@@ -100,6 +100,7 @@ classdef ClusterWrapper
         starting_info_message_ ='';
         started_info_message_ ='';
     end
+
     properties(Access=private)
         %------------------------------------------------------------------
         % Auxiliary properties, defining the output of the log messages
@@ -118,7 +119,7 @@ classdef ClusterWrapper
         % if java process report it has been completed
         running_mess_contents_= 'process has not exited';
     end
-    %
+
     properties(Hidden,Dependent)
         % helper property to print nicely aligned log messages
         log_wrap_length;
@@ -210,7 +211,7 @@ classdef ClusterWrapper
                 error('HERBERT:ClusterWrapper:runtime_error',...
                     'Can not find Matlab');
             end
-            %
+
             obj.matlab_starter_ = prog_path;
             if ispc()
                 obj.matlab_starter_ = fullfile(obj.matlab_starter_,'matlab.exe');
@@ -267,9 +268,9 @@ classdef ClusterWrapper
             %                     'continuing'
             %
             %
-                obj = obj.init_workers(je_init_message,task_init_mess,log_message_prefix);
+            obj = obj.init_workers(je_init_message,task_init_mess,log_message_prefix);
         end
-        %
+
         function obj = init_workers(obj,je_init_message,task_init_mess,log_message_prefix)
             % send initialization information to each worker in the cluster
             % providing information about parallel job.
@@ -350,7 +351,7 @@ classdef ClusterWrapper
                     failedC = true;
                 end
             end
-            %
+
             if paused
                 completed = false;
                 failed    = false;
@@ -358,7 +359,7 @@ classdef ClusterWrapper
             else
                 [completed,failed,mess] = check_progress_from_messages_(obj,varargin{:});
             end
-            %
+
             if isempty(mess) % the information is from job control
                 obj.status = messC;
             else % messages should contain better information about the issue
@@ -466,6 +467,7 @@ classdef ClusterWrapper
                 'Parallel worker %s is not on Matlab path. Parallel extensions are not available',...
                 worker);
         end
+
         % The property returns the list of the configurations, available for
         % usage by the
         function config = get_cluster_configs_available(obj)
@@ -483,6 +485,7 @@ classdef ClusterWrapper
         function isit = get.status_changed(obj)
             isit = obj.status_changed_;
         end
+
         function name = get.status_name(obj)
             if isempty(obj.current_status_)
                 name = 'undefined';
@@ -490,9 +493,11 @@ classdef ClusterWrapper
                 name = obj.current_status_.mess_name;
             end
         end
+
         function log = get.log_value(obj)
             log = obj.log_value_;
         end
+
         function id = get.job_id(obj)
             if isempty(obj.mess_exchange_)
                 id = 'undefined';
@@ -500,6 +505,7 @@ classdef ClusterWrapper
                 id = obj.mess_exchange_.job_id();
             end
         end
+
         function nw = get.n_workers(obj)
             nw = obj.n_workers_;
         end
@@ -507,6 +513,7 @@ classdef ClusterWrapper
         function isit = get.status(obj)
             isit = obj.current_status_;
         end
+
         function obj = set.status(obj,mess)
             obj = obj.set_cluster_status(mess);
         end
@@ -514,12 +521,15 @@ classdef ClusterWrapper
         function len = get.log_wrap_length(obj)
             len = obj.LOG_MESSAGE_WRAP_LENGTH;
         end
+
         function ex = get.exit_worker_when_job_ends(obj)
             ex = exit_worker_when_job_ends_(obj);
         end
+
         function conf = get.cluster_config(obj)
             conf = obj.cluster_config_;
         end
+
         function obj = set.cluster_config(obj,val)
             % sets up configuration class, suitable for appropriate MPI
             % cluster.
@@ -533,12 +543,13 @@ classdef ClusterWrapper
         function name = get.pool_exchange_frmwk_name(obj)
             name = obj.pool_exchange_frmwk_name_;
         end
+
         function frmwk = get_exchange_framework(obj)
             % get framework used for data exchange between running cluster
             % and control node.
             frmwk = obj.mess_exchange_;
         end
-        %
+
         function [completed,failed,mess] = check_progress_from_messages(obj,varargin)
             % function analystes received progress messages and calculates
             % progress from them
@@ -567,7 +578,7 @@ classdef ClusterWrapper
                     'UniformOutput',false);
             end
         end
-        %
+
         function check_failed(obj)
             % run cluster-specific get_state_from_job_control function and
             % throw if this function return failure
@@ -591,13 +602,13 @@ classdef ClusterWrapper
                 jobid = obj.job_id;
                 stat_name  = obj.status_name;
                 obj = obj.finalize_all();
-                %
+
                 error('HERBERT:ClusterWrapper:runtime_error',format,...
                     obj.starting_cluster_name_,jobid,stat_name,info);
 
             end
         end
-        %
+
         function obj = generate_log(obj,varargin)
             % prepare log message from input parameters and the data, retrieved
             % by check_progress method
@@ -626,9 +637,9 @@ classdef ClusterWrapper
         end
 
         function ex = exit_worker_when_job_ends_(~)
-        % function defines desired completion of the workers.
-        % should be true for java-controlled worker and false for parallel
-        % computing toolbox controlled one.
+            % function defines desired completion of the workers.
+            % should be true for java-controlled worker and false for parallel
+            % computing toolbox controlled one.
             ex  = true;
         end
 
