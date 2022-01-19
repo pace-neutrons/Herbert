@@ -366,8 +366,8 @@ end
 function plist_cell = plist_update (plist, pnew)
 % Take mfclass_plist object and replacement numerical parameter list with same number
 % of elements, return cell array of parameters to pass to evaluation function.
-    tmp=plist;
-    tmp.p=reshape(pnew,size(plist.p));  % ensure same orientation
+tmp=plist;
+tmp.p=reshape(pnew,size(plist.p));  % ensure same orientation
 if iscell(tmp.plist)
     plist_cell=tmp.plist;           % case of {@func,plist,c1,c2,...}, {p,c1,c2,...}, {c1,c2,...} or {}
 else

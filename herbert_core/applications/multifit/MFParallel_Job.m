@@ -43,14 +43,14 @@ classdef MFParallel_Job < JobExecutor
         end
 
         function obj=reduce_data(obj)
-        % Performed at end of do job after synchronise
+            % Performed at end of do job after synchronise
 
             obj.iter = obj.iter + 1;
             obj.finished = obj.finished || (obj.iter >= obj.niter);
         end
 
         function ok = is_completed(obj)
-        % If returns true, job will not run another cycle of do_job/reduce_data
+            % If returns true, job will not run another cycle of do_job/reduce_data
             ok = obj.finished;
         end
 
@@ -286,7 +286,7 @@ classdef MFParallel_Job < JobExecutor
         end
 
         function obj = finalise(obj)
-        % Wrap up for exit from fitting routine
+            % Wrap up for exit from fitting routine
             data = obj.loop_data_{1};
             common = obj.common_data_;
 
@@ -370,7 +370,7 @@ classdef MFParallel_Job < JobExecutor
 
     methods
         function jac=multifit_dfdpf(obj,w,xye,func,bfunc,pin,bpin,...
-                                    f_pass_caller_info,bf_pass_caller_info,p,p_info,f,dp,S,Store)
+                f_pass_caller_info,bf_pass_caller_info,p,p_info,f,dp,S,Store)
             % Calculate partial derivatives of function with respect to parameters
             %
             %   >> jac=multifit_dfdpf(w,xye,func,bkdfunc,pin,bpin,...
@@ -430,7 +430,7 @@ classdef MFParallel_Job < JobExecutor
                     ppos(j)=p(j)+del;
 
                     plus = multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-                                                   f_pass_caller_info,bf_pass_caller_info,ppos,p_info,false,S,Store,0);
+                        f_pass_caller_info,bf_pass_caller_info,ppos,p_info,false,S,Store,0);
 
                     plus = obj.reduce(1, plus, @merge_section, 'cell', obj.common_data_.merge_data);
 
@@ -445,9 +445,9 @@ classdef MFParallel_Job < JobExecutor
                     pneg=p;
                     pneg(j)=p(j)-del;
                     plus = multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-                                                   f_pass_caller_info,bf_pass_caller_info,ppos,p_info,false,S,Store,0);
+                        f_pass_caller_info,bf_pass_caller_info,ppos,p_info,false,S,Store,0);
                     minus = multifit_lsqr_func_eval(w,xye,func,bfunc,pin,bpin,...
-                                                    f_pass_caller_info,bf_pass_caller_info,pneg,p_info,false,S,Store,0);
+                        f_pass_caller_info,bf_pass_caller_info,pneg,p_info,false,S,Store,0);
 
                     plus = obj.reduce(1, plus, @merge_section, 'cell', obj.common_data_.merge_data);
                     minus = obj.reduce(1, minus, @merge_section, 'cell', obj.common_data_.merge_data);
@@ -495,8 +495,8 @@ classdef MFParallel_Job < JobExecutor
         end
 
         function val = reduce(obj, root, val, op, opt, varargin)
-        % Reduce data (val) from all processors on lab root using operation op
-        % If op requires a list rather than array
+            % Reduce data (val) from all processors on lab root using operation op
+            % If op requires a list rather than array
 
             if obj.numLabs == 1
                 val = op({val}, varargin{:});
@@ -516,13 +516,13 @@ classdef MFParallel_Job < JobExecutor
                 recv_data = {val, recv_data{:}};
 
                 switch opt
-                  case 'mat'
-                    recv_data = cell2mat(recv_data);
-                    val = op(recv_data, varargin{:});
-                  case 'cell'
-                    val = op(recv_data, varargin{:});
-                  case 'args'
-                    val = op(recv_data{:}, varargin{:});
+                    case 'mat'
+                        recv_data = cell2mat(recv_data);
+                        val = op(recv_data, varargin{:});
+                    case 'cell'
+                        val = op(recv_data, varargin{:});
+                    case 'args'
+                        val = op(recv_data{:}, varargin{:});
                 end
 
             else
@@ -545,24 +545,24 @@ function out = merge_section(in, merge_data)
 % Merge a compenent of split data into contiguous block, collating like sqw data
 % Possibly inefficient, but should be a miniscule part of calculation
 
-    nWorkers = numel(in);
-    nw = numel(in{1});
-    out = in{1};
-    for iWorker=2:nWorkers
-        for iw=1:nw
-            if merge_data{iw}(iWorker).nomerge
-                out{iw} = cat(1, out{iw}, in{iWorker}{iw}(1:end));
-            else
-                out{iw}(end) = out{iw}(end)*merge_data{iWorker-1}(iw*2).nelem(2) + in{iWorker}{iw}(1)*merge_data{iWorker}(iw*2-1).nelem(1);
-                out{iw}(end) = out{iw}(end) / (merge_data{iWorker-1}(iw*2).nelem(2) + merge_data{iWorker}(iw*2-1).nelem(1));
-                out{iw} = cat(1, out{iw}, in{iWorker}{iw}(2:end));
-            end
+nWorkers = numel(in);
+nw = numel(in{1});
+out = in{1};
+for iWorker=2:nWorkers
+    for iw=1:nw
+        if merge_data{iw}(iWorker).nomerge
+            out{iw} = cat(1, out{iw}, in{iWorker}{iw}(1:end));
+        else
+            out{iw}(end) = out{iw}(end)*merge_data{iWorker-1}(iw*2).nelem(2) + in{iWorker}{iw}(1)*merge_data{iWorker}(iw*2-1).nelem(1);
+            out{iw}(end) = out{iw}(end) / (merge_data{iWorker-1}(iw*2).nelem(2) + merge_data{iWorker}(iw*2-1).nelem(1));
+            out{iw} = cat(1, out{iw}, in{iWorker}{iw}(2:end));
         end
     end
-     a = out{1}(:);
-     for i=2:numel(out)
-         a = [a; out{i}(:)];
-     end
-     out = a;
+end
+a = out{1}(:);
+for i=2:numel(out)
+    a = [a; out{i}(:)];
+end
+out = a;
 % $$$     out = cat(1, out{:})
 end
