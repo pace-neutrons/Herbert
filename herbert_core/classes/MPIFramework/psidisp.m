@@ -16,7 +16,7 @@ function psidisp(filename, varargin)
     mpi = MPI_State.instance();
 
     if isempty(mpi)
-        fid = fopen(filename, 'a')
+        fid = fopen(filename, 'a');
     else
         [fp, bn, ext] = fileparts(filename);
         fid = fopen(fullfile(fp, [bn, num2str(mpi.labIndex), ext]), 'a');

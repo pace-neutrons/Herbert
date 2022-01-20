@@ -11,7 +11,6 @@ classdef MFParallel_Job < JobExecutor
         nnorm
         npfree
 
-        p
         f_best
         p_best
         c_best
@@ -26,6 +25,9 @@ classdef MFParallel_Job < JobExecutor
         converged = false
         finished = false
 
+        S
+        Store
+
     end
 
     properties(Constant)
@@ -35,7 +37,7 @@ classdef MFParallel_Job < JobExecutor
     methods
         % Constructor cannot take args as constructed by JobDispatcher
         function obj = MFParallel_Job()
-            obj = obj@JobExecutor()
+            obj = obj@JobExecutor();
         end
 
         function out = get.is_root(obj)
@@ -79,28 +81,28 @@ classdef MFParallel_Job < JobExecutor
 
             w = data.w;
 
-            yval=cell(size(w));
-            wt=cell(size(w));
+            yval_tmp=cell(size(w));
+            wt_tmp=cell(size(w));
             for i=1:numel(w)
                 if data.xye(i)   % xye triple - we have already masked all unwanted points
-                    yval{i}=w{i}.y;
-                    wt{i}=1./w{i}.e;
+                    yval_tmp{i}=w{i}.y;
+                    wt_tmp{i}=1./w{i}.e;
                 else        % a different data object: get data to be fitted
-                    [yval{i},wt{i},msk]=sigvar_get(w{i});
-                    yval{i}=yval{i}(msk);         % remove the points that we are told to ignore
-                    wt{i}=1./sqrt(wt{i}(msk));
+                    [yval_tmp{i},wt_tmp{i},msk]=sigvar_get(w{i});
+                    yval_tmp{i}=yval_tmp{i}(msk);         % remove the points that we are told to ignore
+                    wt_tmp{i}=1./sqrt(wt_tmp{i}(msk));
                 end
-                yval{i}=yval{i}(:);         % make a column vector
-                wt{i}=wt{i}(:);         % make a column vector
+                yval_tmp{i}=yval_tmp{i}(:);         % make a column vector
+                wt_tmp{i}=wt_tmp{i}(:);         % make a column vector
 
-                yval{i} = obj.reduce(1, yval(i), @merge_section, 'cell', common.merge_data);
-                wt{i} = obj.reduce(1, wt(i), @merge_section, 'cell', common.merge_data);
+                yval_tmp{i} = obj.reduce(1, yval_tmp(i), @merge_section, 'cell', common.merge_data);
+                wt_tmp{i} = obj.reduce(1, wt_tmp(i), @merge_section, 'cell', common.merge_data);
             end
 
             % Need these available on root
             if obj.is_root
-                obj.yval=cell2mat(yval(:));     % one long column vector
-                obj.wt=cell2mat(wt(:));
+                obj.yval=cell2mat(yval_tmp(:));     % one long column vector
+                obj.wt=cell2mat(wt_tmp(:));
 
                 % Check that there are more data points than free parameters
                 nval=numel(obj.yval);
@@ -112,7 +114,7 @@ classdef MFParallel_Job < JobExecutor
                 obj.nnorm=max(nval-obj.npfree,1);   % we allow for the case nval=npfree
             end
 
-            [yc, vc, S, Store] = multifit_lsqr_func_eval( ...
+            [yc, ~, obj.S, obj.Store] = multifit_lsqr_func_eval( ...
                 data.w, ...
                 data.xye, ...
                 common.func, ...
@@ -124,8 +126,8 @@ classdef MFParallel_Job < JobExecutor
                 common.p, ...
                 common.p_info, ...
                 true, ...
-                data.S, ...
-                data.Store , ...
+                obj.S, ...
+                obj.Store , ...
                 0);
 
             f = obj.reduce(1, yc, @merge_section, 'cell', common.merge_data);
@@ -172,8 +174,8 @@ classdef MFParallel_Job < JobExecutor
                 common.p_info, ...
                 obj.f_best, ...
                 obj.dp, ...
-                data.S, ...
-                data.Store);
+                obj.S, ...
+                obj.Store);
 
             if obj.is_root
 
@@ -219,7 +221,7 @@ classdef MFParallel_Job < JobExecutor
                     p=obj.p_best+p_chg;
 
 
-                    [yc, vc, S, Store] = multifit_lsqr_func_eval( ...
+                    [yc, ~, obj.S, obj.Store] = multifit_lsqr_func_eval( ...
                         data.w, ...
                         data.xye, ...
                         common.func, ...
@@ -231,8 +233,8 @@ classdef MFParallel_Job < JobExecutor
                         p, ...
                         common.p_info, ...
                         true, ...
-                        data.S, ...
-                        data.Store , ...
+                        obj.S, ...
+                        obj.Store , ...
                         0);
 
                     f = obj.reduce(1, yc, @merge_section, 'cell', common.merge_data);
@@ -299,7 +301,7 @@ classdef MFParallel_Job < JobExecutor
                 % of the covariance matrix. If the stored values are for the best parameters, then this
                 % is a low cost function call, so there is little penalty.)
 
-                [~, ~, S, Store] = multifit_lsqr_func_eval( ...
+                [~, ~, obj.S, obj.Store] = multifit_lsqr_func_eval( ...
                     data.w, ...
                     data.xye, ...
                     common.func, ...
@@ -311,8 +313,8 @@ classdef MFParallel_Job < JobExecutor
                     obj.p_best, ...
                     common.p_info, ...
                     true, ...
-                    data.S, ...
-                    data.Store , ...
+                    obj.S, ...
+                    obj.Store , ...
                     0);
 
                 % Now get Jacobian matrix
@@ -329,11 +331,11 @@ classdef MFParallel_Job < JobExecutor
                     common.p_info, ...
                     obj.f_best, ...
                     obj.dp, ...
-                    data.S, ...
-                    data.Store);
+                    obj.S, ...
+                    obj.Store);
 
                 if obj.is_root
-                    chisqr_red = obj.c_best/obj.nnorm;
+                    obj.chisqr_red = obj.c_best/obj.nnorm;
 
                     for k=1:obj.npfree
                         jac(:,k)=obj.wt.*jac(:,k);
@@ -342,7 +344,7 @@ classdef MFParallel_Job < JobExecutor
                     [~,s,v]=svd(jac,0);
                     s=repmat((1./diag(s))',[obj.npfree,1]);
                     v=v.*s;
-                    cov=chisqr_red*(v*v');  % true covariance matrix;
+                    cov=obj.chisqr_red*(v*v');  % true covariance matrix;
                     sig=sqrt(diag(cov));
                     tmp=repmat(1./sqrt(diag(cov)),[1,obj.npfree]);
                     cor=tmp.*cov.*tmp';
@@ -351,17 +353,17 @@ classdef MFParallel_Job < JobExecutor
 
             else
                 if obj.is_root
-                    chisqr_red = obj.c_best/obj.nnorm;
+                    obj.chisqr_red = obj.c_best/obj.nnorm;
                 end
                 sig=zeros(1,numel(obj.p_best));
                 cor=zeros(numel(obj.p_best));
             end
 
             if obj.is_root
-                obj.task_outputs = struct('p_best', obj.p_best, 'sig', sig, 'cor', cor, 'chisqr_red', chisqr_red, 'converged', obj.converged)
+                obj.task_outputs = struct('p_best', obj.p_best, 'sig', sig, 'cor', cor, 'chisqr_red', obj.chisqr_red, 'converged', obj.converged);
 
             else
-                obj.task_outputs = []
+                obj.task_outputs = [];
             end
 
         end
@@ -465,14 +467,13 @@ classdef MFParallel_Job < JobExecutor
         function val = bcast(obj, root, val)
 
             if obj.numLabs == 1
-                val = val;
                 return
             end
 
             if obj.labIndex == root
                 % Send data
                 send_data = DataMessage(val);
-                to = [1:obj.numLabs];
+                to = 1:obj.numLabs;
                 to = to(to ~= root);
                 for i=1:obj.numLabs-1
                     [ok, err_mess] = obj.mess_framework.send_message(to(i), send_data);
@@ -513,7 +514,7 @@ classdef MFParallel_Job < JobExecutor
 
                 recv_data = recv_data(ind);
                 recv_data = cellfun(@(x) (x.payload), recv_data, 'UniformOutput', false);
-                recv_data = {val, recv_data{:}};
+                recv_data = [val, recv_data{:}];
 
                 switch opt
                     case 'mat'
@@ -559,10 +560,10 @@ for iWorker=2:nWorkers
         end
     end
 end
-a = out{1}(:);
-for i=2:numel(out)
-    a = [a; out{i}(:)];
-end
-out = a;
-% $$$     out = cat(1, out{:})
+% $$$ a = out{1}(:);
+% $$$ for i=2:numel(out)
+% $$$     a = [a; out{i}(:)];
+% $$$ end
+% $$$ out = a;
+out = cat(1, out{:});
 end

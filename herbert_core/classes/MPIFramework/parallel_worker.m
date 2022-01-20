@@ -211,9 +211,8 @@ while keep_worker_running
     try
         if do_logging; log_init_je_finished();  end
         if ~isempty(mess)
-            err = sprintf(' Error sending ''started'' message from task N%d',...
+            error('WORKER:init_worker',' Error sending ''started'' message from task N%d',...
                 fbMPI.labIndex);
-            error('WORKER:init_worker',err);
         end
         % Successful je.init should return "started" message, initiating
         % blocking receive from all other workers.
@@ -240,7 +239,7 @@ while keep_worker_running
         mis.do_logging(0,n_steps);
 
         % Call initial setup function of JobExecutor
-        je = je.setup()
+        je = je.setup();
         check_cancellation_status(je, 'before do_job loop');
 
         while ~je.is_completed()

@@ -76,13 +76,13 @@ classdef mfclass_plist < serializable
 
     properties (Dependent)
         % Parameter list
-        plist
+        plist;
         % Logical indicating if numeric parameter list is present or not
-        p_present = false;
+        p_present;
         % Numeric parameter list
-        p = [];
+        p;
         % Number of elements in numeric parameter list
-        np
+        np;
     end
 
 
