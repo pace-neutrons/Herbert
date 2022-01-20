@@ -286,7 +286,7 @@ function [v, pos] = deserialise_object(m, pos)
             catch ME
                 switch class_name
                   case 'MException'
-                    v = arrayfun(@(cont) feval('MException_her', cont), conts);
+                    v = arrayfun(@MException_her, conts);
                     v = arrayfun(@(x) x.build_MException(x), v);
                   otherwise
                     rethrow(ME)

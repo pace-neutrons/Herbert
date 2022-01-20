@@ -299,11 +299,11 @@ for i=1:numel(w)
         error('HERBERT:split_data:invalid_argument', ...
             'Unrecognised type: %s, data must be of type struct, SQWDnDBase or IX_dataset.', class(w{i}))
     end
-    
+
     for j=1:nWorkers
         loop_data{j}.w{i} = data(j);
     end
-    
+
 end
 
 if exist('tobyfit', 'var')
@@ -313,12 +313,12 @@ if exist('tobyfit', 'var')
         loop_data{i}.rng = a;
         for k = 1:numel(tobyfit)
             for j = 1:numel(tobyfit{k}.kf)
-                
+
                 n = numel(tobyfit{k}.kf{j});
                 nPer = repmat(floor(n / nWorkers), nWorkers, 1);
                 nPer(1:mod(n, nWorkers)) = nPer(1:mod(n, nWorkers)) + 1;
                 points = [0; cumsum(nPer)];
-                
+
                 loop_data{i}.tobyfit_data{k}.kf{j}     = tobyfit{k}.kf{j}(points(i)+1:points(i+1));
                 loop_data{i}.tobyfit_data{k}.dt{j}     = tobyfit{k}.dt{j}(points(i)+1:points(i+1));
                 loop_data{i}.tobyfit_data{k}.dq_mat{j} = tobyfit{k}.dq_mat{j}(:,:,points(i)+1:points(i+1));
@@ -351,7 +351,7 @@ end
 
 function [data, merge_data] = split_dataset(w, nWorkers)
 cls = class(w);
-dims = str2num(cls(12));
+dims = str2double(cls(12));
 n = numel(w.x);
 nPer = repmat(floor(n / nWorkers), nWorkers, 1);
 nPer(1:mod(n, nWorkers)) = nPer(1:mod(n, nWorkers)) + 1;
