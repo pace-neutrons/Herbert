@@ -41,8 +41,8 @@ function [wmask,msk_out] = mask_data_for_fit (w,msk_in)
             [msk_out{i}, mess_tmp] = mask_points_for_fit_xye({},ytmp,vtmp,(msk_in{i}&msk_null));
         end
         if ~isempty(mess_tmp)
-            mess = [data_id_mess(sz,i),mess_tmp]
-            mess = [mess{:}]
+            mess = [data_id_mess(sz,i),mess_tmp];
+            mess = [mess{:}];
             warning('HERBERT:mask_data_for_fit:bad_points', mess);
         end
 
