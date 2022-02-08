@@ -76,7 +76,11 @@ pipeline {
     MATLAB_VERSION = utilities.get_param('MATLAB_VERSION', pli.matlab_release)
     CMAKE_VERSION = utilities.get_param('CMAKE_VERSION', '3.19')
     GCC_VERSION = utilities.get_param('GCC_VERSION', '6.3.0')
-    VS_VERSION = utilities.get_param('VS_VERSION', '2017')
+    if (env.AGENT == 'icdpacewin') {
+      VS_VERSION = utilities.get_param('VS_VERSION', '2019')
+    } else {
+      VS_VERSION = utilities.get_param('VS_VERSION', '2017')
+    }
     CPPCHECK_VERSION = utilities.get_param('CPPCHECK_VERSION', '1.77')
   }
 
@@ -85,145 +89,145 @@ pipeline {
 
     stage('Notify') {
       steps {
-        script {
-          if (env.PR_LABELS) {
-            echo "Found PR labels: ${env.PR_LABELS}"
-          }
-        }
-        post_github_status("pending", "The build is running")
+	script {
+	  if (env.PR_LABELS) {
+	    echo "Found PR labels: ${env.PR_LABELS}"
+	  }
+	}
+	post_github_status("pending", "The build is running")
       }
     }
 
     stage('Configure') {
       steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              module load matlab/\$MATLAB_VERSION &&
-              module load gcc/\$GCC_VERSION &&
-              module load cppcheck/\$CPPCHECK_VERSION &&
-              ./tools/build_config/build.sh \
-                --cmake_flags \"-DHerbert_RELEASE_TYPE=\$RELEASE_TYPE\" \
-                --matlab_release \$MATLAB_VERSION \
-                --print_versions \
-                --configure
-              '''
-          } else {
-            powershell '''
-              ./tools/build_config/build.ps1 \
-                -cmake_flags \"-DHerbert_RELEASE_TYPE=\$env:RELEASE_TYPE\" \
-                -matlab_release \$env:MATLAB_VERSION \
-                -vs_version \$env:VS_VERSION \
-                -print_versions \
-                -configure
-          '''
-          }
-        }
+	script {
+	  if (isUnix()) {
+	    sh '''
+	      module load cmake/\$CMAKE_VERSION &&
+	      module load matlab/\$MATLAB_VERSION &&
+	      module load gcc/\$GCC_VERSION &&
+	      module load cppcheck/\$CPPCHECK_VERSION &&
+	      ./tools/build_config/build.sh \
+		--cmake_flags \"-DHerbert_RELEASE_TYPE=\$RELEASE_TYPE\" \
+		--matlab_release \$MATLAB_VERSION \
+		--print_versions \
+		--configure
+	      '''
+	  } else {
+	    powershell '''
+	      ./tools/build_config/build.ps1 \
+		-cmake_flags \"-DHerbert_RELEASE_TYPE=\$env:RELEASE_TYPE\" \
+		-matlab_release \$env:MATLAB_VERSION \
+		-vs_version \$env:VS_VERSION \
+		-print_versions \
+		-configure
+	  '''
+	  }
+	}
       }
     }
 
     stage('Analyze') {
       steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              module load matlab/\$MATLAB_VERSION &&
-              module load gcc/\$GCC_VERSION &&
-              module load cppcheck/\$CPPCHECK_VERSION &&
-              ./tools/build_config/build.sh --analyze
-            '''
-          }
-          else {
-            powershell '''
-              Write-Output \"Static Analysis in not performed on Windows\"
-            '''
-          }
-        }
+	script {
+	  if (isUnix()) {
+	    sh '''
+	      module load cmake/\$CMAKE_VERSION &&
+	      module load matlab/\$MATLAB_VERSION &&
+	      module load gcc/\$GCC_VERSION &&
+	      module load cppcheck/\$CPPCHECK_VERSION &&
+	      ./tools/build_config/build.sh --analyze
+	    '''
+	  }
+	  else {
+	    powershell '''
+	      Write-Output \"Static Analysis in not performed on Windows\"
+	    '''
+	  }
+	}
       }
     }
 
     stage('Build') {
       when {
-        expression {
-          run_build_stage == true
-        }
+	expression {
+	  run_build_stage == true
+	}
       }
       steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              module load matlab/\$MATLAB_VERSION &&
-              module load gcc/\$GCC_VERSION &&
-              ./tools/build_config/build.sh --build
-            '''
-          }
-          else {
-            powershell '''
-              ./tools/build_config/build.ps1 -build
-            '''
-          }
-        }
+	script {
+	  if (isUnix()) {
+	    sh '''
+	      module load cmake/\$CMAKE_VERSION &&
+	      module load matlab/\$MATLAB_VERSION &&
+	      module load gcc/\$GCC_VERSION &&
+	      ./tools/build_config/build.sh --build
+	    '''
+	  }
+	  else {
+	    powershell '''
+	      ./tools/build_config/build.ps1 -build
+	    '''
+	  }
+	}
       }
     }
 
     stage('Test') {
       when {
-        expression {
-          run_test_stage == true
-        }
+	expression {
+	  run_test_stage == true
+	}
       }
       steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              module load matlab/\$MATLAB_VERSION &&
-              module load gcc/\$GCC_VERSION &&
-              ./tools/build_config/build.sh --test
-            '''
-          }
-          else {
-            powershell './tools/build_config/build.ps1 -test'
-          }
-        }
+	script {
+	  if (isUnix()) {
+	    sh '''
+	      module load cmake/\$CMAKE_VERSION &&
+	      module load matlab/\$MATLAB_VERSION &&
+	      module load gcc/\$GCC_VERSION &&
+	      ./tools/build_config/build.sh --test
+	    '''
+	  }
+	  else {
+	    powershell './tools/build_config/build.ps1 -test'
+	  }
+	}
       }
     }
 
     stage('Package') {
       when {
-        expression {
-          run_build_stage == true
-        }
+	expression {
+	  run_build_stage == true
+	}
       }
       steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              module load cmake/\$CMAKE_VERSION &&
-              ./tools/build_config/build.sh --package
-            '''
-          }
-          else {
-            powershell './tools/build_config/build.ps1 -package'
-          }
-          // Archive a file containing the git revision being built. This
-          // enables the Deploy pipelines to validate against this SHA, and
-          // ensure the correct revision is tagged in Git.
-          if (pli.build_type == 'Release') {
-            def git_rev_file_name = "${env.JOB_BASE_NAME}-git-revision.sha"
-            utilities.write_git_revision_to_file(git_rev_file_name)
-            archiveArtifacts(artifacts: git_rev_file_name, fingerprint: true)
-          }
-        }
+	script {
+	  if (isUnix()) {
+	    sh '''
+	      module load cmake/\$CMAKE_VERSION &&
+	      ./tools/build_config/build.sh --package
+	    '''
+	  }
+	  else {
+	    powershell './tools/build_config/build.ps1 -package'
+	  }
+	  // Archive a file containing the git revision being built. This
+	  // enables the Deploy pipelines to validate against this SHA, and
+	  // ensure the correct revision is tagged in Git.
+	  if (pli.build_type == 'Release') {
+	    def git_rev_file_name = "${env.JOB_BASE_NAME}-git-revision.sha"
+	    utilities.write_git_revision_to_file(git_rev_file_name)
+	    archiveArtifacts(artifacts: git_rev_file_name, fingerprint: true)
+	  }
+	}
 
-        // Archive the release package
-        archiveArtifacts(
-          artifacts: 'build/Herbert-*',
-          fingerprint: true
-        )
+	// Archive the release package
+	archiveArtifacts(
+	  artifacts: 'build/Herbert-*',
+	  fingerprint: true
+	)
       }
     }
   }
@@ -232,39 +236,39 @@ pipeline {
     always {
       // archive static analysis report
       archiveArtifacts(
-        artifacts: '**/cppcheck.xml,**/mlint.json',
-        allowEmptyArchive: true,
-        fingerprint: true
+	artifacts: '**/cppcheck.xml,**/mlint.json',
+	allowEmptyArchive: true,
+	fingerprint: true
       )
 
       recordIssues(
-        tools: [
-          cppCheck(pattern: '**/cppcheck.xml', reportEncoding: 'UTF-8'),
-          issues(id: 'mlint', name: 'MLint', pattern: '**/mlint.json')
-        ]
+	tools: [
+	  cppCheck(pattern: '**/cppcheck.xml', reportEncoding: 'UTF-8'),
+	  issues(id: 'mlint', name: 'MLint', pattern: '**/mlint.json')
+	]
       )
 
       archiveArtifacts(
-        artifacts: 'build/Testing/**/*.xml',
-        allowEmptyArchive: true,
-        fingerprint: true
+	artifacts: 'build/Testing/**/*.xml',
+	allowEmptyArchive: true,
+	fingerprint: true
       )
       xunit (
-        testTimeMargin: '3000',
-        thresholdMode: 1,
-        thresholds: [
-          skipped(failureThreshold: '0'),
-          failed(failureThreshold: '0')
-        ],
-        tools: [
-          CTest(
-            pattern: 'build/Testing/**/*.xml',
-            deleteOutputFiles: true,
-            failIfNotNew: false,
-            skipNoTestFiles: true,
-            stopProcessingIfError: true
-          )
-        ]
+	testTimeMargin: '3000',
+	thresholdMode: 1,
+	thresholds: [
+	  skipped(failureThreshold: '0'),
+	  failed(failureThreshold: '0')
+	],
+	tools: [
+	  CTest(
+	    pattern: 'build/Testing/**/*.xml',
+	    deleteOutputFiles: true,
+	    failIfNotNew: false,
+	    skipNoTestFiles: true,
+	    stopProcessingIfError: true
+	  )
+	]
       )
 
     }
