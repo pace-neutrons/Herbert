@@ -514,7 +514,7 @@ classdef MFParallel_Job < JobExecutor
 
                 recv_data = recv_data(ind);
                 recv_data = cellfun(@(x) (x.payload), recv_data, 'UniformOutput', false);
-                recv_data = [val, recv_data{:}];
+                recv_data = {val, recv_data{:}};
 
                 switch opt
                     case 'mat'
