@@ -17,7 +17,7 @@ classdef MessagesDummy < iMessagesFramework
 
     properties(Access=protected,Hidden=true)
         % equivalent to labNum in MPI
-        task_id_ = 0;
+        task_id_ = 1;
 
         numLabs_ = 1;
 
