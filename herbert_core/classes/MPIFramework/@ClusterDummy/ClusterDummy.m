@@ -88,7 +88,9 @@ classdef ClusterDummy < ClusterWrapper
             try
                 je = feval(je_init_message.payload.JobExecutorClassName);
                 dummyMF = MessagesDummy();
-                je = je.init(dummyMF, dummyMF, task_init_mess{1}.payload, false);
+                dummyMF2 = MessagesDummy();
+
+                je = je.init(dummyMF, dummyMF2, task_init_mess{1}.payload, false);
 
                 while ~je.is_completed()
                     je.do_job_completed = false;
