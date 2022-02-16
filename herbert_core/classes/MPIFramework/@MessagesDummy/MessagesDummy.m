@@ -110,8 +110,8 @@ classdef MessagesDummy < iMessagesFramework
             % Always return Inerrtupt message if any is present
 
             all_messages_names = [];
-            ask_ids = [];
-            ...
+            task_ids = [];
+
         end
 
         function finalize_all(obj)
