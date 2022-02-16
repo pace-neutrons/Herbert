@@ -84,7 +84,7 @@ classdef MessagesDummy < iMessagesFramework
 
             ok = true;
             err_mess = '';
-            obj.message_stack_ = message.payload, obj.message_stack_];
+            obj.message_stack_ = [message.payload, obj.message_stack_];
         end
 
         function [all_messages_names,task_ids] = probe_all(obj,task_ids_in,mess_name)
