@@ -93,7 +93,7 @@ classdef ClusterDummy < ClusterWrapper
                 je.do_job_completed = true; % do not wait at barrier if cancellation here
                 obj.last_results_ = je.task_outputs;
             catch ME
-                obj.last_results = ME;
+                obj.last_results_ = ME;
             end
 
         end
