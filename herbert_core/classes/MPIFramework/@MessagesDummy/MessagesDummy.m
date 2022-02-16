@@ -21,7 +21,7 @@ classdef MessagesDummy < iMessagesFramework
 
         numLabs_ = 1;
 
-        message_stack_ = [];
+        message_stack_ = {};
     end
 
     %----------------------------------------------------------------------
@@ -84,7 +84,7 @@ classdef MessagesDummy < iMessagesFramework
 
             ok = true;
             err_mess = '';
-            obj.message_stack_ = [message.payload, obj.message_stack_(:)];
+            obj.message_stack_ = message.payload, obj.message_stack_];
         end
 
         function [all_messages_names,task_ids] = probe_all(obj,task_ids_in,mess_name)
@@ -213,7 +213,7 @@ classdef MessagesDummy < iMessagesFramework
 
             ok = true;
             err_mess = '';
-            message = obj.message_stack_(1);
+            message = obj.message_stack_{1};
             obj.message_stack_ = obj.message_stack_(2:end);
         end
     end
