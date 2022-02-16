@@ -105,7 +105,7 @@ classdef ClusterDummy < ClusterWrapper
 
         function [outputs,n_failed,obj] = retrieve_results(obj)
             outputs = {obj.last_results_};
-            n_failed = 0;
+            n_failed = isa(obj.last_results_, 'MException');
         end
 
         function [obj,ok] = wait_started_and_report(obj,check_time,varargin)
