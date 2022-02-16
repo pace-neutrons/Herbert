@@ -1,6 +1,16 @@
 classdef ClusterDummy < ClusterWrapper
     % The class to support Dummy cluster
     %
+    %
+    % N.B. This is not MPI, this is a dummy MPI framework
+    % for calling MPI routines in serial on the
+    % local process, for profiling and quickly
+    % validating job executors.
+    %
+    % As such, it only allows one process
+    % and many routines are empty/dummied out.
+    % They aren't needed if we're not really parallel,
+    % but have to conform to the structure laid out by the abstract MPI framework classes.
     %----------------------------------------------------------------------
 
     properties(Access=protected, Hidden=true)
@@ -9,8 +19,7 @@ classdef ClusterDummy < ClusterWrapper
 
     methods
         function obj = ClusterDummy(n_workers,mess_exchange_framework,log_level)
-            % Constructor, which initiates wrapper around Dummy
-            % MPI framework.
+            % Constructor, which initiates Dummy MPI framework.
             %
             % The wrapper provides common interface to run various kind of
             % Herbert parallel jobs.
@@ -20,7 +29,7 @@ classdef ClusterDummy < ClusterWrapper
             %
             % Non-empty constructor calls the init method itself
             %
-            % Inputs:
+            % Inputs (ignored):
             % n_workers -- number of independent Matlab workers to execute
             %              a job
             % mess_exchange_framework -- a class-child of
@@ -50,9 +59,9 @@ classdef ClusterDummy < ClusterWrapper
         end
 
         function obj = init(obj,n_workers,mess_exchange_framework,log_level)
-            % The method to initate the cluster wrapper
+            % The method to initialise the cluster wrapper
             %
-            % Inputs:
+            % Inputs (ignored):
             % n_workers -- number of independent Matlab workers to execute
             %              a job
             % mess_exchange_framework -- a class-child of
@@ -81,17 +90,13 @@ classdef ClusterDummy < ClusterWrapper
                 dummyMF = MessagesDummy();
                 je = je.init(dummyMF, dummyMF, task_init_mess{1}.payload, false);
 
-                % send first "running" log message and set-up starting time. Runs
-                % asynchronously.
-
                 while ~je.is_completed()
-                    je.do_job_completed = false; % do 2 barriers on exception (one at process failure)
-                                                 % Execute job (run main job executor's do_job method
+                    je.do_job_completed = false;
                     je= je.do_job();
                     je = je.reduce_data();
                 end
-                je.do_job_completed = true; % do not wait at barrier if cancellation here
-                obj.last_results_ = {je.task_outputs};
+                je.do_job_completed = true;
+                obj.last_results_ = je.task_outputs;
             catch ME
                 obj.last_results_ = ME;
             end
@@ -99,15 +104,12 @@ classdef ClusterDummy < ClusterWrapper
         end
 
         function [outputs,n_failed,obj] = retrieve_results(obj)
-            outputs = obj.last_results_;
+            outputs = {obj.last_results_};
             n_failed = 0;
         end
 
         function [obj,ok] = wait_started_and_report(obj,check_time,varargin)
             ok = true;
-            info = sprintf('Parallel cluster "%s" is ready to execute tasks',...
-                           class(obj));
-
         end
 
         function [completed, obj] = check_progress(obj);
@@ -119,8 +121,6 @@ classdef ClusterDummy < ClusterWrapper
         end
 
         function is = is_job_initiated(obj)
-            % returns true, if the cluster wrapper is running bunch of
-            % parallel java processes
             is = true;
         end
 
@@ -130,7 +130,6 @@ classdef ClusterDummy < ClusterWrapper
 
     methods(Access = protected)
         function [running,failed,paused,mess] = get_state_from_job_control(obj)
-            % Method checks if java framework is running
             running = true;
             failed = false;
             paused = false;
