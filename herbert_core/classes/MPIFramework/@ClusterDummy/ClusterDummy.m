@@ -92,13 +92,13 @@ classdef ClusterDummy < ClusterWrapper
 
                 je = je.init(dummyMF, dummyMF2, task_init_mess{1}.payload, false);
 
-                je.setup();
+                je = je.setup();
                 while ~je.is_completed()
                     je.do_job_completed = false;
                     je= je.do_job();
                     je = je.reduce_data();
                 end
-                je.finalise();
+                je = je.finalise();
                 je.do_job_completed = true;
                 obj.last_results_ = je.task_outputs;
             catch ME
