@@ -81,6 +81,11 @@ else
     nmax=Inf;
 end
         
+% See if bounded by []
+if numel(strtmp)>=2 && strtmp(1)=='[' && strtmp(end)==']'
+    strtmp = strtmp(2:end-1);
+end
+
 % Find positions of tokens:
 %  [Add final position, so that beg(i):beg(i+1) contains a token, including any trailing delimiters
 %  which it turns out that sscanf happily ignores]

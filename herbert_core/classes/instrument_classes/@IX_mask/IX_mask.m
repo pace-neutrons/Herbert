@@ -3,7 +3,7 @@ classdef IX_mask
     
     properties
         % Spectra to be masked. Row vector of integers greater than zero
-        msk = ones(1,0)
+        msk = []
     end
     
     methods
@@ -39,33 +39,111 @@ classdef IX_mask
             %
             %                   % Another comment line
             %                   11:3:35      % an in-line comment
-            
-            
-            if isnumeric(val)
-                % Numeric array
-                msk = unique(val(:)');
-                if ~(any(msk<1) || any(~isfinite(msk)))
-                    obj.msk = msk;
+                      
+            if nargin>0 && ~isempty(val)
+                if is_string (val)
+                    % Assume a filename
+                    if ~isempty(val)
+                        msk = get_mask(val);
+                    else
+                        error ('IX_mask:invalid_argument',...
+                        'File name cannot be an empty string')
+                    end
+                    
+                elseif isnumeric(val)
+                    % Numeric input
+                    msk = val;
+                    
                 else
-                    error ('HERBERT:IX_mask:invalid_argument',...
-                        'Spectrum numbers must be finite and greater or equal to 1')
+                    % Unrecognised input
+                    error ('IX_mask:invalid_argument',...
+                        'Input must be an array or file name')
                 end
-                
-            elseif is_string (val)
-                % Assume a filename
-                if ~isempty(val)
-                    [wout,ok,mess] = get_mask(val);
-                else
-                    error('File name cannot be an empty string')
-                end
-                
-            elseif ~isempty(val)
-                % Unrecognised input
-                error ('HERBERT:IX_mask:invalid_argument',...
-                    'Input must be an array or file name')
+                obj.msk = msk;
             end
             
         end
+    end
+    
+    
+    %------------------------------------------------------------------
+    % Set method
+    %------------------------------------------------------------------
+    methods
+        function obj = set.msk (obj, val)
+            if isnumeric(val) && ~(any(val<1) || any(~isfinite(val)))
+                if ~isempty(val)
+                    obj.msk = unique(val(:)');
+                else
+                    obj.msk = [];
+                end
+            else
+                error ('IX_mask:set:invalid_argument',...
+                    'Spectrum numbers must be finite and greater or equal to 1')
+            end
+        end
+    end
+    
+    
+    %------------------------------------------------------------------
+    % I/O methods
+    %------------------------------------------------------------------
+    methods
+        function save (w, file)
+            % Save a mask object to an ASCII file
+            %
+            %   >> save (w)              % prompts for file
+            %   >> save (w, file)
+            %
+            % Input:
+            % ------
+            %   w       Mask object (single object only, not an array)
+            %   file    [optional] File for output.
+            %           If none given, then prompts for a file
+            
+            
+            % Get file name - prompting if necessary
+            % --------------------------------------
+            if nargin==1
+                file='*.msk';
+            end
+            [file_full, ok, mess] = putfilecheck (file);
+            if ~ok
+                error ('IX_mask:save:io_error', mess)
+            end
+            
+            % Write data to file
+            % ------------------
+            disp(['Writing mask data to ', file_full, '...'])
+            put_mask (w.msk, file_full);
+            
+        end
+    end
+    
+    methods (Static)
+        function obj = read (file)
+            % Read mask data from an ASCII file
+            %
+            %   >> obj = IX_mask.read           % prompts for file
+            %   >> obj = IX_mask.read (file)
+            
+            
+            % Get file name - prompt if file does not exist
+            % ---------------------------------------------
+            % The chosen file resets default seach location and extension
+            if nargin==0 || ~is_file(file)
+                file = '*.msk';     % default for file prompt
+            end
+            [file_full, ok, mess] = getfilecheck (file);
+            if ~ok
+                error ('IX_mask:read:io_error', mess)
+            end
+            
+            % Read data from file
+            % ---------------------
+            obj = IX_mask (file_full);
+        end
+        
     end
     
 end
