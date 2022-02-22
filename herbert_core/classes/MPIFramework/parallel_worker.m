@@ -278,7 +278,8 @@ while keep_worker_running
 
         if DO_PROFILING
             p = profile('info');
-            prof_fn = sprintf('Profile_%s_%d_%d_%d',fbMPI.job_id,intercomm.labIndex,intercomm.numLabs,num_of_runs);
+            prof_fn = sprintf('Profile_%s_%d_%d_%d',...
+                              fbMPI.job_id,intercomm.labIndex,intercomm.numLabs,num_of_runs);
             profsave(p, prof_fn);
         end
 
