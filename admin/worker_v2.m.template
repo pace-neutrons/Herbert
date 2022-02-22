@@ -14,7 +14,7 @@ function [ok,err_mess,je]=worker_v2(worker_controls_string)
 %              folder name where the job initialization data are located on
 %              a remote system.
 
-if nargin<1 || isempty(worker_controls_string)    
+if nargin<1 || isempty(worker_controls_string)
     worker_controls_string = getenv('WORKER_CONTROL_STRING');
 end
 
@@ -37,19 +37,20 @@ if isempty(DO_LOGGING)
 else
     DO_LOGGING = feval(DO_LOGGING);
 end
+DO_PROFILING = logical(getenv('DO_PARALLEL_MATLAB_PROFILING'));
 
 try
-    [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING);
+    [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING);
 catch ME1 % intercepted exception in processing failure or some odd bug indeed
     write_fail_log(ME1);
     err_mess = ME1;
 end
-if ~ok 
+if ~ok
     write_fail_log(err_mess);
 end
 
 function write_fail_log(ERROR)
-%
+
 pid = int64(feature('getpid'));
 log_file_name  = sprintf('WORKER_V2_Process_%d_failure.log',pid);
 log_file = fullfile(getuserdir,log_file_name );
@@ -69,9 +70,7 @@ try
     fprintf(fh,'******* Unhandled exception:\n');
     fprintf(fh,'******** ERROR: \n');
     fprintf(fh,'%s',error_contents );
-    stat = fclose(fh);    
+    stat = fclose(fh);
 catch ERR % again, may be log will clarify the situation
     warning('Can not write log file %s; Reason %s',log_file,getReport(ERR));
 end
-
-

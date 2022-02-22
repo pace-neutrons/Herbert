@@ -1,4 +1,4 @@
-function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING)
+function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING)
 % function used as standard worker to do a job in a separate Matlab
 % session.
 %
@@ -21,7 +21,7 @@ function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,D
 % err_mess -- empty if ok==true and contains error message if it is not.
 % je       -- instance of a job executor, used to run the particular
 %             task after the task completion.
-%%
+
 je = [];
 ok = false;
 is_tested  = false;
@@ -29,19 +29,22 @@ err_mess = 'Failure in the initialization procedure';
 if ~exist('DO_LOGGING', 'var')
     DO_LOGGING = false;
 end
-if nargin<3
+if ~exist('DO_DEBUGGING', 'var')
     DO_DEBUGGING = false;
+end
+if ~exist('DO_PROFILING', 'var')
+    DO_PROFILING = false;
 end
 
 try
-    %
+
     % Check current state of mpi framework and set up deployment status
     % within Matlab code to run
     mis = MPI_State.instance();
     mis.is_deployed = true;
     is_tested = mis.is_tested; % set up to tested state within unit tests not to
     % exit running Matlab on test failure
-    %
+
     % for testing we need to recover 'not-deployed' state to avoid clashes with
     % other unit tests. The production job finishes Matlab and clean-up is not necessary
     % though doing no harm.
@@ -59,7 +62,7 @@ try
 
     % Initialize config files to use on remote session. Needs to be initialized
     % first as may be used by message framework.
-    %
+
     % Place where config files are stored:
     config_exchange_folder = control_struct.data_path;
     % set path to the config sources, remove configurations,
@@ -99,23 +102,23 @@ catch ME0 %unhandled exception during init procedure
         quit(100);
     end
 end
-%%
 
 num_of_runs = 0;
 while keep_worker_running
+
     num_of_runs = num_of_runs+1;
     if DO_LOGGING; log_num_runs(num_of_runs); end
     fprintf('   *******************************************\n');
     fprintf('   ******  LabN %d  : RUN N : %d  Task: %s *\n',intercomm.labIndex,num_of_runs,fbMPI.job_id);
     fprintf('   *******************************************\n');
 
-    %
+
     %% --------------------------------------------------------------------
     % 2) step 2 of the worker initialization.
     %----------------------------------------------------------------------
-    %
+
     if DO_LOGGING; log_disp_message(' Entering JE loop: receiving "starting" message'); end
-    %
+
     try
         [ok,err,mess]= fbMPI.receive_message(0,'starting','-synch');
         if ok ~= MESS_CODES.ok
@@ -131,15 +134,14 @@ while keep_worker_running
             worker_init_data = mess.payload;
             keep_worker_running = worker_init_data.keep_worker_running;
         end
-        %
-        %
+
+
         exit_at_the_end = ~is_tested && worker_init_data.exit_on_compl;
         if DO_DEBUGGING
             exit_at_the_end = false; % used for debugging filebased framework, to
             %be able to view the results of a failure.
         end
 
-        %
         if DO_LOGGING; log_worker_init_received();  end
         % instantiate job executor class.
         je = feval(worker_init_data.JobExecutorClassName);
@@ -151,7 +153,7 @@ while keep_worker_running
         % initialized and worker knows what to do when it finishes or
         % fails.
         %----------------------------------------------------------------------
-        %
+
         %----------------------------------------------------------------------
         % 3) step 3 of the worker initialization. Initializing the particular
         % job executor
@@ -170,11 +172,10 @@ while keep_worker_running
                 return
             end
         end
-        if DO_LOGGING; log_init_received();   end
-
-        %%
-
-        if DO_LOGGING; log_init_je_started();  end
+        if DO_LOGGING
+            log_init_received();
+            log_init_je_started();
+        end
         % to decrease probability of other job started their tasks and
         % failed before node 1 is initialized -- let's set this barrier.
         intercomm.labBarrier();
@@ -208,7 +209,7 @@ while keep_worker_running
         end
         % Successful je.init should return "started" message, initiating
         % blocking receive from all other workers.
-        %
+
         % Attach jobExecutor methods to mpi singleton to be available from any part
         % of the code.
         mis.logger = @(step,n_steps,time,add_info)...
@@ -220,9 +221,11 @@ while keep_worker_running
         % send first "running" log message and set-up starting time. Runs
         % asynchronously.
         n_steps = je.n_steps;
+        if DO_PROFILING
+            profile('-memory','on')
+        end
         if DO_LOGGING; log_disp_message('Logging start and checking for job cancellation before loop je.is_completed loop\n'); end
         mis.do_logging(0,n_steps);
-        %%
 
         % Call initial setup function of JobExecutor
         je = je.setup()
@@ -272,17 +275,28 @@ while keep_worker_running
 
         je.labBarrier(false);
         je.do_job_completed = true; % do not wait at barrier if cancellation here
-        %
+
+        if DO_PROFILING
+            p = profile('info');
+            prof_fn = sprintf('Profile_%s_%d_%d_%d',fbMPI.job_id,intercomm.labIndex,intercomm.numLabs,num_of_runs);
+            profsave(p, prof_fn);
+        end
+
     catch ME % Catch error in users code and finish task gracefully.
-        if DO_LOGGING; log_exception_caught();  end
+
+        if DO_PROFILING
+            profile off
+        end
+
         try
             if DO_LOGGING
+                log_exception_caught()
                 mess = je.process_fail_state(ME,fh);
+                log_disp_message(' Completed processing JE fail state');
+                log_disp_message('arriving at Process_fail_state end of task barrier')
             else
                 mess = je.process_fail_state(ME);
             end
-            if DO_LOGGING; log_disp_message(' Completed processing JE fail state'); end
-            if DO_LOGGING; log_disp_message('arriving at Process_fail_state end of task barrier'); end
 
             je.labBarrier(true);
             je.do_job_completed = true;
@@ -322,8 +336,6 @@ while keep_worker_running
         end
     end %Exception
 
-
-    %%
     if DO_LOGGING;  fprintf(fh,'************* finishing subtask: %s \n',...
             fbMPI.job_id); end
     [ok,err_mess,je] = je.finish_task();
@@ -337,9 +349,11 @@ if DO_DEBUGGING
     disp('************** Paused Parallel worker: Enter something to continue')
     pause % for debugging filebased framework
 end
+
 if exit_at_the_end
     quit(0);
 end
+
 %% -------------------------------------------------------
 % Logging functions used to print debug information
 % -------------------------------------------------------
@@ -348,7 +362,7 @@ end
         fprintf(fh,'---> %s\n',mess);
     end
 
-%
+
     function fh = log_inputs_level1()
         log_name = sprintf('Job_%s_wkN%d#%d.log',fbMPI.job_id,intercomm.labIndex,intercomm.numLabs);
         flog_name = fullfile(config_exchange_folder,log_name);
@@ -377,14 +391,14 @@ end
             fprintf(fh,'  Node: %d  : Name : %s \n',i,pool_nodes{i});
         end
     end
-%
+
     function log_num_runs(num_of_runs)
         fprintf(fh,'   ***************************************\n');
         fprintf(fh,'   ******  LabN %d  : RUN N : %d  Task: %s *\n',intercomm.labIndex,num_of_runs,fbMPI.job_id);
         fprintf(fh,'   ****************************************=\n');
     end
-%
-%
+
+
     function log_worker_init_received()
         fprintf(fh,['Received starting message with parameters: \n',...
             '         JobExecutor: %s;\n',...
@@ -392,23 +406,23 @@ end
             '         exit lab on completion %d\n'],...
             worker_init_data.JobExecutorClassName,keep_worker_running,exit_at_the_end);
     end
-%
+
     function log_init_received()
         disp('WORKER_4TESTS: init message received ***********************')
         fprintf(fh,'***************************************\n');
         fprintf(fh,'got JE %s "init" message\n',worker_init_data.JobExecutorClassName);
     end
-%
+
     function log_init_je_started()
         fprintf(fh,'Trying to start JE: %s\n',worker_init_data.JobExecutorClassName);
         disp('WORKER_4TESTS: initializing worker ************************')
     end
-%
+
     function log_init_je_finished()
         fprintf(fh,'JE: %s has been initialized, init error message: ''%s''\n',worker_init_data.JobExecutorClassName,mess);
         disp('WORKER_4TESTS: worker has been initialized ************************')
     end
-%
+
     function log_input_message_exception_caught()
         fprintf(fh,'Receiving Init messages exception caught, ErrMessage: %s, ID: %s;\n',...
             ME.message,ME.identifier);
