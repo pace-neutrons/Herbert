@@ -30,14 +30,9 @@ if isempty(which('herbert_init.m'))
     end
 end
 
-DO_DEBUGGING = false;
-DO_LOGGING = getenv('DO_PARALLEL_MATLAB_LOGGING');
-if isempty(DO_LOGGING)
-    DO_LOGGING = false;
-else
-    DO_LOGGING = feval(DO_LOGGING);
-end
-DO_PROFILING = logical(getenv('DO_PARALLEL_MATLAB_PROFILING'));
+DO_DEBUGGING = parse_env_var_logical('DO_PARALLEL_MATLAB_DEBUGGING');
+DO_LOGGING = parse_env_var_logical('DO_PARALLEL_MATLAB_LOGGING');
+DO_PROFILING = parse_env_var_logical('DO_PARALLEL_MATLAB_PROFILING');
 
 try
     [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING);
@@ -47,6 +42,8 @@ catch ME1 % intercepted exception in processing failure or some odd bug indeed
 end
 if ~ok
     write_fail_log(err_mess);
+end
+
 end
 
 function write_fail_log(ERROR)
@@ -73,4 +70,13 @@ try
     stat = fclose(fh);
 catch ERR % again, may be log will clarify the situation
     warning('Can not write log file %s; Reason %s',log_file,getReport(ERR));
+end
+
+end
+
+function tf = parse_env_var_logical(env_var_name)
+
+env_var = getenv(env_var_name);
+tf = str2logical(env_var);
+
 end
