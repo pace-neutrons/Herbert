@@ -4,7 +4,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
     properties
         skip_cluster_tests
     end
-    
+
     methods
         function obj = test_parallel_config_and_clusters_factory(varargin)
             if ~exist('name', 'var')
@@ -18,7 +18,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             else
                 obj.skip_cluster_tests= false;
             end
-            
+
         end
         %------------------------------------------------------------------
         function test_cluster_slurm_factory_set_get(~)
@@ -26,16 +26,16 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             % define current config data to return it after testing
             cur_config = pc.get_data_to_store();
             clob1 = onCleanup(@()set(pc,cur_config));
-            
+
             mf = MPI_clusters_factory.instance();
             mf.parallel_cluster = 'slurm_mpi';
             assertEqual(mf.parallel_cluster_name,'slurm_mpi')
-            
+
             all_cfg = mf.get_all_configs();
             assertTrue(numel(all_cfg)==2);
             % first cluster after changing from paropool to mpiexec_mpi would be 'local'
             assertEqual(all_cfg{1},'srun');
-            
+
             cl = mf.parallel_cluster;
             if mf.framework_available
                 assertTrue(isa(cl,'ClusterSlurm'));
@@ -50,17 +50,17 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             % define current config data to return it after testing
             cur_config = pc.get_data_to_store();
             clob1 = onCleanup(@()set(pc,cur_config));
-            
+
             mf = MPI_clusters_factory.instance();
             mf.parallel_cluster = 'herbert';
             assertEqual(mf.parallel_cluster_name,'herbert');
-            
+
             all_cfg = mf.get_all_configs();
             assertTrue(numel(all_cfg)==1);
             % first cluster after changing from parpool to mpiexec_mpi would be 'local'
             % because the first configuration for mpiexec_mpi is 'local'
             assertEqual(all_cfg{1},'local');
-            
+
             cl = mf.parallel_cluster;
             if mf.framework_available
                 assertTrue(isa(cl,'ClusterHerbert'));
@@ -70,7 +70,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
         end
         %
         function test_cluster_parpool_factory_set_get(~)
-            
+
             pc = parallel_config;
             % define current config data to return it after testing
             cur_config = pc.get_data_to_store();
@@ -79,11 +79,11 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             mf = MPI_clusters_factory.instance();
             mf.parallel_cluster = 'parpool';
             assertEqual(mf.parallel_cluster_name,'parpool');
-            
+
             all_cfg = mf.get_all_configs();
             assertEqual(numel(all_cfg),1);
             assertEqual(all_cfg{1},'default');
-            
+
             cl = mf.parallel_cluster;
             if mf.framework_available
                 assertTrue(isa(cl,'ClusterParpoolWrapper'));
@@ -93,22 +93,22 @@ classdef test_parallel_config_and_clusters_factory < TestCase
         end
         %
         function test_cluster_mpiexec_factory_set_get(~)
-            
+
             pc = parallel_config;
             % define current config data to return it after testing
             cur_config = pc.get_data_to_store();
             clob1 = onCleanup(@()set(pc,cur_config));
-            
+
             mf = MPI_clusters_factory.instance();
             mf.parallel_cluster = 'mpiexec_mpi';
             assertEqual(mf.parallel_cluster_name,'mpiexec_mpi');
-            
+
             all_cfg = mf.get_all_configs();
             assertTrue(numel(all_cfg)>1);
-            % first cluster config after changing from parpool to 
+            % first cluster config after changing from parpool to
             % mpiexec_mpi would be 'local'
             assertEqual(all_cfg{1},'local');
-            
+
             cl = mf.parallel_cluster;
             if mf.framework_available
                 assertTrue(isa(cl,'ClusterMPI'));
@@ -129,19 +129,20 @@ classdef test_parallel_config_and_clusters_factory < TestCase
         end
         %
         function test_known_clusters(~)
-            
+
             all_clusters_names = MPI_clusters_factory.instance().known_cluster_names;
-            
+
             pc = parallel_config;
             cl_names = pc.known_clusters;
             assertEqual(all_clusters_names,cl_names)
-            
-            assertEqual(numel(all_clusters_names),4);
+
+            assertEqual(numel(all_clusters_names),5);
             assertEqual(all_clusters_names{1},'herbert');
             assertEqual(all_clusters_names{2},'parpool');
             assertEqual(all_clusters_names{3},'mpiexec_mpi');
             assertEqual(all_clusters_names{4},'slurm_mpi');
-            
+            assertEqual(all_clusters_names{5},'dummy');
+
         end
         %------------------------------------------------------------------
         function test_parallel_config_herbert(obj)
@@ -154,7 +155,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             clob1 = onCleanup(@()set(pc,cur_config));
             pc.saveable = false;
             clob2 = onCleanup(@()set(pc,'saveable',true));
-            
+
             pc.parallel_cluster='her';
             assertEqual(pc.parallel_cluster,'herbert');
             all_clcfg = pc.known_clust_configs;
@@ -180,7 +181,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             clob1 = onCleanup(@()set(pc,cur_config));
             pc.saveable = false;
             clob2 = onCleanup(@()set(pc,'saveable',true));
-            
+
             try
                 pc.parallel_cluster='p';
             catch ME
@@ -192,7 +193,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 end
             end
             assertEqual(pc.parallel_cluster,'parpool');
-            
+
             all_clcfg = pc.known_clust_configs;
             cl_config = pc.cluster_config;
             assertEqual(numel(all_clcfg),1);
@@ -216,7 +217,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             clob1 = onCleanup(@()set(pc,cur_config));
             pc.saveable = false;
             clob2 = onCleanup(@()set(pc,'saveable',true));
-            
+
             try
                 pc.parallel_cluster='m';
             catch ME
@@ -228,11 +229,11 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 end
             end
             assertEqual(pc.parallel_cluster,'mpiexec_mpi');
-            
+
             all_clcfg = pc.known_clust_configs;
             cl_config = pc.cluster_config;
             assertTrue(numel(all_clcfg)>1);
-            
+
             % old config stored at the beginning of the test
             old_config = cur_config.cluster_config;
             if ismember(old_config,all_clcfg)
@@ -241,7 +242,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 assertEqual(all_clcfg{1},cl_config);
                 assertEqual(cl_config,'local');
             end
-            
+
             if ispc
                 assertTrue(any(ismember(all_clcfg,'test_win_cluster.win')));
                 pc.cluster_config = 'test_win';
@@ -265,7 +266,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             clob1 = onCleanup(@()set(pc,cur_config));
             pc.saveable = false;
             clob2 = onCleanup(@()set(pc,'saveable',true));
-            
+
             try
                 pc.parallel_cluster='s';
             catch ME
@@ -277,13 +278,13 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 end
             end
             assertEqual(pc.parallel_cluster,'slurm_mpi');
-            
+
             all_clcfg = pc.known_clust_configs;
             assertEqual(numel(all_clcfg),2);
-            
+
             cl_config = pc.cluster_config;
             assertEqual(cl_config,'srun')
-            
+
         end
     end
 end
