@@ -218,6 +218,10 @@ classdef mfclass_plist < serializable
         end
     end
 
+    properties(Constant,Access=protected)
+        fields_to_save_ = {'plist_', 'p_present_', 'p_'};
+    end
+
     methods(Access=public)
         % get independent fields, which fully define the state of the object
         function flds = indepFields(~)
@@ -226,7 +230,7 @@ classdef mfclass_plist < serializable
         % get class version, which would affect the way class is stored on/
         % /restore from an external media
         function ver  = classVersion(~)
-            ver = mfclass_plist.version_holder();
+            ver = 1;
         end
     end
 
@@ -238,22 +242,6 @@ classdef mfclass_plist < serializable
         end
     end
 
-    properties(Constant,Access=protected)
-        fields_to_save_ = {'plist_', 'p_present_', 'p_'};
-    end
-
-    methods(Static)
-        function verr = version_holder(ver)
-            persistent version;
-            if nargin>0
-                version = ver;
-            end
-            if isempty(version)
-                version = 1;
-            end
-            verr = version;
-        end
-    end
 
 end
 
