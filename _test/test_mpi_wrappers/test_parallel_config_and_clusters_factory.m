@@ -20,7 +20,9 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             end
 
         end
+
         %------------------------------------------------------------------
+
         function test_cluster_slurm_factory_set_get(~)
             pc = parallel_config;
             % define current config data to return it after testing
@@ -42,9 +44,9 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             else
                 assertTrue(isempty(cl));
             end
-            %
+
         end
-        %
+
         function test_cluster_herbert_factory_set_get(~)
             pc = parallel_config;
             % define current config data to return it after testing
@@ -68,14 +70,14 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 assertTrue(isempty(cl));
             end
         end
-        %
+
         function test_cluster_parpool_factory_set_get(~)
 
             pc = parallel_config;
             % define current config data to return it after testing
             cur_config = pc.get_data_to_store();
             clob1 = onCleanup(@()set(pc,cur_config));
-            %
+
             mf = MPI_clusters_factory.instance();
             mf.parallel_cluster = 'parpool';
             assertEqual(mf.parallel_cluster_name,'parpool');
@@ -91,7 +93,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 assertTrue(isempty(cl));
             end
         end
-        %
+
         function test_cluster_mpiexec_factory_set_get(~)
 
             pc = parallel_config;
@@ -115,9 +117,11 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             else
                 assertTrue(isempty(cl));
             end
-            %
+
         end
+
         %------------------------------------------------------------------
+
         function test_cluster_invalid_factory_set(~)
             try
                 mf = MPI_clusters_factory.instance();
@@ -127,7 +131,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                     'HERBERT:MPI_clusters_factory:invalid_argument'))
             end
         end
-        %
+
         function test_known_clusters(~)
 
             all_clusters_names = MPI_clusters_factory.instance().known_cluster_names;
@@ -144,7 +148,9 @@ classdef test_parallel_config_and_clusters_factory < TestCase
             assertEqual(all_clusters_names{5},'dummy');
 
         end
+
         %------------------------------------------------------------------
+
         function test_parallel_config_herbert(obj)
             if obj.skip_cluster_tests
                 skipTest('Herbert cluster setup skipped as parallel worker is not available')
@@ -170,7 +176,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 assertTrue(strcmp(pc.cluster_config,'local'));
             end
         end
-        %
+
         function test_parallel_config_parpool(obj)
             if obj.skip_cluster_tests
                 skipTest('Parpool cluster setup skipped as parallel worker is not available')
@@ -206,7 +212,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 assertTrue(strcmp(pc.cluster_config,'default'));
             end
         end
-        %
+
         function test_parallel_config_mpiexec(obj)
             if obj.skip_cluster_tests
                 skipTest('mpiexec cluster setup test skipped as parallel worker is not available')
@@ -255,7 +261,7 @@ classdef test_parallel_config_and_clusters_factory < TestCase
                 assertEqual(cl_config,'test_lnx_cluster.lnx');
             end
         end
-        %
+
         function test_parallel_config_slurm(obj)
             if obj.skip_cluster_tests
                 skipTest('slurm cluster setup test skipped as parallel worker is not available')
