@@ -36,14 +36,7 @@ if ~isempty(file) && ischar(file) && size(file,1)==1 && numel(size(file))==2
             if nargout==1 && ~ok, error(mess); end  % If not given ok as output argument, fail if ~ok
             return
         end
-        if ~isvalidfilename(filename)
-            file_out='';
-            ok=false;
-            mess=['Invalid file name or extension: ',file];
-            if nargout==1 && ~ok, error(mess); end  % If not given ok as output argument, fail if ~ok
-            return
-        end
-        if ~(isempty(ext)||(numel(ext)>1 && isvalidfileext(ext(2:end))))     % allow extension to be empty
+        if ~CheckFileName([filename,ext])
             file_out='';
             ok=false;
             mess=['Invalid file name or extension: ',file];
@@ -60,6 +53,8 @@ else
 end
 
 if nargout>1, ok=true; mess=''; end
+
+end
 
 
 %--------------------------------------------------------------------------------------------------
@@ -103,30 +98,4 @@ for i=1:numel(dir)
 end
 file_out='';
 
-%-------------------------------------------------------------------------------------------
-function ok=isvalidfilename(str)
-% Check if valid file name
-%
-%   >> ok=isvalidfilename(str)
-%
-% Depending on operating system, certain non-alphanumeric characters may be
-% permitted in file names
-%
-%
-% let's prohibit : in the file name
-
-
-ok= isempty(regexp(str,'\:','once'));
-
-%-------------------------------------------------------------------------------------------
-function ok=isvalidfileext(str)
-% Check if valid file extension
-%
-%   >> ok=isvalidfileext(str)
-%
-% Depending on operating system, certain non-alphanumeric characters may be
-% permitted in file names
-%
-% *** CURRENTLY A DUMMY FUNCTION
-
-ok=true;
+end

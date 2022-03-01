@@ -1,12 +1,19 @@
 function ok = is_file(name)
-% tests if name is a file on the file system while NOT searching MATLAB path
+% Tests if name is a file on the file system without searching MATLAB path
 %
-% On older versions of matlab this is done through ensuring the path is an explicit path
-% and using exist. More recent versions simply call the MATLAB built-in isfile.
+%   >> ok = is_file(name)
+%
+% On older versions of MATLAB this is done through ensuring the file is an
+% explicit file and using exist. More recent versions simply call the
+% MATLAB built-in isfile.
 %
 % Input:
 % ------
-%   name                The name of the file you want to check;
+%   name    The name of the file you want to check;
+%
+% Output:
+% -------
+%   ok      Logical true (is a file) or false (is not)
 %
 % Usage:
 % ------
@@ -14,16 +21,17 @@ function ok = is_file(name)
 %  >> is_file('test.m');                   % True if file exists in current dir
 %
 
+
 % Remove searching MATLAB path with explicit path
-if ~verLessThan('matlab', '9.1') % R2016b
+if ~verLessThan('matlab', '9.3') % R2017b
     ok = isfile(name);
 else
-    currpath = fileparts(name);
-    if isempty(currpath)
-        currpath = pwd();
-        name = fullfile(currpath, name);
+    folder = fileparts(name);
+    if isempty(folder)
+        folder = pwd();
+        name = fullfile(folder, name);
     end
-    
     ok = exist(name, 'file') == 2;
 end
+
 end

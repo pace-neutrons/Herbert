@@ -1,61 +1,68 @@
-function file_out = getfile (filterspec,dialogtitle)
-% Utility to get file name for input:  file_out = getfile (filterspec,dialogtitle)
+function file_out = getfile (filterspec, dialogtitle)
+% Utility to get file name for input
+%
+%   >> file_out = getfile (filterspec, dialogtitle)
 %
 % It is identical to the Matlab built-in function uigetfile, except that
-%  - Returns filename including path; ='' if no file selected
+% - Returns filename including path; ='' if no file selected
 %
-%  - If a dialog box is opened, the default operation of uigetfile is altered:
-%    (1) the default directory is that of the file most recently selected by getfile (if filespec is a simple string)
-%    (2) the default extension is *.* rather than Matlab files
-%    (3) it does not fail if dialogtitle is not a string
-%
-% Syntax:
-%   >> filename = getfile (filterspec)
-%   e.g.    >> file = getfile                          'Select File' box opened, default path is path
-%                                                          of most recent file selected
-%
-%           >> file = getfile ('c:\temp')              'Select File' box opened, default path is c:\temp\
-%
-%           >> file = getfile ('*.spe')                 'Select File' box opened, default path is path
-%                                                          of most recent file selected; default extension .spe
-%
-%           >> file = getfile ('d:\data\*.spe')         'Select File' box opened, default path is d:\data\
-%                                                          and default extension is .spe
-%
-%           >> file = getfile ('c:\mprogs\add_spe.m')   Default file name
-%
-%   >> filename = getfile (filterspec, dialogtitle)     Title of 'Select File' box changed to dialogtitle
+% - If a dialog box is opened, the default operation of uigetfile is altered:
+%   (1) The default directory is that of the file most recently selected
+%       by getfile (if filespec is a simple string)
+%   (2) The default extension is *.* rather than Matlab files
+%   (3) It does not fail if dialogtitle is not a string
 %
 %
-% See also putfile (essentially the same as uiputfile)
+% Input:
+% ------
+%   filterspec      File filter to apply in dialog box
+%                   - Default folder is the most recent folder selected with
+%                    getfile
+%                   - Default file filter *.*
+%
+%   dialogtitle     Title of 'Select File' box changed to dialogtitle
+%
+% Output:
+% -------
+%   file_out        Full file name (path and name)
+%                   If no file selected, then empty
+%
+% EXAMPLES
+%   >> file = getfile
+%   >> file = getfile ('c:\temp')
+%   >> file = getfile ('*.spe')
+%   >> file = getfile ('d:\data\*.spe')
+%   >> file = getfile ('c:\mprogs\add_spe.m')
+%
+% See also putfile
+
 
 persistent path_save
 
-% initialise the default path on first use
+% Initialise the default path on first use
 if (isempty(path_save))
     path_save ='';
 end
 
-% get file
+% Get file
 if (nargin==0)
-    [file,path] = uigetfile (fullfile(path_save,'*.*')); % default path is that when getfile last used (cf current directory)
-                                                         % no default extension (cf Matlab files)
+    [file,path] = uigetfile (fullfile(path_save,'*.*'));
+    
 elseif (nargin>0)
-    if (ischar(filterspec) && isvector(filterspec))  % filterspec is a one-dimensional string array
-        if (is_dir(filterspec))                 % is a directory, ensure no default extension
+    if (ischar(filterspec) && isvector(filterspec))
+        if (is_folder(filterspec))
             filterspec_in = fullfile(filterspec,'*.*');
-%         elseif (length(findstr('*.',filterspec))>=1 && min(findstr('*.',filterspec))) % filterspec begins '*.', so assume extensions list
         elseif startsWith(filterspec, '*.')
             filterspec_in = fullfile(path_save,filterspec);
         else
             [pathstr,~,~] = fileparts(filterspec);
             if (isempty(pathstr))
-                filterspec_in = fullfile(path_save,filterspec);  % no path at front, so use the default path
+                filterspec_in = fullfile(path_save,filterspec);
             else
-                filterspec_in = filterspec;                      % otherwise use filterspec as is (i.e. ensure uigetfile acts as usual)
+                filterspec_in = filterspec;
             end
         end
-    elseif (iscellstr(filterspec) && (size(filterspec,2)==1 || size(filterspec,2)==2))  % required cellstr format for uigetfile
+    elseif (iscellstr(filterspec) && (size(filterspec,2)==1 || size(filterspec,2)==2))
         filterspec_in = filterspec;
     else
         error ('FILTERSPEC argument must be a string or an M by 1 or M by 2 cell array.')
@@ -72,7 +79,7 @@ elseif (nargin>0)
     end
 end
 
-% store path for future calls to getfile if user did not select cancel
+% Store path for future calls to getfile if user did not select cancel
 if (isequal(file,0) || isequal(path,0))
     file_out = '';
 else

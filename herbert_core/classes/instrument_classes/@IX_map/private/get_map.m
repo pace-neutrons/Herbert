@@ -200,5 +200,5 @@ w.s=spec;
 if ~vms_format
     w.wkno=wkno;
 else
-    w.wkno=zeros(1,0);
+    w.wkno=[];
 end

@@ -1,15 +1,27 @@
 function y=randpoisson(lam,varargin)
-% Random while numnbers from Poisson distribution with specified mean value lam
-%   >> y=randpoisson(lam)           % single number from distribution with mean lam
-%   >> y=randpoisson(lam,n)         % n x n matrix
-%   >> y=randpoisson(lam,m,n,p...)  % m x n x p x ... array
-%   >> y=randpoisson(lam,[m,n,p...])% m x n x p x ... array
+% Generate random numbers from a Poisson distribution with mean lam
 %
+%   >> y = randpoisson(lam)                 % single number
+%   >> y = randpoisson(lam, n)              % n x n matrix
+%   >> y = randpoisson(lam, m, n, p...)     % array size [m, n, p,...]
+%   >> y = randpoisson(lam, [m, n, p...])   % array size [m, n, p,...]
+
+
+% T.G.Perring 22 Jun 2021
+% -----------------------
+% Corrected a bugs: if lam=0 (more specifically when exp(-lam) is evaluated
+% to unity) then now correctly returns y=0
+%
+% Performance tested against the Matlab Statistics and machine learning
+% toolbox function poissrnd. The code in this routine is up to 50% faster
+% for lam > 1000; poissrnd is upto 50% faster for 10 < lam < 50. They are
+% comparable elsewhere. [Dell Precision 5540 laptop, R2021a, Win 10]
 %
 % T.G.Perring 21 Dec 2006
+% -----------------------
 % Inspired by algorithm POIDEV in Numerical Recipes in Fortran77
 % Cambridge University Press, (Press, Teukolsky, Vetterling and Flannery)
-
+%
 % Compared performance with two routines available from Matlab Central file exchange:
 % randraw('po',...) and randpois. The former is slow when called only once with a
 % given lam; the latter has problems when lam>~200, and if called with n>~10000.
@@ -22,18 +34,21 @@ if lam<12
     g=exp(-lam);
     if nargin==1
         y=-1; t=1;
-        while t>g
+        while t>g || y<0
             y=y+1;
             t=t*rand;
         end
     else
         size_arr=parse_array_size(varargin{:});
-        if isempty(size_arr); error('Size vector must be a row vector with integer elements.'); end
+        if isempty(size_arr)
+            error('HERBERT:randpoisson:invalid_argument',...
+                'Size vector must be a row vector with integer elements.')
+        end
         n=prod(size_arr);
         y=zeros(n,1);
         for i=1:n
             y(i)=-1; t=1;
-            while t>g
+            while t>g || y(i)<0
                 y(i)=y(i)+1;
                 t=t*rand;
             end
@@ -57,7 +72,10 @@ else
         end
     else
         size_arr=parse_array_size(varargin{:});
-        if isempty(size_arr); error('Size vector must be a row vector with integer elements.'); end
+        if isempty(size_arr)
+            error('HERBERT:randpoisson:invalid_argument',...
+                'Size vector must be a row vector with integer elements.')
+        end
         n=prod(size_arr);
         y=zeros(n,1);
         for i=1:n

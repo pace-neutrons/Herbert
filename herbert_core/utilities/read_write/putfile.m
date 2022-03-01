@@ -1,65 +1,64 @@
-function file_out = putfile (filterspec,dialogtitle)
-% Utility to get file name for input:  file_out = putfile (filterspec,dialogtitle)
+function file_out = putfile (filterspec, dialogtitle)
+% Utility to get file name for output:  
+%
+%   >> file_out = putfile (filterspec, dialogtitle)
 %
 % It is identical to the Matlab built-in function uiputfile, except that
-%  - Returns filename including path; ='' if no file selected
+% - Returns filename including path; ='' if no file selected
 %
-%  - If a dialog box is opened, the default operation of uiputfile is altered:
-%    (1) the default directory is that of the file most recently selected by putfile (if filespec is a simple string)
-%    (2) the default extension is *.* rather than Matlab files
-%    (3) it does not fail if dialogtitle is not a string
+% - If a dialog box is opened, the default operation of uiputfile is altered:
+%   (1) The default directory is that of the file most recently selected
+%       by putfile (if filespec is a simple string)
+%   (2) The default extension is *.* rather than Matlab files
+%   (3) It does not fail if dialogtitle is not a string
 %
-% Syntax:
-%   >> filename = putfile (filterspec)
-%   e.g.    >> file = putfile                          'Select File' box opened, default path is path
-%                                                          of most recent file selected
+% Input:
+% ------
+%   filterspec      File filter to apply in dialog box
+%                   - Default folder is the most recent folder selected with
+%                    getfile
+%                   - Default file filter *.*
 %
-%           >> file = putfile ('c:\temp')              'Select File' box opened, default path is c:\temp\
+%   dialogtitle     Title of 'Select File' box changed to dialogtitle
 %
-%           >> file = putfile ('*.spe')                 'Select File' box opened, default path is path
-%                                                          of most recent file selected; default extension .spe
+% Output:
+% -------
+%   file_out        Full file name (path and name)
+%                   If no file selected, then empty
 %
-%           >> file = putfile ('d:\data\*.spe')         'Select File' box opened, default path is d:\data\
-%                                                          and default extension is .spe
+% EXAMPLES
+%   >> file = putfile
+%   >> file = putfile ('c:\temp')
+%   >> file = putfile ('*.spe')
+%   >> file = putfile ('d:\data\*.spe')
+%   >> file = putfile ('c:\mprogs\add_spe.m')
 %
-%           >> file = putfile ('c:\mprogs\add_spe.m')   Default file name
-%
-%   >> filename = putfile (filterspec, dialogtitle)     Title of 'Select File' box changed to dialogtitle
-%
-%
-% See also getfile (essentially the same as uigetfile)
+% See also getfile
 
-% Code would be much neater if I knew how to pass an unknown length list of variables to a function
-
-% Alternative I toyed with (code commented out below)
-%  - It sensibly decide whether or not to open a dialog box:
-%       if just the name of a file that actually exists was passed (i.e. no dialog box argument), then file_out = filterspec,
-%       and the routine is ignored. The routine can therefore be used in both interactive mode and script files.
 
 persistent path_save
 
-% initialise the default path on first use
+% Initialise the default path on first use
 if (isempty(path_save))
     path_save ='';
 end
 
-% get file
+% Put file
 if (nargin==0)
-    [file,path] = uiputfile (fullfile(path_save,'*.*')); % default path is that when putfile last used (cf current directory)
-                                                         % no default extension (cf Matlab files)
+    [file,path] = uiputfile (fullfile(path_save,'*.*'));
+    
 elseif (nargin>0)
-    if (ischar(filterspec) && isvector(filterspec))  % filterspec is a one-dimensional string array
-        if (is_folder(filterspec))                 % is a directory, ensure no default extension
+    if (ischar(filterspec) && isvector(filterspec))
+        if (is_folder(filterspec))
             filterspec_in = fullfile(filterspec,'*.*');
-%         elseif (length(findstr('*.',filterspec))>=1 & min(findstr('*.',filterspec))) % filterspec begins '*.', so assume extensions list
         elseif startsWith(filterspec, '*.')
             filterspec_in = fullfile(path_save,filterspec);
         else
             [pathstr,~,~] = fileparts(filterspec);
             if (isempty(pathstr))
-                filterspec_in = fullfile(path_save,filterspec); % no path at front, so use the default path
+                filterspec_in = fullfile(path_save,filterspec);
             else
-                filterspec_in = filterspec;                     % otherwise use filterspec as is (i.e. ensure uiputfile acts as usual)
+                filterspec_in = filterspec;
             end
         end
     elseif (iscellstr(filterspec) && (size(filterspec,2)==1 || size(filterspec,2)==2))
@@ -79,7 +78,7 @@ elseif (nargin>0)
     end
 end
 
-% store path for future calls to putfile if user did not select cancel
+% Store path for future calls to putfile if user did not select cancel
 if (isequal(file,0) || isequal(path,0))
     file_out = '';
 else

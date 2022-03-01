@@ -3,7 +3,7 @@ classdef IX_mask
     
     properties
         % Spectra to be masked. Row vector of integers greater than zero
-        msk = []
+        msk
     end
     
     methods
@@ -39,7 +39,7 @@ classdef IX_mask
             %
             %                   % Another comment line
             %                   11:3:35      % an in-line comment
-                      
+            
             if nargin>0 && ~isempty(val)
                 if is_string (val)
                     % Assume a filename
@@ -47,7 +47,7 @@ classdef IX_mask
                         msk = get_mask(val);
                     else
                         error ('IX_mask:invalid_argument',...
-                        'File name cannot be an empty string')
+                            'File name cannot be an empty string')
                     end
                     
                 elseif isnumeric(val)
@@ -60,6 +60,8 @@ classdef IX_mask
                         'Input must be an array or file name')
                 end
                 obj.msk = msk;
+            else
+                obj.msk = zeros(1,0);
             end
             
         end
@@ -71,11 +73,13 @@ classdef IX_mask
     %------------------------------------------------------------------
     methods
         function obj = set.msk (obj, val)
+            % Performs the checks on value, and sets with unique values
+            % or empty value - defines the contents from all routes
             if isnumeric(val) && ~(any(val<1) || any(~isfinite(val)))
                 if ~isempty(val)
                     obj.msk = unique(val(:)');
                 else
-                    obj.msk = [];
+                    obj.msk = zeros(1,0);
                 end
             else
                 error ('IX_mask:set:invalid_argument',...
@@ -89,11 +93,11 @@ classdef IX_mask
     % I/O methods
     %------------------------------------------------------------------
     methods
-        function save (w, file)
+        function save (obj, file)
             % Save a mask object to an ASCII file
             %
-            %   >> save (w)              % prompts for file
-            %   >> save (w, file)
+            %   >> save (obj)              % prompts for file
+            %   >> save (obj, file)
             %
             % Input:
             % ------
@@ -115,7 +119,7 @@ classdef IX_mask
             % Write data to file
             % ------------------
             disp(['Writing mask data to ', file_full, '...'])
-            put_mask (w.msk, file_full);
+            put_mask (obj.msk, file_full);
             
         end
     end
@@ -141,7 +145,9 @@ classdef IX_mask
             
             % Read data from file
             % ---------------------
-            obj = IX_mask (file_full);
+            msk = get_mask(file_full);
+            obj = IX_mask (msk);
+            
         end
         
     end

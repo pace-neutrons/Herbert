@@ -1,5 +1,5 @@
-function [file_full,ok,mess]=getfilecheck(varargin)
-% Utility routine that prompts for a file if its name is not given, or it doesn't exist
+function [file_full, ok, mess] = getfilecheck (varargin)
+% Prompt for a file if a name is not given, or the file doesn't exist
 %
 % Check file exists, resolving file name if form pathname:::file where pathname is a globalpath
 %   >> [file_full,ok,mess] = getfilecheck (file)    
@@ -22,7 +22,7 @@ if nargin==0 || (nargin==1 && isempty(varargin{1}))
         ok=false; mess='No file given';
     end
 else
-    % If just one imput, try to intepret as a file first
+    % If just one input, try to intepret as a file first
     if nargin==1
         [file_full,ok,mess]=translate_read(varargin{1});
         if ok, return, end
