@@ -1,4 +1,4 @@
-function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING)
+function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING,DO_MEMORY_PROFILE)
 % function used as standard worker to do a job in a separate Matlab
 % session.
 %
@@ -32,8 +32,11 @@ end
 if ~exist('DO_DEBUGGING', 'var')
     DO_DEBUGGING = false;
 end
+if ~exist('DO_MEMORY_PROFILE', 'var')
+    DO_MEMORY_PROFILE = false;
+end
 if ~exist('DO_PROFILING', 'var')
-    DO_PROFILING = false;
+    DO_PROFILING = false || DO_MEMORY_PROFILE;
 end
 
 try
@@ -222,7 +225,11 @@ while keep_worker_running
         % asynchronously.
         n_steps = je.n_steps;
         if DO_PROFILING
-            profile('-memory','on')
+            if DO_MEMORY_PROFILE
+                profile('-memory','on')
+            else
+                profile('on')
+            end
         end
         if DO_LOGGING; log_disp_message('Logging start and checking for job cancellation before loop je.is_completed loop\n'); end
         mis.do_logging(0,n_steps);

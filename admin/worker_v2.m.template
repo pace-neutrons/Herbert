@@ -33,9 +33,10 @@ end
 DO_DEBUGGING = parse_env_var_logical('DO_PARALLEL_MATLAB_DEBUGGING');
 DO_LOGGING = parse_env_var_logical('DO_PARALLEL_MATLAB_LOGGING');
 DO_PROFILING = parse_env_var_logical('DO_PARALLEL_MATLAB_PROFILING');
+DO_MEMORY_PROFILE = parse_env_var_logical('DO_PARALLEL_MATLAB_MEMORY_PROFILING');
 
 try
-    [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING);
+    [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING,DO_MEMORY_PROFILE);
 catch ME1 % intercepted exception in processing failure or some odd bug indeed
     write_fail_log(ME1);
     err_mess = ME1;
