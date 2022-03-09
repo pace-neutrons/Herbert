@@ -1,4 +1,4 @@
-function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING,DO_MEMORY_PROFILE)
+function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING,DO_MEMORY_PROFILE,DO_HTML_PROFILE)
 % function used as standard worker to do a job in a separate Matlab
 % session.
 %
@@ -36,7 +36,10 @@ if ~exist('DO_MEMORY_PROFILE', 'var')
     DO_MEMORY_PROFILE = false;
 end
 if ~exist('DO_PROFILING', 'var')
-    DO_PROFILING = false || DO_MEMORY_PROFILE;
+    DO_PROFILING = DO_MEMORY_PROFILE;
+end
+if ~exist('DO_PROFILING', 'var')
+    DO_HTML_PROFILING = false;
 end
 
 try
@@ -287,7 +290,11 @@ while keep_worker_running
             p = profile('info');
             prof_fn = sprintf('Profile_%s_%d_%d_%d',...
                               fbMPI.job_id,intercomm.labIndex,intercomm.numLabs,num_of_runs);
-            profsave(p, prof_fn);
+            if DO_HTML_PROFILING
+                profsave(p, prof_fn);
+            else
+                dump_profile(p, prof_fn);
+            end
         end
 
     catch ME % Catch error in users code and finish task gracefully.
