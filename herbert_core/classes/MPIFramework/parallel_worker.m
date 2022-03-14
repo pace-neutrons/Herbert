@@ -38,7 +38,7 @@ end
 if ~exist('DO_PROFILING', 'var')
     DO_PROFILING = DO_MEMORY_PROFILE;
 end
-if ~exist('DO_PROFILING', 'var')
+if ~exist('DO_HTML_PROFILING', 'var')
     DO_HTML_PROFILING = false;
 end
 
