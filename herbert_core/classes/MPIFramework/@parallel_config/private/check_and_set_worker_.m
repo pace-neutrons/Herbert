@@ -9,6 +9,14 @@ if ~ischar(new_wrkr)
 end
 scr_path = which(new_wrkr);
 if isempty(scr_path)
+    % Check if it is a compiled worker
+    new_wrkr = check_compiled_(new_wrkr);
+    if ~isempty(new_wrkr)
+        config_store.instance().store_config(obj, 'worker', new_wrkr);
+        config_store.instance().store_config(obj, 'is_compiled', true);
+        return
+    end
+
     def_wrkr = obj.worker_;
     if strcmp(new_wrkr,def_wrkr)
         cur_fmw = get_or_restore_field(obj,'parallel_cluster');
@@ -32,6 +40,23 @@ if isempty(scr_path)
         
     end
 else % worker function is available.
-    config_store.instance().store_config(obj,'worker',new_wrkr);
+    config_store.instance().store_config(obj, 'worker', new_wrkr);
+    config_store.instance().store_config(obj, 'is_compiled', false);
 end
+end % function
 
+function out = check_compiled_(worker)
+    out = '';
+    if exist(worker, 'file')
+        % Assume if input is full path to file, then it is a compiled worker
+        out = worker;
+    else
+        if ispc(), cmd = 'where'; else, cmd = 'which'; end
+        [rs, rv] = system([cmd ' ' worker]);
+        if rs == 0
+            % Assume if it is on the system path, then it is a compiled worker
+            out = splitlines(strip(rv));
+            out = out{1}; % Only take first path if there is more than one
+        end
+    end
+end

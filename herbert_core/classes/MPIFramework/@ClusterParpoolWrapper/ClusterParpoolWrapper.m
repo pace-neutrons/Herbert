@@ -137,7 +137,11 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             % variables, but if the cluster is remote, the envriomental
             % variables transfer should be investigated
             obj.set_env();
-            h_worker = str2func(obj.worker_name_);
+            if obj.is_compiled_script_
+                h_worker = @worker_v2;
+            else
+                h_worker = str2func(obj.worker_name_);
+            end
             task = createTask(cjob,h_worker,0,{cs});
             
             obj.cluster_ = cl;

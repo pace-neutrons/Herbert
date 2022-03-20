@@ -215,22 +215,19 @@ classdef parallel_config<config_base
         %-----------------------------------------------------------------
         % overloaded getters
         function wrkr = get.worker(obj)
-            wrkr= get_or_restore_field(obj,'worker');
+            wrkr = get_or_restore_field(obj, 'worker');
         end
         function wrkr = get.is_compiled(obj)
-            % incomplete! Should be derived from worker
-            wrkr= obj.is_compiled_;
+            wrkr = get_or_restore_field(obj, 'is_compiled');
         end
         
         function frmw =get.parallel_cluster(obj)
             %
             wrkr = config_store.instance.get_value(obj,'worker');
-            pkp = which(wrkr);
-            if isempty(pkp)
-                frmw = 'none';
-                return
+            frmw = 'none';
+            if ~isempty(which(wrkr)) || exist(wrkr, 'file')
+                frmw = get_or_restore_field(obj, 'parallel_cluster');
             end
-            frmw = get_or_restore_field(obj,'parallel_cluster');
         end
         function conf = get.cluster_config(obj)
             conf = get_or_restore_field(obj,'cluster_config');
