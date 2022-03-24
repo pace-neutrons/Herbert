@@ -178,9 +178,8 @@ classdef ClusterMPI < ClusterWrapper
                     mpis = splitlines(mpi_exec);
                     if numel(mpis) > 1
                         % If multiple mpiexec on path, prefer user installed MS MPI
-                        mpi_id = find(cellfun(@(x) ~isempty(strfind(x,'Microsoft')), mpis), 1);
-                        if isempty(mpi_id), mpi_id = 1; end
-                        mpi_exec = mpis{mpi_id};
+                        mpi_id = [1 find(cellfun(@(x) ~isempty(strfind(x,'Microsoft')), mpis), 1)];
+                        mpi_exec = mpis{max(mpi_id)};
                     end
                 else
                     % No mpiexec on path, use pre-packaged version

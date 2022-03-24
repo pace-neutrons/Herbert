@@ -94,6 +94,9 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             end
             
             obj = init@ClusterWrapper(obj,n_workers,mess_exchange_framework,log_level);
+            assert(~obj.is_compiled_script_, ...
+                'HERBERT:ClusterParpoolWrapper:invalid_argument', ...
+                'Parpool cluster does not work with compiled workers')
             
             % delete interactive parallel cluster if any exist
             cl = gcp('nocreate');
@@ -137,11 +140,7 @@ classdef ClusterParpoolWrapper < ClusterWrapper
             % variables, but if the cluster is remote, the envriomental
             % variables transfer should be investigated
             obj.set_env();
-            if obj.is_compiled_script_
-                h_worker = @worker_v2;
-            else
-                h_worker = str2func(obj.worker_name_);
-            end
+            h_worker = str2func(obj.worker_name_);
             task = createTask(cjob,h_worker,0,{cs});
             
             obj.cluster_ = cl;
