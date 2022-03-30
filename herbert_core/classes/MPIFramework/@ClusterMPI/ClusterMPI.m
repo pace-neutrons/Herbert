@@ -173,14 +173,13 @@ classdef ClusterMPI < ClusterWrapper
             external_dll_dir = fullfile(rootpath, 'DLL','external');
             if ispc()
                 [rs, rv] = system('where mpiexec');
-                if rs == 0
-                    mpi_exec = strip(rv);
-                    mpis = splitlines(mpi_exec);
-                    if numel(mpis) > 1
-                        % If multiple mpiexec on path, prefer user installed MS MPI
-                        mpi_id = [1 find(cellfun(@(x) ~isempty(strfind(x,'Microsoft')), mpis), 1)];
-                        mpi_exec = mpis{max(mpi_id)};
-                    end
+                mpis = splitlines(strip(rv));
+                % Ignore Matlab-bundled mpiexec (firewall issues)
+                mpis(cellfun(@(x) contains(x, matlabroot), mpis)) = [];
+                if rs == 0 && ~isempty(mpis)
+                    % If multiple mpiexec on path, prefer user installed MS MPI
+                    mpi_id = [1 find(cellfun(@(x) contains(x,'Microsoft'), mpis), 1)];
+                    mpi_exec = mpis{max(mpi_id)};
                 else
                     % No mpiexec on path, use pre-packaged version
                     mpi_exec = fullfile(external_dll_dir, 'mpiexec.exe');
