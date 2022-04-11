@@ -1,4 +1,4 @@
-function [ok, err_mess,je] = parallel_worker(worker_controls_string,DO_LOGGING,DO_DEBUGGING,DO_PROFILING,DO_MEMORY_PROFILE,DO_HTML_PROFILE)
+function [ok, err_mess,je] = parallel_worker(worker_controls_string,do_logging,do_debugging,do_profiling,do_memory_profile,do_html_profile)
 % function used as standard worker to do a job in a separate Matlab
 % session.
 %
@@ -26,20 +26,20 @@ je = [];
 ok = false;
 is_tested  = false;
 err_mess = 'Failure in the initialization procedure';
-if ~exist('DO_LOGGING', 'var')
-    DO_LOGGING = false;
+if ~exist('do_logging', 'var')
+    do_logging = false;
 end
-if ~exist('DO_DEBUGGING', 'var')
-    DO_DEBUGGING = false;
+if ~exist('do_debugging', 'var')
+    do_debugging = false;
 end
-if ~exist('DO_MEMORY_PROFILE', 'var')
-    DO_MEMORY_PROFILE = false;
+if ~exist('do_memory_profile', 'var')
+    do_memory_profile = false;
 end
-if ~exist('DO_PROFILING', 'var')
-    DO_PROFILING = DO_MEMORY_PROFILE;
+if ~exist('do_profiling', 'var')
+    do_profiling = do_memory_profile;
 end
-if ~exist('DO_HTML_PROFILING', 'var')
-    DO_HTML_PROFILING = false;
+if ~exist('do_html_profiling', 'var')
+    do_html_profiling = false;
 end
 
 try
@@ -87,12 +87,12 @@ try
     %--------------------------------------------------------------------------
 
     keep_worker_running = true;
-    if DO_LOGGING
+    if do_logging
         fh = log_inputs_level1();
         clob_log = onCleanup(@()fclose(fh));
     end
     exit_at_the_end = ~is_tested;
-    if DO_DEBUGGING
+    if do_debugging
         exit_at_the_end = false;
     end
     % inform the control node that the cluster have been started and ready
@@ -113,7 +113,7 @@ num_of_runs = 0;
 while keep_worker_running
 
     num_of_runs = num_of_runs+1;
-    if DO_LOGGING; log_num_runs(num_of_runs); end
+    if do_logging; log_num_runs(num_of_runs); end
     fprintf('   *******************************************\n');
     fprintf('   ******  LabN %d  : RUN N : %d  Task: %s *\n',intercomm.labIndex,num_of_runs,fbMPI.job_id);
     fprintf('   *******************************************\n');
@@ -123,7 +123,7 @@ while keep_worker_running
     % 2) step 2 of the worker initialization.
     %----------------------------------------------------------------------
 
-    if DO_LOGGING; log_disp_message(' Entering JE loop: receiving "starting" message'); end
+    if do_logging; log_disp_message(' Entering JE loop: receiving "starting" message'); end
 
     try
         [ok,err,mess]= fbMPI.receive_message(0,'starting','-synch');
@@ -143,15 +143,15 @@ while keep_worker_running
 
 
         exit_at_the_end = ~is_tested && worker_init_data.exit_on_compl;
-        if DO_DEBUGGING
+        if do_debugging
             exit_at_the_end = false; % used for debugging filebased framework, to
             %be able to view the results of a failure.
         end
 
-        if DO_LOGGING; log_worker_init_received();  end
+        if do_logging; log_worker_init_received();  end
         % instantiate job executor class.
         je = feval(worker_init_data.JobExecutorClassName);
-        if DO_LOGGING; je.ext_log_fh = fh;
+        if do_logging; je.ext_log_fh = fh;
         end
         je.do_job_completed = false; % do 2 barriers on exception (one at process failure)
         % ---------------------------------------------------------------------
@@ -178,7 +178,7 @@ while keep_worker_running
                 return
             end
         end
-        if DO_LOGGING
+        if do_logging
             log_init_received();
             log_init_je_started();
         end
@@ -196,7 +196,7 @@ while keep_worker_running
         if ~strcmp(ME.identifier,'MESSAGE_FRAMEWORK:cancelled')
             % if job is cancelled, we can recover further, as it will throw
             % below at first call to log progress. Any other exception is unhandled one
-            if DO_LOGGING; log_input_message_exception_caught();  end
+            if do_logging; log_input_message_exception_caught();  end
             err_mess = sprintf('job "%s" failed. Error during job initialization: %s',...
                 control_struct.job_id,ME.message);
             fbMPI.send_message(0,FailedMessage(err_mess,ME));
@@ -207,7 +207,7 @@ while keep_worker_running
     end
     %----------------------------------------------------------------------
     try
-        if DO_LOGGING; log_init_je_finished();  end
+        if do_logging; log_init_je_finished();  end
         if ~isempty(mess)
             err = sprinft(' Error sending ''started'' message from task N%d',...
                 fbMPI.labIndex);
@@ -227,14 +227,14 @@ while keep_worker_running
         % send first "running" log message and set-up starting time. Runs
         % asynchronously.
         n_steps = je.n_steps;
-        if DO_PROFILING
-            if DO_MEMORY_PROFILE
+        if do_profiling
+            if do_memory_profile
                 profile('-memory','on')
             else
                 profile('on')
             end
         end
-        if DO_LOGGING; log_disp_message('Logging start and checking for job cancellation before loop je.is_completed loop\n'); end
+        if do_logging; log_disp_message('Logging start and checking for job cancellation before loop je.is_completed loop\n'); end
         mis.do_logging(0,n_steps);
 
         % Call initial setup function of JobExecutor
@@ -243,18 +243,18 @@ while keep_worker_running
         while ~je.is_completed()
             je.do_job_completed = false; % do 2 barriers on exception (one at process failure)
             % Execute job (run main job executor's do_job method
-            if DO_LOGGING; log_disp_message('Entering Je do_job loop'); end
+            if do_logging; log_disp_message('Entering Je do_job loop'); end
 
             je= je.do_job();
             % explicitly check for cancellation before data reduction
-            if DO_LOGGING; log_disp_message('Check for cancellation after Je do_job loop'); end
+            if do_logging; log_disp_message('Check for cancellation after Je do_job loop'); end
             is_cancelled = je.is_job_cancelled();
             if is_cancelled
                 error('JOB_EXECUTOR:cancelled',...
                     'Job cancelled before synchronization after do_job')
             end
 
-            if DO_LOGGING; log_disp_message('Got to barrier for all chunks do_job completion'); end
+            if do_logging; log_disp_message('Got to barrier for all chunks do_job completion'); end
             % when its tested, workers are tested in single Matlab
             % session so it will hand up on synchronization
 
@@ -262,7 +262,7 @@ while keep_worker_running
             je.labBarrier(false); % Wait until all workers finish their
             %                       job before reducing the data
             je.do_job_completed = true; % do 1 barrier on exception at reduction (miss one at process failure)
-            if DO_LOGGING; log_disp_message('Reduce data started');  end
+            if do_logging; log_disp_message('Reduce data started');  end
             % explicitly check for cancellation before data reduction
             %  the case of cancellation below
             is_cancelled = je.is_job_cancelled();
@@ -281,16 +281,16 @@ while keep_worker_running
         mis.do_logging(n_steps,n_steps);
         % stop other nodes until the node 1 finishes to produce the
         % final message
-        if DO_LOGGING; log_disp_message('arriving at JE end of task barrier'); end
+        if do_logging; log_disp_message('arriving at JE end of task barrier'); end
 
         je.labBarrier(false);
         je.do_job_completed = true; % do not wait at barrier if cancellation here
 
-        if DO_PROFILING
+        if do_profiling
             p = profile('info');
             prof_fn = sprintf('Profile_%s_%d_%d_%d',...
                               fbMPI.job_id,intercomm.labIndex,intercomm.numLabs,num_of_runs);
-            if DO_HTML_PROFILING
+            if do_html_profiling
                 profsave(p, prof_fn);
             else
                 dump_profile(p, prof_fn);
@@ -299,12 +299,12 @@ while keep_worker_running
 
     catch ME % Catch error in users code and finish task gracefully.
 
-        if DO_PROFILING
+        if do_profiling
             profile off
         end
 
         try
-            if DO_LOGGING
+            if do_logging
                 log_exception_caught()
                 mess = je.process_fail_state(ME,fh);
                 log_disp_message(' Completed processing JE fail state');
@@ -316,7 +316,7 @@ while keep_worker_running
             je.labBarrier(true);
             je.do_job_completed = true;
 
-            if DO_LOGGING; log_disp_message('--->Arrived at finish task at failure\n'); end
+            if do_logging; log_disp_message('--->Arrived at finish task at failure\n'); end
             if is_tested
                 finish_mode = '-asynch';
             else
@@ -327,7 +327,7 @@ while keep_worker_running
             if keep_worker_running
                 % migrate job folder for message exchange without deleting the old
                 % one
-                if DO_LOGGING; log_disp_message('--->start migrating log folder\n'); end
+                if do_logging; log_disp_message('--->start migrating log folder\n'); end
                 je=je.migrate_job_folder(false);
                 continue;
             else
@@ -337,7 +337,7 @@ while keep_worker_running
             end
         catch ME1 % the only exception happen is due to error in JE system
             % code. (or user-oveloaded code) Unrecoverable failure
-            if DO_LOGGING; log_disp_message('************* Error in JE finalize code\n');  end
+            if do_logging; log_disp_message('************* Error in JE finalize code\n');  end
             err_mess = sprintf('job ID: "%s"; critical failure. JE processing failure error %s:',...
                 control_struct.job_id,ME1.message);
             fbMPI.send_message(0,FailedMessage(err_mess,ME1));
@@ -351,16 +351,16 @@ while keep_worker_running
         end
     end %Exception
 
-    if DO_LOGGING;  fprintf(fh,'************* finishing subtask: %s \n',...
+    if do_logging;  fprintf(fh,'************* finishing subtask: %s \n',...
             fbMPI.job_id); end
     [ok,err_mess,je] = je.finish_task();
     % migrate job folder for message exchange without deleting the old
     % one
     je=je.migrate_job_folder(false);
 
-    if DO_LOGGING;  fprintf(fh,'************* subtask: %s  finished\n',fbMPI.job_id); end
+    if do_logging;  fprintf(fh,'************* subtask: %s  finished\n',fbMPI.job_id); end
 end
-if DO_DEBUGGING
+if do_debugging
     disp('************** Paused Parallel worker: Enter something to continue')
     pause % for debugging filebased framework
 end

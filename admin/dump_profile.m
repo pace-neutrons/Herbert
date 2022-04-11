@@ -1,4 +1,21 @@
 function dump_profile(prof, filename)
+
+% Dump profile dumps a profile to a simply parsable raw text file.
+% The interface is designed to mimic that of the MATLAB internal "profsave"
+%
+% When given a MATLAB profiler statistics structure (as returned from profile('info'),
+% it extracts the properties defined in extract (currently constant) and
+% dumps them as a MATLAB table (cast to string) to the file "filename"
+%
+% It also calculates the percentage time, and the percentage self-time for the
+% profile.
+%
+% Usage:
+%
+%   >> dump_profile(p, 'my_dump');
+%
+% J. Wilkins April 2022
+
     extract = {'FunctionName' 'NumCalls' 'TotalTime' 'TotalMemAllocated' 'TotalMemFreed' 'PeakMem'};
 
     ft = prof.FunctionTable;
