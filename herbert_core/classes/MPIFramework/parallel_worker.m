@@ -1,4 +1,4 @@
-function [ok, err_mess,je] = parallel_worker(worker_controls_string,do_logging,do_debugging,do_profiling,do_memory_profile,do_html_profile)
+function [ok, err_mess,je] = parallel_worker(worker_controls_string,do_logging,do_debugging,do_profiling,do_memory_profiling,do_html_profiling)
 % function used as standard worker to do a job in a separate Matlab
 % session.
 %
@@ -32,11 +32,11 @@ end
 if ~exist('do_debugging', 'var')
     do_debugging = false;
 end
-if ~exist('do_memory_profile', 'var')
-    do_memory_profile = false;
+if ~exist('do_memory_profiling', 'var')
+    do_memory_profiling = false;
 end
 if ~exist('do_profiling', 'var')
-    do_profiling = do_memory_profile;
+    do_profiling = do_memory_profiling;
 end
 if ~exist('do_html_profiling', 'var')
     do_html_profiling = false;
@@ -228,7 +228,7 @@ while keep_worker_running
         % asynchronously.
         n_steps = je.n_steps;
         if do_profiling
-            if do_memory_profile
+            if do_memory_profiling
                 profile('-memory','on')
             else
                 profile('on')
