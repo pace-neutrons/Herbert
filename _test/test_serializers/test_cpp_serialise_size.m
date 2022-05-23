@@ -18,9 +18,8 @@ classdef test_cpp_serialise_size < TestCase
             else
                 this.use_mex = true;
             end
-            this.use_mex = false;
-            warning('C++ tests are currently disabled   #394');
         end
+
         %% Test Objects
         %------------------------------------------------------------------
         function test_sise_struct(this)
@@ -29,67 +28,67 @@ classdef test_cpp_serialise_size < TestCase
             end
             test_struc = struct('clc',true(1,3),'a',1,'ba',single(2),'ce',[1,2,3],...
                 'dee',struct('a',10),'ei',int32([9;8;7]));
-            
+
             sz = hlp_serial_sise(test_struc);
             cpp = c_serial_size(test_struc);
             assertEqual(cpp,sz);
-            
+
             test_struc = struct('clc',{1,2,4,5},'a',[1,4,5,6],...
                 'ba',zeros(3,2),'ce',struct(),...
                 'dee',@(x)sin(x),'ei',[1,2,4]');
-            
+
             cpp = c_serial_size(test_struc);
             sz = hlp_serial_sise(test_struc);
             assertEqual(cpp,sz);
-            
+
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sample(this)
             if ~this.use_mex
                 skipTest('MEX not enabled');
             end
             sam1=IX_sample(true,[1,1,0],[0,0,1],'cuboid',[0.04,0.03,0.02]);
-            
+
             size1 = hlp_serial_sise(sam1);
             cpp = c_serial_size(sam1);
             assertEqual(size1,cpp);
-            
+
             sam2=IX_sample(true,[1,1,0],[0,0,1],'cuboid',[0.04,0.03,0.02]);
-            
+
             size2 = hlp_serial_sise(sam2);
             cpp = c_serial_size(sam2);
             assertEqual(size2,cpp);
-            
-            
+
+
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_instrument(this)
             if ~this.use_mex
                 skipTest('MEX not enabled');
             end
-            
+
             % Create three different instruments
             inst1=create_test_instrument(95,250,'s');
             size1 = hlp_serial_sise(inst1);
             cpp = c_serial_size(inst1);
             assertEqual(size1,cpp);
-            
+
             inst2=create_test_instrument(56,300,'s');
             inst2.flipper=true;
             size2 = hlp_serial_sise(inst2);
             cpp = c_serial_size(inst2);
             assertEqual(size2,cpp);
-            
+
             inst3=create_test_instrument(195,600,'a');
             inst3.filter=[3,4,5];
             size3 = hlp_serial_sise(inst3);
             cpp = c_serial_size(inst3);
             assertEqual(size3,cpp);
-            
+
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_datamessage(this)
             if ~this.use_mex
@@ -98,24 +97,24 @@ classdef test_cpp_serialise_size < TestCase
             my_struc = struct('clc',true(1,3),'a',1,'ba',single(2),'ce',[1,2,3],...
                 'dee',struct('a',10),'ei',int32([9;8;7]));
             test_struc = DataMessage(my_struc);
-            
+
             cpp = c_serial_size(test_struc);
             sz = hlp_serial_sise(test_struc);
             assertEqual(cpp,sz);
-            
+
             test_struc = DataMessage(123456789);
-            
+
             cpp = c_serial_size(test_struc);
             sz = hlp_serial_sise(test_struc);
             assertEqual(cpp,sz);
-            
+
             test_struc = DataMessage('This is a test message');
-            
+
             cpp = c_serial_size(test_struc);
             sz = hlp_serial_sise(test_struc);
             assertEqual(cpp,sz);
         end
-        
+
         function test_ser_datamessage_array(this)
             if ~this.use_mex
                 skipTest('MEX not enabled');
@@ -123,12 +122,12 @@ classdef test_cpp_serialise_size < TestCase
             my_struc = struct('clc',true(1,3),'a',1,'ba',single(2),'ce',[1,2,3],...
                 'dee',struct('a',10),'ei',int32([9;8;7]));
             test_obj = [DataMessage(my_struc), DataMessage(10), DataMessage('Hello')];
-            
+
             cpp = c_serial_size(test_obj);
             sz = hlp_serial_sise(test_obj);
             assertEqual(cpp,sz);
         end
-        
+
         %% Test null
         function test_ser_sise_array_null(this)
             if ~this.use_mex
@@ -139,8 +138,8 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
-        
+
+
         %% Test Logicals
         %------------------------------------------------------------------
         function test_ser_sise_logical_scalar(this)
@@ -152,7 +151,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_logical_array(this)
             if ~this.use_mex
@@ -163,7 +162,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Characters
         %------------------------------------------------------------------
         function test_ser_sise_chararray_null(this)
@@ -175,7 +174,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_chararray_scalar(this)
             if ~this.use_mex
@@ -186,7 +185,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_chararray_array(this)
             if ~this.use_mex
@@ -197,7 +196,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Doubles
         %------------------------------------------------------------------
         function test_ser_sise_double_scalar(this)
@@ -209,7 +208,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_double_list(this)
             if ~this.use_mex
@@ -220,7 +219,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_double_array(this)
             if ~this.use_mex
@@ -231,7 +230,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Complexes
         %------------------------------------------------------------------
         function test_ser_sise_complex_scalar(this)
@@ -243,7 +242,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_complex_array(this)
             if ~this.use_mex
@@ -254,7 +253,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_mixed_complex_array(this)
             if ~this.use_mex
@@ -265,7 +264,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_obj);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Structs
         %------------------------------------------------------------------
         function test_ser_struct_null(this)
@@ -277,7 +276,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_struct);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_struct_empty(this)
             if ~this.use_mex
@@ -288,7 +287,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_struct);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_struct_scalar(this)
             if ~this.use_mex
@@ -299,7 +298,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_struct);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_struct_list(this)
             if ~this.use_mex
@@ -310,7 +309,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_struct);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_struct_array(this)
             if ~this.use_mex
@@ -321,7 +320,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_struct);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Sparse
         %------------------------------------------------------------------
         function test_ser_real_sparse_null(this)
@@ -329,22 +328,24 @@ classdef test_cpp_serialise_size < TestCase
                 skipTest('MEX not enabled');
             end
             test_sparse = sparse([],[],[]);
+            size(test_sparse)
             cpp = c_serial_size(test_sparse);
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_real_sparse_empty(this)
             if ~this.use_mex
                 skipTest('MEX not enabled');
             end
             test_sparse = sparse([],[],[],10,10);
+            size(test_sparse)
             cpp = c_serial_size(test_sparse);
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_real_sparse_single(this)
             if ~this.use_mex
@@ -355,7 +356,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_real_sparse_array(this)
             if ~this.use_mex
@@ -366,7 +367,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_complex_sparse_null(this)
             if ~this.use_mex
@@ -377,7 +378,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_complex_sparse_empty(this)
             if ~this.use_mex
@@ -388,7 +389,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_complex_sparse_single(this)
             if ~this.use_mex
@@ -399,7 +400,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_complex_sparse_array(this)
             if ~this.use_mex
@@ -410,7 +411,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Function handle
         function test_ser_sise_function_handle(this)
             if ~this.use_mex
@@ -421,7 +422,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_func);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %% Test Cell Array
         %------------------------------------------------------------------
         function test_ser_sise_cell_null(this)
@@ -433,7 +434,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_numeric(this)
             if ~this.use_mex
@@ -444,7 +445,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_cell_homo_numeric_array(this)
             if ~this.use_mex
@@ -455,7 +456,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_complex(this)
             if ~this.use_mex
@@ -466,7 +467,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_mixed_complex(this)
             if ~this.use_mex
@@ -477,7 +478,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_cell(this)
             if ~this.use_mex
@@ -488,7 +489,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_bool(this)
             if ~this.use_mex
@@ -499,7 +500,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_string(this)
             if ~this.use_mex
@@ -510,7 +511,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_cell_homo_structs(this)
             if ~this.use_mex
@@ -521,7 +522,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_homo_function_handles(this)
             if ~this.use_mex
@@ -532,7 +533,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
+
         %------------------------------------------------------------------
         function test_ser_sise_cell_hetero(this)
             if ~this.use_mex
@@ -543,7 +544,7 @@ classdef test_cpp_serialise_size < TestCase
             ser_siz = hlp_serial_sise(test_cell);
             assertEqual(cpp, ser_siz)
         end
-        
-        
+
+
     end
 end
