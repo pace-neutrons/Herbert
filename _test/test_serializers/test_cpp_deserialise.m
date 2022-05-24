@@ -46,11 +46,9 @@ classdef test_cpp_deserialise < TestCase
               skipTest('MEX not enabled');
             end
 
-            skipTest()
-
             % Create three different instruments
             inst1=create_test_instrument(95,250,'s');
-            bytes = c_serialise(inst1)
+            bytes = c_serialise(inst1);
             inst1rec = c_deserialise(bytes);
             assertEqual(inst1,inst1rec);
 
@@ -75,8 +73,6 @@ classdef test_cpp_deserialise < TestCase
             if ~this.use_mex
               skipTest('MEX not enabled');
             end
-
-            skipTest()
 
             my_struc = struct('clc',true(1,3),'a',1,'ba',single(2),'ce',[1,2,3],...
                               'dee',struct('a',10),'ei',int32([9;8;7]));

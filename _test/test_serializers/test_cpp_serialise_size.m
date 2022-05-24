@@ -13,11 +13,7 @@ classdef test_cpp_serialise_size < TestCase
             this = this@TestCase(name);
             this.warned = get(herbert_config, 'log_level') > 0;
             [~,nerr] = check_herbert_mex();
-            if nerr>0
-                this.use_mex = false;
-            else
-                this.use_mex = true;
-            end
+            this.use_mex = nerr == 0;
         end
 
         %% Test Objects
@@ -328,7 +324,6 @@ classdef test_cpp_serialise_size < TestCase
                 skipTest('MEX not enabled');
             end
             test_sparse = sparse([],[],[]);
-            size(test_sparse)
             cpp = c_serial_size(test_sparse);
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)
@@ -340,7 +335,6 @@ classdef test_cpp_serialise_size < TestCase
                 skipTest('MEX not enabled');
             end
             test_sparse = sparse([],[],[],10,10);
-            size(test_sparse)
             cpp = c_serial_size(test_sparse);
             ser_siz = hlp_serial_sise(test_sparse);
             assertEqual(cpp, ser_siz)

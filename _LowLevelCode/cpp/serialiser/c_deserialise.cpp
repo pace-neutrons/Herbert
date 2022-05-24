@@ -265,13 +265,17 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
 
     case VALUE_OBJECT:
       {
-        memPtr++; // Skip name_tag
+
+        memPtr += 2; // Skip name_tag and dim tag
+
         uint32_t nameLen;
         deser(data, memPtr, &nameLen, types_size[UINT32]);
+
         std::vector<char> name(nameLen + 1);
+
         // Null terminator
         name[nameLen] = 0;
-        deser(data, memPtr, name, nameLen * types_size[CHAR]);
+        deser(data, memPtr, name.data(), nameLen * types_size[CHAR]);
 
         uint8_t ser_tag;
         deser(data, memPtr, &ser_tag, types_size[UINT8]);
