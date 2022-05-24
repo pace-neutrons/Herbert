@@ -545,25 +545,43 @@ end
 function out = merge_section(in, merge_data)
 % Merge a compenent of split data into contiguous block, collating like sqw data
 % Possibly inefficient, but should be a miniscule part of calculation
+% Possibly less inefficient, and should be a lesser part of calculation - JW 24/5/22
 
 nWorkers = numel(in);
 nw = numel(in{1});
-out = in{1};
-for iWorker=2:nWorkers
-    for iw=1:nw
-        if merge_data{iw}(iWorker).nomerge
-            out{iw} = cat(1, out{iw}, in{iWorker}{iw}(1:end));
-        else
-            out{iw}(end) = out{iw}(end)*merge_data{iWorker-1}(iw*2).nelem(2) + in{iWorker}{iw}(1)*merge_data{iWorker}(iw*2-1).nelem(1);
-            out{iw}(end) = out{iw}(end) / (merge_data{iWorker-1}(iw*2).nelem(2) + merge_data{iWorker}(iw*2-1).nelem(1));
-            out{iw} = cat(1, out{iw}, in{iWorker}{iw}(2:end));
+nel = zeros(nWorkers, nw);
+for iWorker = 1:nWorkers
+    nel(iWorker, :) = cellfun(@numel, in{iWorker});
+end
+
+% Preallocate
+offset = sum(nel, 2);
+
+cnt = sum(~cellfun(@(x) x(1).nomerge, merge_data));
+
+out = zeros(sum(offset)-cnt, 1);
+pos = 1;
+
+for iw = 1:nw
+    if merge_data{iw}(1).nomerge
+        for iWorker = 1:nWorkers
+            curr_nel = nel(iWorker, iw);
+            out(pos:pos+curr_nel-1) = in{iWorker}{iw}(1:end);
+            pos = pos + curr_nel;
+        end
+    else
+        curr_nel = nel(iWorker, iw);
+        out(pos:pos+curr_nel-1) = in{iWorker}{iw}(1:end);
+        pos = pos + curr_nel;
+
+        for iWorker = 2:nWorkers
+            curr_nel = nel(iWorker, iw);
+            out(pos-1) = out(pos-1)*merge_data{iWorker-1}(iw*2).nelem(2) + in{iWorker}{iw}(1)*merge_data{iWorker}(iw*2-1).nelem(1);
+            out(pos-1) = out(pos-1) / (merge_data{iWorker-1}(iw*2).nelem(2) + merge_data{iWorker}(iw*2-1).nelem(1));
+            out(pos:pos+curr_nel-2) = in{iWorker}{iw}(2:end);
+            pos = pos + curr_nel;
         end
     end
 end
-% $$$ a = out{1}(:);
-% $$$ for i=2:numel(out)
-% $$$     a = [a; out{i}(:)];
-% $$$ end
-% $$$ out = a;
-out = cat(1, out{:});
+
 end
