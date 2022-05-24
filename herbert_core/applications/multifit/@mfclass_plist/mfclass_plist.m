@@ -224,7 +224,7 @@ classdef mfclass_plist < serializable
 
     methods(Access=public)
         % get independent fields, which fully define the state of the object
-        function flds = indepFields(~)
+        function flds = saveableFields(~)
             flds = mfclass_plist.fields_to_save_;
         end
         % get class version, which would affect the way class is stored on/
