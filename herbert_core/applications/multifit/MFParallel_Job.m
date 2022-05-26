@@ -464,7 +464,7 @@ classdef MFParallel_Job < JobExecutor
     end
 
     methods(Hidden)
-        function val = bcast(obj, root, val)
+        function varargout = bcast(obj, root, varargin)
 
             if obj.numLabs == 1
                 return
@@ -472,7 +472,7 @@ classdef MFParallel_Job < JobExecutor
 
             if obj.labIndex == root
                 % Send data
-                send_data = DataMessage(val);
+                send_data = DataMessage(varargin);
                 to = 1:obj.numLabs;
                 to = to(to ~= root);
                 for i=1:obj.numLabs-1
@@ -490,7 +490,7 @@ classdef MFParallel_Job < JobExecutor
                     error('HORACE:MFParallel_Job:receive_error', err_mess)
                 end
 
-                val = data.payload;
+                varargout = data.payload;
             end
 
         end
