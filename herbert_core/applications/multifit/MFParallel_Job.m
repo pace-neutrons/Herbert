@@ -467,6 +467,7 @@ classdef MFParallel_Job < JobExecutor
         function varargout = bcast(obj, root, varargin)
 
             if obj.numLabs == 1
+                varargout = varargin;
                 return
             end
 
