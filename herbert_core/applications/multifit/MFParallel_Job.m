@@ -82,24 +82,23 @@ classdef MFParallel_Job < JobExecutor
 
             w = data.w;
 
-            yval_tmp=cell(size(w));
-            wt_tmp=cell(size(w));
+            % Package data values and weights (i.e. 1/error_bar) each into a single column vector
+            obj.yval=cell(size(w));
+            obj.wt=cell(size(w));
             for i=1:numel(w)
                 if data.xye(i)   % xye triple - we have already masked all unwanted points
-                    yval_tmp{i}=w{i}.y;
-                    wt_tmp{i}=1./w{i}.e;
+                    obj.yval{i}=w{i}.y;
+                    obj.wt{i}=1./w{i}.e;
                 else        % a different data object: get data to be fitted
-                    [yval_tmp{i},wt_tmp{i},msk]=sigvar_get(w{i});
-                    yval_tmp{i}=yval_tmp{i}(msk);         % remove the points that we are told to ignore
-                    wt_tmp{i}=1./sqrt(wt_tmp{i}(msk));
+                    [obj.yval{i},obj.wt{i},msk]=sigvar_get(w{i});
+                    obj.yval{i}=obj.yval{i}(msk);         % remove the points that we are told to ignore
+                    obj.wt{i}=1./sqrt(obj.wt{i}(msk));
                 end
-                yval_tmp{i}=yval_tmp{i}(:);         % make a column vector
-                wt_tmp{i}=wt_tmp{i}(:);         % make a column vector
-
+                obj.yval{i}=obj.yval{i}(:);         % make a column vector
+                obj.wt{i}=obj.wt{i}(:);         % make a column vector
             end
-
-            obj.yval=cell2mat(yval_tmp(:));     % one long column vector
-            obj.wt=cell2mat(wt_tmp(:));
+            obj.yval=cell2mat(obj.yval(:));     % one long column vector
+            obj.wt=cell2mat(obj.wt(:));
 
             % Check that there are more data points than free parameters
             obj.nval = numel(obj.yval);
@@ -154,9 +153,6 @@ classdef MFParallel_Job < JobExecutor
             max_rescale_lambda=false;
             improved = false;
 
-            % Compute Jacobian matrix
-            resid=obj.wt.*(obj.yval-obj.f_best);
-
             obj.p_best = obj.bcast(1, obj.p_best);
 
             jac=obj.multifit_dfdpf(...
@@ -175,21 +171,19 @@ classdef MFParallel_Job < JobExecutor
                 obj.S, ...
                 obj.Store);
 
-
-            nrm=zeros(obj.npfree,1);
-            for k=1:obj.npfree
-                jac(:,k)=obj.wt.*jac(:,k);
-                nrm(k)=jac(:,k)'*jac(:,k);
-                if nrm(k)>0
-                    nrm(k)=1/sqrt(nrm(k));
-                end
-                jac(:,k)=nrm(k)*jac(:,k);
-            end
+            % Compute Jacobian matrix
+            jac=obj.wt.*jac;
+            nrm = dot(jac, jac);
+            resid = obj.wt.*(obj.yval-obj.f_best);
 
             jac = obj.reduce(1, jac, @vertcat, 'args');
-            resid= obj.reduce(1, resid, @vertcat, 'args');
+            nrm = obj.reduce(1, nrm, @vertcat, 'args');
+            resid = obj.reduce(1, resid, @vertcat, 'args');
 
             if obj.is_root
+                nrm = sum(nrm, 1);
+                nrm(nrm > 0) = 1 ./ sqrt(nrm(nrm > 0));
+                jac=nrm.*jac;
 
                 [jac,s,v]=svd(jac,0);
                 s=diag(s);
@@ -198,7 +192,7 @@ classdef MFParallel_Job < JobExecutor
                 % Compute change in parameter values.
                 % If the change does not improve chisqr  then increase the
                 % Levenberg-Marquardt parameter until it does (up to a maximum
-                % number of times gicven by the length of lambda_table).
+                % number of times given by the length of lambda_table).
                 if obj.tol>0
                     c_goal=(1-obj.tol)*obj.c_best;  % Goal for improvement in chisqr
                 else
@@ -214,7 +208,7 @@ classdef MFParallel_Job < JobExecutor
                 if obj.is_root
                     se=sqrt((s.*s)+obj.lambda);
                     gse=g./se;
-                    p_chg=((v*gse).*nrm);   % compute change in parameter values
+                    p_chg=((v*gse).*nrm');   % compute change in parameter values
                 end
 
                 p_chg = obj.bcast(1, p_chg);
@@ -244,12 +238,7 @@ classdef MFParallel_Job < JobExecutor
 
                     c = obj.reduce(1, chi, @sum);
 
-                    if obj.is_root
-                        improved = c < obj.c_best || c==0;
-                    else
-                        improved = false;
-                    end
-
+                    improved = obj.is_root && (c < obj.c_best || c==0);
                     improved = obj.bcast(1, improved);
 
                     if improved
@@ -329,9 +318,7 @@ classdef MFParallel_Job < JobExecutor
                     obj.S, ...
                     obj.Store);
 
-                for k=1:obj.npfree
-                    jac(:,k)=obj.wt.*jac(:,k);
-                end
+                jac=obj.wt.*jac;
                 jac = obj.reduce(1, jac, @vertcat, 'args');
 
                 if obj.is_root
