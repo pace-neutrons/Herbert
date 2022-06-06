@@ -473,6 +473,7 @@ classdef MFParallel_Job < JobExecutor
 
             if obj.labIndex == root
                 % Send data
+                varargout = varargin;
                 send_data = DataMessage(varargin);
                 to = 1:obj.numLabs;
                 to = to(to ~= root);
