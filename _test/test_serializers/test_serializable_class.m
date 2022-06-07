@@ -40,8 +40,8 @@ classdef test_serializable_class < TestCase
 
             assertEqual(serCl, serCl_rec)
 
-            size = hlp_serial_sise(serCl);
-            assertEqual(size,numel(ser));
+            data_size = hlp_serial_sise(serCl);
+            assertEqual(data_size,numel(ser));
 
         end
 
@@ -70,13 +70,12 @@ classdef test_serializable_class < TestCase
 
             %--------------------------------------------------------------
             % Serialize using C++
+            data_size_c = c_serial_size(serCl);
             ser_c     = c_serialise(serCl);
             serCl_rec = c_deserialise(ser_c);
 
             assertEqual(serCl, serCl_rec)
-
-            size_c = c_serial_size(serCl);
-            assertEqual(size_c,numel(ser_c));
+            assertEqual(data_size_c,numel(ser_c));
         end
 
         function test_ser_serializeble_obj_array_class1_obj_class2(obj)
@@ -99,13 +98,12 @@ classdef test_serializable_class < TestCase
 
             %--------------------------------------------------------------
             % Serialize using Matlab
+            data_size = hlp_serial_sise(serCl);
             ser =  hlp_serialise(serCl);
             serCl_rec = hlp_deserialise(ser);
 
             assertEqual(serCl, serCl_rec)
-
-            size = hlp_serial_sise(serCl);
-            assertEqual(size,numel(ser));
+            assertEqual(data_size,numel(ser));
 
         end
 
@@ -133,13 +131,12 @@ classdef test_serializable_class < TestCase
             %--------------------------------------------------------------
             % Serialize using C++
 
+            data_size_c = c_serial_size(serCl);
             ser_c     = c_serialise(serCl);
             serCl_rec = c_deserialise(ser_c);
 
             assertEqual(serCl, serCl_rec)
-
-            size_c = c_serial_size(serCl);
-            assertEqual(size_c,numel(ser_c));
+            assertEqual(data_size_c,numel(ser_c));
         end
 
         function test_ser_serializeble_obj_array_class1(obj)
@@ -159,13 +156,12 @@ classdef test_serializable_class < TestCase
 
             %--------------------------------------------------------------
             % Serialize using Matlab
+            data_size = hlp_serial_sise(serCl);
             ser =  hlp_serialise(serCl);
             serCl_rec = hlp_deserialise(ser);
 
             assertEqual(serCl, serCl_rec)
-
-            size = hlp_serial_sise(serCl);
-            assertEqual(size,numel(ser));
+            assertEqual(data_size,numel(ser));
 
         end
 
@@ -190,18 +186,12 @@ classdef test_serializable_class < TestCase
 
             %--------------------------------------------------------------
             % Serialize using C++
-            size_c = c_serial_size(serCl);
-            assertEqual(size_c,size);
-
+            data_size_c = c_serial_size(serCl);
             ser_c     = c_serialise(serCl);
-            assertEqual(ser,ser_c);
-
             serCl_rec = c_deserialise(ser_c);
 
             assertEqual(serCl, serCl_rec)
-
-            size_c = c_serial_size(serCl);
-            assertEqual(size_c,numel(ser_c));
+            assertEqual(data_size_c,numel(ser_c));
         end
 
         function test_ser_serializeble_obj(obj)
@@ -218,13 +208,13 @@ classdef test_serializable_class < TestCase
             % Serialize using MATLAB
 
             ser =  hlp_serialise(serCl);
-            size = hlp_serial_sise(serCl);
-            assertEqual(size,numel(ser));
-            [cerCl_rec,nbytes] = hlp_deserialise(ser);
+            data_size = hlp_serial_sise(serCl);
+            assertEqual(data_size,numel(ser));
+            [serCl_rec,nbytes] = hlp_deserialise(ser);
 
             assertEqual(nbytes,numel(ser));
-            assertEqual(serCl, cerCl_rec)
-            assertTrue(isa(cerCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
+            assertEqual(serCl, serCl_rec)
+            assertTrue(isa(serCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
 
         end
 
@@ -244,7 +234,7 @@ classdef test_serializable_class < TestCase
 
             %--------------------------------------------------------------
             % Serialize using C++
-            size_c = c_serial_size(serCl);
+            data_size_c = c_serial_size(serCl);
 
             ser_c     = c_serialise(serCl);
 
@@ -252,9 +242,9 @@ classdef test_serializable_class < TestCase
 
             assertEqual(nbytes,numel(ser_c))
             assertEqual(serCl, serCl_rec)
-            assertTrue(isa(cerCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
+            assertTrue(isa(serCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
 
-            assertEqual(size_c,numel(ser_c));
+            assertEqual(data_size_c,numel(ser_c));
         end
 
         function test_ser_serializeble_obj_level0(obj)
@@ -271,14 +261,14 @@ classdef test_serializable_class < TestCase
             %--------------------------------------------------------------
 
             ser =  hlp_serialise(serCl);
-            size = hlp_serial_sise(serCl);
-            assertEqual(size,numel(ser));
+            data_size = hlp_serial_sise(serCl);
+            assertEqual(data_size,numel(ser));
 
-            [cerCl_rec,nbytes] = hlp_deserialise(ser);
+            [serCl_rec,nbytes] = hlp_deserialise(ser);
 
             assertEqual(nbytes,numel(ser));
-            assertEqual(serCl, cerCl_rec)
-            assertTrue(isa(cerCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
+            assertEqual(serCl, serCl_rec)
+            assertTrue(isa(serCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
         end
 
         function test_ser_serializeble_obj_level0_cpp(obj)
@@ -296,21 +286,18 @@ classdef test_serializable_class < TestCase
             serCl.Prop_class2_2= [1,2,4];
 
             %--------------------------------------------------------------
-
-            %--------------------------------------------------------------
             % Serialize using C++
-            size_c = c_serial_size(serCl);
+            data_size_c = c_serial_size(serCl);
 
             ser_c  = c_serialise(serCl);
 
             [serCl_rec,nbytes] = c_deserialise(ser_c);
 
-
             assertEqual(nbytes,numel(ser_c))
             assertEqual(serCl, serCl_rec)
-            assertTrue(isa(cerCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
+            assertTrue(isa(serCl_rec.Prop_class2_2,class(serCl.Prop_class2_2)));
 
-            assertEqual(size_c,numel(ser_c));
+            assertEqual(data_size_c,numel(ser_c));
         end
 
         function test_saveobj_old_version_loadobj_new_version(~)
