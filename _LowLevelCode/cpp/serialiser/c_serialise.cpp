@@ -274,7 +274,11 @@ void serialise(uint8_t* data, size_t& memPtr, const mxArray* input){
 
       write_header(data, memPtr, tag, nElem, dims, nDims);
       for (mwIndex i = 0; i < nElem; i++){
-        serialise(data, memPtr, mxGetCell(input, i));
+        mxArray* cellElem = mxGetCell(input, i);
+        if (cellElem == nullptr) {
+          cellElem = mxCreateUninitNumericMatrix(0, 0, mxDOUBLE_CLASS, (mxComplexity) 0);
+        }
+        serialise(data, memPtr, cellElem);
       }
 
     }

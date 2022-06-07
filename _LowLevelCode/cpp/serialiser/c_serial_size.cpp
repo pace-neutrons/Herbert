@@ -196,7 +196,7 @@ size_t get_size(const mxArray *input) {
       size_t data_size = 0;
       for (mwIndex i = 0; i < nElem; i++){
         mxArray* cellElem = mxGetCell(input, i);
-        data_size += get_size(cellElem);
+        data_size += (cellElem == nullptr) ? 2 : get_size(cellElem);
       }
 
       if (nElem == 0) { // Null (string?)
