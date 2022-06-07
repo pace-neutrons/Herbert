@@ -29,7 +29,9 @@ classdef test_cpp_deserialise < TestCase
             sam1=IX_sample(true,[1,1,0],[0,0,1],'cuboid',[0.04,0.03,0.02]);
 
             bytes = c_serialise(sam1);
+            "BEEP"
             sam1rec = c_deserialise(bytes);
+            "BOOP"
             assertEqual(sam1,sam1rec);
 
             sam2=IX_sample(true,[1,1,0],[0,0,1],'cuboid',[0.04,0.03,0.02]);
