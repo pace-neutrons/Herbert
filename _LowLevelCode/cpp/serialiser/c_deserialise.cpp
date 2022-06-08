@@ -260,7 +260,7 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
         mxSetM(mxData, 0);
         mxSetPr(mxData, tmp);
         mxDestroyArray(mxData);
-        mxDestroyArray(results[1]);
+        // mxDestroyArray(results[1]);
       }
       break;
 
