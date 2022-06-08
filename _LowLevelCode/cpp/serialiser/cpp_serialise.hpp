@@ -221,7 +221,7 @@ tag_type tag_data(const mxArray* input) {
         mxArray* ser_type;
         mxArray* arr = const_cast<mxArray *>(input);
         mexCallMATLAB(1, &ser_type, 1, &arr, "get_ser_type");
-        uint8_t a = *static_cast<uint8_t*>(mxGetData(ser_type));
+        uint8_t a = (uint8_t) mxGetScalar(ser_type);
         // object serializes itself together with dimensions transforming array structure into structure array
         if (a == 0) {
           tag.type = SERIALIZABLE;

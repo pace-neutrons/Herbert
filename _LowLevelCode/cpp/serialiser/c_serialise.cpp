@@ -209,7 +209,7 @@ void serialise(uint8_t* data, size_t& memPtr, const mxArray* input){
       mxArray* ser_type;
       mexCallMATLAB(1, &ser_type, 1, &arr, "get_ser_type");
 
-      if ((bool) mxGetScalar(ser_type) == 0) { // object serializes itself together with dimensions transforming array structure into structure array
+      if (!(bool) mxGetScalar(ser_type)) { // object serializes itself together with dimensions transforming array structure into structure array
           nElem = 1;
           nDims = 2;
       }
