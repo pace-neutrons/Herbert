@@ -122,6 +122,8 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
     // C Mex API requires pointer, not vector
     mwSize* dims = vDims.data();
 
+    mexPrintf("Tag: %d\n", tag.type);
+
     switch (tag.type) {
       // Sparse
     case SPARSE_LOGICAL:
@@ -428,9 +430,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[]) {
     // the position of the data in the input bytes array. By default, it's 0
     size_t initial_pos(0);
     if (nrhs == 2) { // get the position from second argument. Convert from Matlab to C indexing convention
-        auto double_pos = static_cast<double*>(mxGetData(prhs[1]));
-        initial_pos = size_t(double_pos[0]) - 1;
-
+      initial_pos = (size_t) mxGetScalar(prhs[1]) - 1;
     }
 
     size_t memPtr = initial_pos;
