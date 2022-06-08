@@ -247,20 +247,25 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
 
         memPtr -= 1; // Reread tag
 
+        mexPrintf("TAP\n")
         mxArray* mxData = mxCreateUninitNumericMatrix(0, 1, mxUINT8_CLASS, (mxComplexity) 0);
         double* tmp = mxGetPr(mxData);
         mxSetM(mxData, size - memPtr);
         mxSetPr(mxData, (double*)&data[memPtr]);
+        mexPrintf("TEP\n")
 
         std::vector<mxArray*> results(2);
+        mexPrintf("TIP\n")
         mexCallMATLAB(2, results.data(), 1, &mxData, "hlp_deserialise");
+        mexPrintf("TOP\n")
         output = results[0];
         memPtr += (size_t) mxGetScalar(results[1]);
 
         mxSetM(mxData, 0);
         mxSetPr(mxData, tmp);
         mxDestroyArray(mxData);
-        // mxDestroyArray(results[1]);
+        mxDestroyArray(results[1]);
+        mexPrintf("TUP\n")
       }
       break;
 
