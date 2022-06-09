@@ -48,6 +48,7 @@ classdef ClusterWrapper
         % cluster. Property used in debugging to change default framework
         pool_exchange_frmwk_name
     end
+
     properties(Access = protected)
         % The default name of the function or function handle of the function
         % to run a remote job. The function itself must be
@@ -298,6 +299,44 @@ classdef ClusterWrapper
             end
 
             obj = init_workers_(obj,je_init_message,task_init_mess,log_message_prefix );
+        end
+
+        function [obj, task_id] = start_workers(obj, n_workers, worker_control_string, ...
+                                                prefix_command, postfix_command, matlab_extra)
+
+            obj.common_env_var_('WORKER_CONTROL_STRING') = worker_control_string;
+
+            n_cores = feature('numcores');
+            n_poss_threads = n_cores/n_workers;
+            hc = hpc_config;
+            target_threads = hc.num_parallel_threads;
+
+            if target_threads < 1
+                target_threads = n_poss_threads;
+            else if target_threads > n_poss_threads
+                warning('Number of threads might exceed computer capacity')
+            end
+
+            matlab_command = sprintf('maxNumCompThreads(%d);%s;%s(''%s'');exit;', ...
+                                     target_threads, matlab_extra, obj.worker_name_, worker_control_string);
+
+            task_info = [prefix_command(:),...
+                         {obj.common_env_var_('HERBERT_PARALLEL_EXECUTOR')},...
+                         postfix_command(:), ...
+                         {'-batch'},{matlab_command}];
+
+            if ispc()
+                runtime = java.lang.ProcessBuilder('cmd.exe');
+            else
+                runtime = java.lang.ProcessBuilder('/bin/sh');
+            end
+
+            env = runtime.environment();
+            obj.set_env(env);
+
+            runtime = runtime.command(task_info);
+            task_id = runtime.start();
+
         end
 
         function [obj,ok]=wait_started_and_report(obj,check_time,varargin)
