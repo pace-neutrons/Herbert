@@ -42,7 +42,7 @@ classdef ClusterMPI < ClusterWrapper
                 '**** mpiexec MPI job configured,  Starting MPI job  with %d workers ****\n';
             obj.started_info_message_  = ...
                 '**** mpiexec MPI job submitted                                     ****\n';
-
+            "Hi!"
             % The default name of the messages framework, used for communications
             % between the nodes of the parallel job
             obj.pool_exchange_frmwk_name_ ='MessagesCppMPI';
@@ -52,11 +52,13 @@ classdef ClusterMPI < ClusterWrapper
             obj.config_folder_ = fullfile(root,'admin','mpi_cluster_configs');
             obj.starting_cluster_name_ = class(obj);
             if nargin < 2
+                "WhEEE!"
                 return;
             end
             if ~exist('log_level', 'var')
                 log_level = -1;
             end
+            "Whuh!"
             obj = obj.init(n_workers,mess_exchange_framework,log_level);
         end
 
@@ -83,7 +85,7 @@ classdef ClusterMPI < ClusterWrapper
 
             % build generic worker init string without lab parameters
             cs = obj.mess_exchange_.get_worker_init(obj.pool_exchange_frmwk_name);
-
+            "Meep"
             obj.mpiexec_handle_ = obj.start_workers(n_workers, cs, mpiexec_str);
 
             % check if job control API reported failure
