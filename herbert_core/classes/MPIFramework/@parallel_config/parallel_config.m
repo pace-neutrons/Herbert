@@ -281,7 +281,7 @@ classdef parallel_config<config_base
         function n_threads=get.threads(obj)
             n_threads = get_or_restore_field(obj,'threads');
             if n_threads < 1
-                n_threads = obj.n_cores
+                n_threads = obj.n_cores;
             elseif n_threads > obj.n_cores
                 warning('HERBERT:parallel_config:threads', 'Number of threads might exceed computer capacity')
             end
@@ -292,8 +292,8 @@ classdef parallel_config<config_base
             n_workers = get_or_restore_field(obj, 'parallel_workers_number');
             n_poss_threads = floor(obj.n_cores/n_workers);
 
-            if n_threads <= 0
-                n_threads = n_poss_threads
+            if n_threads < 1
+                n_threads = n_poss_threads;
             elseif n_threads > n_poss_threads
                 warning('HERBERT:parallel_config:par_threads', 'Number of par threads might exceed computer capacity')
             end
@@ -338,7 +338,7 @@ classdef parallel_config<config_base
                 work_dir = obj.get_or_restore_field('working_directory');
             end
 
-            is = isempty(work_dir)
+            is = isempty(work_dir);
 
         end
 
