@@ -304,19 +304,11 @@ classdef ClusterWrapper
         function [obj, task_id] = start_workers(obj, n_workers, worker_control_string, ...
                                                 prefix_command, postfix_command, matlab_extra)
 
-            "Hello"
+
             obj.common_env_var_('WORKER_CONTROL_STRING') = worker_control_string;
 
-            n_cores = feature('numcores');
-            n_poss_threads = n_cores/n_workers;
-            hc = hpc_config;
-            target_threads = hc.num_parallel_threads;
-
-            if target_threads < 1
-                target_threads = n_poss_threads;
-            elseif target_threads > n_poss_threads
-                    warning('Number of threads might exceed computer capacity')
-            end
+            par = parallel_config;
+            target_threads = par.par_threads;
 
             matlab_command = sprintf('maxNumCompThreads(%d);%s;%s(''%s'');exit;', ...
                                      target_threads, matlab_extra, obj.worker_name_, worker_control_string);

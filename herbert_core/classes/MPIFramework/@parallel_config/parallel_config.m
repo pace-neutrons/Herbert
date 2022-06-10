@@ -121,10 +121,14 @@ classdef parallel_config<config_base
         % assumes that the cluster configuration, defined there is correct.
         cluster_config;
 
-        % Number of threads to use in mex files. No more then number
-        % of processors but value higher then 8 do not provide obvious
-        % performance benefits for given mem_chunk_size.
+        % number of workers to deploy in parallel jobs
+        parallel_workers_number;
+
+        % Number of threads to use.
         threads;
+
+        % Number of threads to use in MPIFramework.
+        par_threads;
 
         % Information method returning the list of the parallel clusters,
         % known to Herbert. You can not add or change a cluster
@@ -195,7 +199,9 @@ classdef parallel_config<config_base
         saved_properties_list_={'worker', ...
                                 'parallel_cluster', ...
                                 'cluster_config', ...
+                                'parallel_workers_number',...
                                 'threads', ...
+                                'par_threads', ...
                                 'shared_folder_on_local', ...
                                 'shared_folder_on_remote', ...
                                 'working_directory', ...
@@ -215,8 +221,12 @@ classdef parallel_config<config_base
         % the configuration, used as default
         cluster_config_ = 'local';
 
+        % Default parallel workers
+        parallel_workers_number_ = 2;
         % default auto threads
         threads_ = 0;
+        % default auto threads
+        par_threads_ = 0;
 
         % default remote folder is unset
         shared_folder_on_local_ ='';
@@ -228,10 +238,14 @@ classdef parallel_config<config_base
         external_mpiexec_ = '';
     end
 
+    properties(Constant)
+        n_cores = feature('numcores');
+    end
+
     methods
-        function this = parallel_config()
+        function obj = parallel_config()
             % constructor
-            this=this@config_base(mfilename('class'));
+            obj=obj@config_base(mfilename('class'));
         end
 
         %-----------------------------------------------------------------
@@ -258,19 +272,38 @@ classdef parallel_config<config_base
             conf = obj.get_or_restore_field('cluster_config');
         end
 
-        function n_threads=get.threads(this)
-            n_threads = get_or_restore_field(this,'threads');
+
+        function n_workers = get.parallel_workers_number(obj)
+            n_workers = get_or_restore_field(obj,'parallel_workers_number');
+        end
+
+        function n_threads=get.threads(obj)
+            n_threads = get_or_restore_field(obj,'threads');
+            if n_threads < 1
+                n_threads = obj.n_cores
+            elseif n_threads > obj.n_cores
+                warning('HERBERT:parallel_config:threads', 'Number of threads might exceed computer capacity')
+            end
+        end
+
+        function n_threads=get.par_threads(obj)
+            n_threads = get_or_restore_field(obj, 'par_threads');
+            n_workers = get_or_restore_field(obj, 'parallel_workers_number');
+            n_poss_threads = floor(obj.n_cores/n_workers);
+
+            if n_threads <= 0
+                n_threads = n_poss_threads
+            elseif n_threads > n_poss_threads
+                warning('HERBERT:parallel_config:par_threads', 'Number of par threads might exceed computer capacity')
+            end
         end
 
         function folder = get.shared_folder_on_local(obj)
             folder = obj.get_or_restore_field('shared_folder_on_local');
-            if isempty(folder)
-                is_depl = MPI_State.instance().is_deployed;
-                if is_depl
-                    folder = obj.get_or_restore_field('working_directory');
-                    if isempty(folder)
-                        folder = tmp_dir;
-                    end
+            if isempty(folder) && MPI_State.instance().is_deployed
+                folder = obj.get_or_restore_field('working_directory');
+                if isempty(folder)
+                    folder = tmp_dir;
                 end
             end
         end
@@ -303,11 +336,8 @@ classdef parallel_config<config_base
             else
                 work_dir = obj.get_or_restore_field('working_directory');
             end
-            if isempty(work_dir)
-                is = true;
-            else
-                is = false;
-            end
+
+            is = isempty(work_dir)
 
         end
 
@@ -374,13 +404,26 @@ classdef parallel_config<config_base
             config_store.instance().store_config(obj,'cluster_config',the_config);
         end
 
-        function this = set.threads(this,val)
+        function obj = set.accumulating_process_num(obj,val)
+            obj.parallel_workers_number = val;
+        end
+
+        function obj = set.parallel_workers_number(obj,val)
             if val<1
-                warning('HERBERT:parallel_config:set_threads',...
-                    ' number of threads can not be less than one. Using 1');
-                val = 1;
+                error('HERBERT:parallel_config:invalid_argument',...
+                    'Number of parallel workers must be more then 1');
             end
-            config_store.instance().store_config(this,'threads',val);
+            config_store.instance().store_config(obj,'parallel_workers_number',val);
+        end
+
+        function obj = set.threads(obj,val)
+            val = max(floor(val), 0);
+            config_store.instance().store_config(obj,'threads',val);
+        end
+
+        function obj = set.par_threads(obj,val)
+            val = max(floor(val), 0);
+            config_store.instance().store_config(obj,'par_threads',val);
         end
 
         function obj=set.shared_folder_on_local(obj,val)
@@ -468,16 +511,16 @@ classdef parallel_config<config_base
         % ABSTACT INTERFACE DEFINED
         %------------------------------------------------------------------
 
-        function fields = get_storage_field_names(this)
+        function fields = get_storage_field_names(obj)
             % helper function returns the list of the name of the structure,
             % get_data_to_store returns
-            fields = this.saved_properties_list_;
+            fields = obj.saved_properties_list_;
         end
 
-        function value = get_internal_field(this,field_name)
+        function value = get_internal_field(obj,field_name)
             % method gets internal field value bypassing standard get/set
             % methods interface
-            value = this.([field_name,'_']);
+            value = obj.([field_name,'_']);
         end
     end
 
