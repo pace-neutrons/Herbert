@@ -28,11 +28,13 @@ classdef parallel_config<config_base
     %                    applications compiler.
     %
     % parallel_cluster   - The name of a cluster to use. Currently
-    %                      defined are h[erbert], p[arpool], 
+    %                      defined are h[erbert], p[arpool],
     %                      [m]pi_cluster and [s]lurm_mpi clusters but they
     %                      may not be available on all systems.
     % cluster_config     - The configuration class describing parallel
     %                      cluster, running selected cluster.
+    % threads            - How many computational threads to use in parallel
+    %                      and in MEX
     % ---------------------------------------------------------------------
     % shared_folder_on_local - The folder on your working machine containing
     %                          the job input and output data.
@@ -45,8 +47,8 @@ classdef parallel_config<config_base
     %                        and tmp and output results should be stored.
     %                        View from a remote worker.
     % ---------------------------------------------------------------------
-    % external_mpiexec     - if cpp_communicator is compiled with MPI, 
-    %                        installed on system rather then the one, 
+    % external_mpiexec     - if cpp_communicator is compiled with MPI,
+    %                        installed on system rather then the one,
     %                        provided with Herbert,the full name (with path)
     %                        to mpiexec program used to run parallel job
     %            Used ony when  parallel_cluster=='mpiexec_mpi'
@@ -59,13 +61,13 @@ classdef parallel_config<config_base
     % ---------------------------------------------------------------------
     % Type:
     %>>parallel_config  to see the list of current configuration option values.
-    %
+
     properties(Dependent)
         % The name of the script or program to run on cluster in parallel
         % using parallel workers. The script has to be on the Matlab search
         % path for all
         worker;
-        
+
         % False if the worker above is a Matlab script. The nodes need to
         % have  Matlab licenses or Matlab distributed cluster licenses to
         % run this code.
@@ -73,7 +75,7 @@ classdef parallel_config<config_base
         % compiler. The nodes need to have appropriate Matlab
         % redistributable installed to run this application.
         is_compiled;
-        
+
         % The name of a cluster to use for messages exchange. . Currently
         % available are h[erbert], p[arpool] and [m]pi_cluster-s .
         % where:
@@ -100,11 +102,10 @@ classdef parallel_config<config_base
         %    [s]lurm_mpi -- Deploys MPI program using Slurm job control
         %              software
         %    none      -- not available. If worker can not be found on a
-        %              path, any parallel cluster should be not
+        %              path, any parallel cluster should be not be
         %              available. Parallel extensions will not work.
         parallel_cluster;
-        
-        
+
         % The configuration class describing parallel cluster, running
         % selected cluster.
         % For herbert cluster, the configuration name can only be 'local'
@@ -119,13 +120,18 @@ classdef parallel_config<config_base
         % -f <file_name> on Linux. The property picks up the file and
         % assumes that the cluster configuration, defined there is correct.
         cluster_config;
-        
+
+        % Number of threads to use in mex files. No more then number
+        % of processors but value higher then 8 do not provide obvious
+        % performance benefits for given mem_chunk_size.
+        threads;
+
         % Information method returning the list of the parallel clusters,
         % known to Herbert. You can not add or change a cluster
         % using this method, The cluster has to be defined and subscribed
         % via the clusters factory.
-        known_clusters
-        
+        known_clusters;
+
         % Information method returning list of the known configurations,
         % available to run the selected cluster.
         % For mpiexec_mpi cluster, the cluster is defined
@@ -136,8 +142,8 @@ classdef parallel_config<config_base
         % The cluster used by parpool and slurm clusters are using the default
         % configurations selected in parallel computing toolbox GUI for
         % parpool and slurm database configuration for slurm.
-        known_clust_configs
-        
+        known_clust_configs;
+
         % The folder on your working machine containing the job input and
         % output data mounted on local machine and available from the remote
         % machines.
@@ -147,7 +153,7 @@ classdef parallel_config<config_base
         % If empty, assumed that the local machine filesystem is shared
         % with remote machine filesystem and have the same mounting points.
         shared_folder_on_local;
-        
+
         % The place where a job data should be found on a remote worker.
         % Must have read/write permissions for all machines.
         %
@@ -156,7 +162,7 @@ classdef parallel_config<config_base
         %
         % If empty, assumed to be equal to shared_folder_on_local.
         shared_folder_on_remote;
-        
+
         % Used as  the folder where tmp files should be stored in
         % parallel and non-parallel configuration.
         %
@@ -171,68 +177,91 @@ classdef parallel_config<config_base
         %
         % If parallel Horace job is deployed, the value of this directory
         % evaluated on a remote worker equal to shared_folder_on_remote value
-        working_directory
-        
+        working_directory;
+
         % Information field:
         % true, if working directory have not ever been set
-        wkdir_is_default
-        
+        wkdir_is_default;
+
         % if set up, specifies the mpiexc program with full path to it,
         % used to launch parallel jobs instead of internal mpiexec
         % program, provided with Herbert. Must be used when you compiled
         % cpp_communicator with external MPI libraries, so it has to be
         % launched by the mpiexec, provided with these libraries.
-        external_mpiexec
+        external_mpiexec;
     end
-    %
+
     properties(Constant,Access=private)
-        saved_properties_list_={'worker',...
-            'parallel_cluster','cluster_config',...
-            'shared_folder_on_local','shared_folder_on_remote',...
-            'working_directory','external_mpiexec'};
-        %-------------------------------------------------------------------
+        saved_properties_list_={'worker', ...
+                                'parallel_cluster', ...
+                                'cluster_config', ...
+                                'threads', ...
+                                'shared_folder_on_local', ...
+                                'shared_folder_on_remote', ...
+                                'working_directory', ...
+                                'external_mpiexec'};
     end
+
+    %-------------------------------------------------------------------
+
     properties(Access=protected)
+
         worker_ = 'worker_v2'
         is_compiled_ = false;
+
         % these values provide defaults for the properties above
         parallel_cluster_   = 'herbert';
+
         % the configuration, used as default
         cluster_config_ = 'local';
+
+        % default auto threads
+        threads_ = 0;
+
         % default remote folder is unset
         shared_folder_on_local_ ='';
         shared_folder_on_remote_ = '';
-        %
+
         working_directory_ ='';
+
         % holder to default external_mpiexec property value
         external_mpiexec_ = '';
     end
+
     methods
         function this = parallel_config()
             % constructor
             this=this@config_base(mfilename('class'));
         end
+
         %-----------------------------------------------------------------
         % overloaded getters
+
         function wrkr = get.worker(obj)
             wrkr = obj.get_or_restore_field('worker');
         end
+
         function wrkr = get.is_compiled(obj)
             wrkr = obj.get_or_restore_field('is_compiled');
         end
-        
+
         function frmw = get.parallel_cluster(obj)
-            %
+
             wrkr = config_store.instance.get_value(obj,'worker');
             frmw = 'none';
             if ~isempty(which(wrkr)) || exist(wrkr, 'file')
                 frmw = obj.get_or_restore_field('parallel_cluster');
             end
         end
+
         function conf = get.cluster_config(obj)
             conf = obj.get_or_restore_field('cluster_config');
         end
-        %
+
+        function n_threads=get.threads(this)
+            n_threads = get_or_restore_field(this,'threads');
+        end
+
         function folder = get.shared_folder_on_local(obj)
             folder = obj.get_or_restore_field('shared_folder_on_local');
             if isempty(folder)
@@ -245,14 +274,14 @@ classdef parallel_config<config_base
                 end
             end
         end
-        %
+
         function folder = get.shared_folder_on_remote(obj)
             folder = obj.get_or_restore_field('shared_folder_on_remote');
             if isempty(folder)
                 folder = obj.shared_folder_on_local;
             end
         end
-        
+
         function work_dir = get.working_directory(obj)
             is_depl = MPI_State.instance().is_deployed;
             if is_depl
@@ -264,7 +293,7 @@ classdef parallel_config<config_base
                 work_dir = tmp_dir;
             end
         end
-        %
+
         function is = get.wkdir_is_default(obj)
             % returns true if working directory has not been set (points to
             % tmpdir)
@@ -279,9 +308,11 @@ classdef parallel_config<config_base
             else
                 is = false;
             end
-            
+
         end
+
         %------------------------------------------------------------------
+
         function frmw = get.known_clusters(obj)
             % Return list of clusters, known to Herbert
             wrkr = config_store.instance.get_value(obj,'worker');
@@ -292,7 +323,7 @@ classdef parallel_config<config_base
                 frmw = MPI_clusters_factory.instance().known_cluster_names;
             end
         end
-        
+
         function clust_configs = get.known_clust_configs(obj)
             % information about clusters (cluster configurations),
             % available for the selected cluster
@@ -303,17 +334,17 @@ classdef parallel_config<config_base
                 clust_configs = MPI_clusters_factory.instance().get_all_configs();
             end
         end
-        %
+
         %-----------------------------------------------------------------
         % overloaded setters
         function obj = set.worker(obj,new_wrkr)
             % Check and set new worker:
             % Input:
             % new_wrkr - the string, defining new worker function.
-            %
+
             obj = check_and_set_worker_(obj,new_wrkr);
         end
-        %
+
         function obj=set.parallel_cluster(obj,cluster_name)
             % Set up MPI cluster to use.
             %
@@ -327,22 +358,31 @@ classdef parallel_config<config_base
             % available on the current system.
             obj = check_and_set_cluster_(obj,cluster_name);
         end
-        %
+
         function obj = set.cluster_config(obj,val)
             % select one of the clusters which configuration is available
             % Throws HERBERT:parallel_config:invalid_argument if the cluster
             % configuration is invalid or not available on the current system.
-            
+
             opt = obj.known_clust_configs;
             if strcmpi(opt{1},'none')
                 the_config = 'none';
             else
                 the_config = select_option_(opt,val);
             end
-            
+
             config_store.instance().store_config(obj,'cluster_config',the_config);
         end
-        %
+
+        function this = set.threads(this,val)
+            if val<1
+                warning('HERBERT:parallel_config:set_threads',...
+                    ' number of threads can not be less than one. Using 1');
+                val = 1;
+            end
+            config_store.instance().store_config(this,'threads',val);
+        end
+
         function obj=set.shared_folder_on_local(obj,val)
             if isempty(val)
                 val = '';
@@ -355,12 +395,12 @@ classdef parallel_config<config_base
             end
             config_store.instance().store_config(obj,'shared_folder_on_local',val);
         end
-        %
+
         function obj=set.shared_folder_on_remote(obj,val)
             if isempty(val)
                 val = '';
             end
-            
+
             if ~ischar(val)
                 error('HERBERT:parallel_config:invalid_argument',...
                     ['The remote folder value should be a text string,',...
@@ -369,7 +409,7 @@ classdef parallel_config<config_base
             end
             config_store.instance().store_config(obj,'shared_folder_on_remote',val);
         end
-        %
+
         function data=get_data_to_store(obj)
             data = get_data_to_store@config_base(obj);
             % temp working directory should not be stored
@@ -379,16 +419,18 @@ classdef parallel_config<config_base
                 data.working_directory = '';
             end
         end
-        
+
         function obj=set.working_directory(obj,val)
             % Check and set working directory
             if isempty(val)
                 val = '';
             end
+
             if ~is_string(val)
                 error('HERBERT:parallel_config:invalid_argument',...
                     'working directory value should be a string')
             end
+
             if ~isempty(val)
                 if strcmp(val,tmp_dir) % avoid storing tmp dir as working directory as this is default
                     val = '';
@@ -406,11 +448,11 @@ classdef parallel_config<config_base
             end
             config_store.instance().store_config(obj,'working_directory',val);
         end
-        %
+
         function mpirunner = get.external_mpiexec(obj)
             mpirunner = obj.get_or_restore_field('external_mpiexec');
         end
-        %
+
         function obj=set.external_mpiexec(obj,val)
             if isempty(val)
                 val = '';
@@ -421,20 +463,24 @@ classdef parallel_config<config_base
             end
             config_store.instance().store_config(obj,'external_mpiexec',val);
         end
+
         %------------------------------------------------------------------
         % ABSTACT INTERFACE DEFINED
         %------------------------------------------------------------------
+
         function fields = get_storage_field_names(this)
             % helper function returns the list of the name of the structure,
             % get_data_to_store returns
             fields = this.saved_properties_list_;
         end
+
         function value = get_internal_field(this,field_name)
             % method gets internal field value bypassing standard get/set
             % methods interface
             value = this.([field_name,'_']);
         end
     end
+
     methods(Static)
         function the_opt = select_option(opt,arg)
             % Select single valued option from the list of available options
@@ -445,7 +491,7 @@ classdef parallel_config<config_base
             %        Uniquely here means that the comparison of the
             %        argument with all options available returns only
             %        one match.
-            %
+
             the_opt = select_option_(opt,arg);
         end
     end
