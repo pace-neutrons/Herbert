@@ -302,8 +302,17 @@ classdef ClusterWrapper
         end
 
         function [obj, task_id] = start_workers(obj, n_workers, worker_control_string, ...
-                                                prefix_command, postfix_command, matlab_extra)
+                                                varargin)
 
+            p = inputParser();
+            addOptional(p,'prefix_command' , {}, @iscellstr);
+            addOptional(p,'postfix_command', {}, @iscellstr);
+            addOptional(p,'matlab_extra'   , '', @isstring);
+            parse(p, varargin{:});
+
+            prefix_command = p.Results.prefix_command;
+            postfix_command = p.Results.postfix_command;
+            matlab_extra = p.Results.matlab_extra;
 
             obj.common_env_var_('WORKER_CONTROL_STRING') = worker_control_string;
 
@@ -684,11 +693,12 @@ classdef ClusterWrapper
         %                               indicating that the process is
         %                               still running
             if isempty(task_handle)
-                running      = false;
+                running = false;
                 failed  = true;
                 mess = 'process has not been started';
                 return;
             end
+
             % Should redirect process error but does not. Why?
             %err_stream_scan = java.util.Scanner(task_handle.getErrorStream());
             %err_stream_scan.useDelimiter("\r\n");
@@ -706,6 +716,7 @@ classdef ClusterWrapper
             mess = 'running';
             %end
             %err_stream_scan.close();
+
             if isunix()
                 is_alive = task_handle.isAlive();
                 if is_alive
