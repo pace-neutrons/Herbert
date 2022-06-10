@@ -122,6 +122,7 @@ classdef parallel_config<config_base
         cluster_config;
 
         % number of workers to deploy in parallel jobs
+        accumulating_process_num;
         parallel_workers_number;
 
         % Number of threads to use.
