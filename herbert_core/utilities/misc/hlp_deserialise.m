@@ -271,6 +271,11 @@ if totalElem == 0
 else
     [ser_tag, pos] = read_bytes(m, pos, 'uint8', 1);
 
+    if strcmp(class_name, 'MException')
+        class_name = 'MException_her';
+        ser_tag = 2;
+    end
+
     switch ser_tag
         case 0 % Object serialises itself
             v(1:totalElem) = feval(class_name);
@@ -286,9 +291,6 @@ else
         case 2 % Serialise as struct
             [conts, pos] = deserialise_value(m, pos);
             % Preallocate
-            if strcmp(class_name, 'MException')
-                class_name = 'MException_her';
-            end
 
             cls = str2func(class_name);
             v = arrayfun(cls, conts);
