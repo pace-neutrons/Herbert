@@ -9,6 +9,7 @@
  * This is a MEX-file for MATLAB.
  *=======================================================*/
 #include <iostream>
+#include <string>
 #include <cstring>
 #include <cmath>
 #include <vector>
@@ -252,10 +253,9 @@ mxArray* deserialise(uint8_t* data, size_t& memPtr, size_t size, bool recursed) 
         uint32_t nameLen;
         deser(data, memPtr, &nameLen, types_size[UINT32]);
 
-        std::string name = new std::string();
-        name.reserve(nameLen);
+        std::string name = std::string(nameLen, ' ');
 
-        deser(data, memPtr, name.data(), nameLen * types_size[CHAR]);
+        deser(data, memPtr, &name[0], nameLen * types_size[CHAR]);
 
         uint8_t ser_tag;
         deser(data, memPtr, &ser_tag, types_size[UINT8]);
