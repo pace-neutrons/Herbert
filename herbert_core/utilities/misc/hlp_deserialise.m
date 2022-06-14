@@ -286,7 +286,7 @@ else
         case 1 % Serialise as saveobj (must have loadobj)
             [conts, pos] = deserialise_value(m, pos);
             % Preallocate
-            cls = str2func([class_name '.loadobj'])
+            cls = str2func([class_name '.loadobj']);
             v = arrayfun(cls, conts);
         case 2 % Serialise as struct
             [conts, pos] = deserialise_value(m, pos);
