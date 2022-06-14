@@ -1,4 +1,4 @@
-function payload_p = parse_payload_(payload)
+function payload = parse_payload_(payload)
 % Analyse the data structure, provided as input and modify the classes
 % which are not serializable into the form, accepting serialization
 %
@@ -11,6 +11,6 @@ function payload_p = parse_payload_(payload)
 % -------
 %   payload_p  -- modified input, containing all serializable classes
 
-    payload_p = payload;
+    payload = payload;
 
 end

@@ -265,10 +265,12 @@ function [v, pos] = deserialise_object(m, pos)
 
 totalElem = prod(size);
 [class_name, pos] = deserialise_simple_data(m, pos);
+
 if totalElem == 0
     v = feval(class_name);
 else
     [ser_tag, pos] = read_bytes(m, pos, 'uint8', 1);
+
     switch ser_tag
         case 0 % Object serialises itself
             v(1:totalElem) = feval(class_name);
@@ -279,17 +281,17 @@ else
         case 1 % Serialise as saveobj (must have loadobj)
             [conts, pos] = deserialise_value(m, pos);
             % Preallocate
-            v(1:totalElem) = feval(class_name);
-            for i=1:totalElem
-                v(i) = eval([class_name '.loadobj(conts(' num2str(i) '))']);
-            end
+            cls = str2func([class_name '.loadobj'])
+            v = arrayfun(cls, conts);
         case 2 % Serialise as struct
             [conts, pos] = deserialise_value(m, pos);
             % Preallocate
-            v(1:totalElem) = feval(class_name);
-            for i=1:totalElem
-                v(i) = eval([class_name '(conts(' num2str(i) '))']);
+            if strcmp(class_name, 'MException')
+                class_name = 'MException_her';
             end
+
+            cls = str2func(class_name);
+            v = arrayfun(cls, conts);
     end
 end
 
