@@ -23,7 +23,7 @@ if exist('log_message', 'var')
         log =[log,sprintf('**** %s\n',log_message)];
     end
 else % report internal state of the JobDispatcher
-    
+
     if obj.status_changed
         info = gen_job_info(obj);
         log = [log,info,CR];
@@ -72,16 +72,34 @@ elseif stateMess.tag == MESS_NAMES.mess_id('failed')
     elseif isstruct(err) && isfield(err,'fail_reason')
         info = sprintf('***Job   : %s : state: %8s |\n***Reason: %s |\n',obj.job_id,name,err.fail_reason);
         if isfield(err,'error') && isa(err.error,'MException')
-            if contains(err.error.message,'automatic exception')
-                info = sprintf('%s\n',info);
-            else  % report only meaningful exceptions logs
-                info = sprintf('%s\n%s\n',info,err.error.getReport());
+            if isempty(err.error)
+                info = sprintf('%s\n***Unhandled exception. Possibly insufficient resources for the job\nErr contains: %s\n',info,disp2str(err));
+            else
+                if contains(err.error.message,'automatic exception')
+                    info = sprintf('%s\n',info);
+                else  % report only meaningful exceptions logs
+                    info = sprintf('%s\n%s\n',info,err.error.getReport());
+                end
             end
         end
-        
+
         %     elseif isa(err,'MExeption') || isa(err,'ParallelException')
         %         for i=1:numel(err.stack)
         %             info = [info,err.stack{i}];
         %         end
     end
 end
+
+function out_str = disp2str(in_obj)
+% Return string value of an input object as obtained from 'disp' function
+% but without leading and trailing control characters and whitespaces.
+%
+% Normally used for reporting incorrect values of arbitrary objects
+% in call 'error' function
+% Usage:
+% >>out_str = disp2str(in_obj)
+% where:
+% in_obj  -- the input object to convert to string using internal Matlab
+%            'disp' function
+% out_str -- the string the object is converted to.
+out_str = strtrim(evalc('disp(in_obj)'));
