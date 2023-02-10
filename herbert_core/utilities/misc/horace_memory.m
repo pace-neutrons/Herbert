@@ -24,5 +24,5 @@ end
 
 function [phys_memory,free_memory] = parse_mem_string(mem_string)
 cont = regexp(mem_string,'\s+','split');
-phys_memory =  sscanf(cont{2},'%d');
-free_memory =  sscanf(cont{4},'%d');
+phys_memory =  1024*sscanf(cont{2},'%d');
+free_memory =  1024*sscanf(cont{4},'%d');
