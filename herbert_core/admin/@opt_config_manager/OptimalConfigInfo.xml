@@ -105,7 +105,7 @@
          <init_tests>[false]</init_tests>
       </herbert_config>
       <hor_config>
-         <mem_chunk_size>5000000</mem_chunk_size>
+         <mem_chunk_size>10000000</mem_chunk_size>
          <threads>4</threads>
          <ignore_nan>[true]</ignore_nan>
          <ignore_inf>[false]</ignore_inf>
