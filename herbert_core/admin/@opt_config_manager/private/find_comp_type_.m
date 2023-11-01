@@ -66,7 +66,7 @@ elseif isunix
         n_profile = 4; % normal unix machine
     end
 
-    if hpc_computer
+    if hpc_computer && (n_profile == 6 || n_profile == 4) 
         n_profile=n_profile+1;
     end
     pc_type = types{n_profile};
