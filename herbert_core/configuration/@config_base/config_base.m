@@ -34,7 +34,7 @@ classdef config_base
     %       config_store.instance().store_config(this,'stored_poperty',val);
     %end
     %
-
+    
     properties(Dependent)
         % property defines the name of the derived storage class. The
         % storage knows the stored configuration under this name.
@@ -45,7 +45,7 @@ classdef config_base
         % if this property is set to true, class getters return default configurations
         % instead of saved configurations
         returns_defaults;
-
+        
         % the folder where the configuration data are stored (defined by
         % config store class, and provided here as an interface to it)
         config_folder;
@@ -53,7 +53,7 @@ classdef config_base
         % interdependent properties until they all have been set up.
         do_check_combo_arg
     end
-
+    
     properties(Access=protected)
         % the name of the derived class with provides information to store
         class_name_ ;
@@ -61,7 +61,7 @@ classdef config_base
         returns_defaults_=false;
         do_check_combo_arg_ = true;
     end
-
+    
     methods(Abstract)
         fields = get_storage_field_names(class_instance)
         % helper function returns the list of the public properties,
@@ -126,18 +126,18 @@ classdef config_base
         function is = get.returns_defaults(this)
             is = this.returns_defaults_;
         end
-
+        
         function this=set.returns_defaults(this,val)
             this.returns_defaults_ = val > 0;
-        end        
+        end
         %
         function do = get.do_check_combo_arg(obj)
             do = obj.do_check_combo_arg_;
         end
         function obj = set.do_check_combo_arg(obj,val)
-             obj.do_check_combo_arg_ = logical(val);
-            end
+            obj.do_check_combo_arg_ = logical(val);
         end
+        
         function isit = is_default(this)
             % check if a configuration has been changed by user or
             % still has its default values
@@ -168,7 +168,6 @@ classdef config_base
                 data.(fields{i}) = get_internal_field(this,fields{i});
             end
         end
-        
         %
         function data=get_data_to_store(this)
             % method returns the structure with the data, expected to be stored
@@ -179,7 +178,7 @@ classdef config_base
                 data.(fields{i}) = this.(fields{i});
             end
         end
-
+        
         function obj = set_stored_data(obj,data)
             % Method executes class setters for the config class_instance
             % using data structure provided as second argument
@@ -197,14 +196,14 @@ classdef config_base
                 field_name = fields{i};
                 obj.(field_name) = data.(field_name);
             end
-            obj.do_check_combo_arg = true;            
+            obj.do_check_combo_arg = true;
             obj = obj.check_combo_arg();
         end
         function obj = check_combo_arg(obj)
             % do validation of the interdependent properties
         end
     end
- 
+    
 end
 
 

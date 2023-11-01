@@ -28,7 +28,7 @@ classdef parallel_config<config_base
     %                    applications compiler.
     %
     % parallel_cluster   - The name of a cluster to use. Currently
-    %                      defined are h[erbert], p[arpool], 
+    %                      defined are h[erbert], p[arpool],
     %                      [m]pi_cluster and [s]lurm_mpi clusters but they
     %                      may not be available on all systems.
     % cluster_config     - The configuration class describing parallel
@@ -45,8 +45,8 @@ classdef parallel_config<config_base
     %                        and tmp and output results should be stored.
     %                        View from a remote worker.
     % ---------------------------------------------------------------------
-    % external_mpiexec     - if cpp_communicator is compiled with MPI, 
-    %                        installed on system rather then the one, 
+    % external_mpiexec     - if cpp_communicator is compiled with MPI,
+    %                        installed on system rather then the one,
     %                        provided with Herbert,the full name (with path)
     %                        to mpiexec program used to run parallel job
     %            Used only when  parallel_cluster=='mpiexec_mpi'
@@ -205,6 +205,13 @@ classdef parallel_config<config_base
         % holder to default external_mpiexec property value
         external_mpiexec_ = '';
     end
+    properties(Access = private)
+        % Property, used by setter of cluster configuration to keep cluster
+        % configuration until all properties are set and final validation
+        % may be performed.
+        trial_cluster_config_;
+    end
+    
     methods
         function this = parallel_config()
             % constructor
@@ -291,7 +298,7 @@ classdef parallel_config<config_base
             end
         end
         
-        function clust_configs = get.known_clust_configs(obj)
+        function clust_configs = get.known_cluster_configs(obj)
             % information about clusters (cluster configurations),
             % available for the selected cluster
             fram = obj.parallel_cluster;
@@ -334,7 +341,7 @@ classdef parallel_config<config_base
             if obj.do_check_combo_arg
                 obj = obj.check_combo_arg();
             end
-
+            
             
         end
         %
