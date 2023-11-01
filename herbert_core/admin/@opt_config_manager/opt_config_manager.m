@@ -52,9 +52,7 @@ classdef opt_config_manager
         % the configurations, which may be optimized for a particular pc so
         % should be stored
         known_configs_ = {'herbert_config','hor_config','hpc_config','parallel_config'}
-        % different pc types, one may optimize Horace/Herbert for. The
-        % order of the types is hard-written in the find_comp_type function,
-        % so should not be changed without changing find_comp_type.
+        % different pc types, where we have estimated specs for Horace.
         known_pc_types_ = {'win_small','win_large','a_mac',...
             'unix_small','unix_large',...
             'idaaas_small','idaaas_large', 'jenkins_win', 'jenkins_unix'};
