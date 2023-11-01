@@ -34,7 +34,7 @@ classdef config_base
     %       config_store.instance().store_config(this,'stored_poperty',val);
     %end
     %
-    %   
+
     properties(Dependent)
         % property defines the name of the derived storage class. The
         % storage knows the stored configuration under this name.
@@ -49,15 +49,19 @@ classdef config_base
         % the folder where the configuration data are stored (defined by
         % config store class, and provided here as an interface to it)
         config_folder;
-
+        % similarly to serializable, allows disabling the check for
+        % interdependent properties until they all have been set up.
+        do_check_combo_arg
     end
+
     properties(Access=protected)
         % the name of the derived class with provides information to store
         class_name_ ;
         is_saveable_ = true;
         returns_defaults_=false;
+        do_check_combo_arg_ = true;
     end
-    %
+
     methods(Abstract)
         fields = get_storage_field_names(class_instance)
         % helper function returns the list of the public properties,
@@ -92,7 +96,8 @@ classdef config_base
             if ischar(class_name)
                 obj.class_name_ = class_name;
             else
-                error('CONFIG_BASE:constructor','first config_base variable has to be a string, providing the derived class name');
+                error('HERBERT:config_base:constructor', ...
+                    'first config_base variable has to be a string, providing the derived class name');
             end
         end
         %
@@ -121,12 +126,16 @@ classdef config_base
         function is = get.returns_defaults(this)
             is = this.returns_defaults_;
         end
-        %
+
         function this=set.returns_defaults(this,val)
-            if val > 0
-                this.returns_defaults_=true;
-            else
-                this.returns_defaults_=false;
+            this.returns_defaults_ = val > 0;
+        end        
+        %
+        function do = get.do_check_combo_arg(obj)
+            do = obj.do_check_combo_arg_;
+        end
+        function obj = set.do_check_combo_arg(obj,val)
+             obj.do_check_combo_arg_ = logical(val);
             end
         end
         function isit = is_default(this)
@@ -170,8 +179,8 @@ classdef config_base
                 data.(fields{i}) = this.(fields{i});
             end
         end
-        %
-        function class_instance = set_stored_data(class_instance,data)
+
+        function obj = set_stored_data(obj,data)
             % Method executes class setters for the config class_instance
             % using data structure provided as second argument
             %
@@ -182,12 +191,17 @@ classdef config_base
             % instance though such usage is not standard and should be used
             % for testing and debugging purposes only
             %
+            obj.do_check_combo_arg = false;
             fields = fieldnames(data);
             for i=1:numel(fields)
                 field_name = fields{i};
-                class_instance.(field_name) = data.(field_name);
+                obj.(field_name) = data.(field_name);
             end
-            
+            obj.do_check_combo_arg = true;            
+            obj = obj.check_combo_arg();
+        end
+        function obj = check_combo_arg(obj)
+            % do validation of the interdependent properties
         end
     end
  
