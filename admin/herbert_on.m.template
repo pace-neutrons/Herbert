@@ -30,22 +30,22 @@ if nargin == 1
 else
     init_herbert(default_herbert_path);
 end
-path = fileparts(which('herbert_init.m'));
+path = fileparts(which('herbert3_init.m'));
 
 % -----------------------------------------------------------------------------
 function init_herbert(path)
-    if ~exist(fullfile(path,'herbert_init.m'),'file')
+    if ~exist(fullfile(path,'herbert3_init.m'),'file')
         path = fullfile(path,'herbert_core');
     end
     addpath(path);
-    herbert_init;
+    herbert3_init;
 
 % -----------------------------------------------------------------------------
 function path = find_herbert_path(default_herbert_path)
-    path = which('herbert_init.m');
+    path = which('herbert_init3.m');
     if isempty(path)
         path = default_herbert_path;
-        if ~exist(fullfile(path,'herbert_init.m'),'file')
+        if ~exist(fullfile(path,'herbert3_init.m'),'file')
             path = '';
         end
     else
