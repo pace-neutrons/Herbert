@@ -1,9 +1,9 @@
 function herbert3_init
 % Adds the paths needed by Herbert.
 %
-% In your startup.m, add the Herbert root path and call herbert_init, e.g.
-%       addpath('c:\mprogs\herbert')
-%       herbert_init
+% Do not call this script directly. Use horace_on or herbert_on 
+% command which enables this script
+% 
 %
 % Is PC and Unix compatible.
 
