@@ -210,6 +210,9 @@ classdef MPI_State<handle
                 obj.(varargin{i}) = varargin{i+1};
             end
         end
+        function delete(obj)
+            obj.instance('clear');
+        end
         
     end
     

@@ -131,7 +131,7 @@
    <idaaas_large>
       <info>iDaaaS large machine benefit from mex code and can run some MPI</info>
       <herbert_config>
-         <use_mex>[false]</use_mex>
+         <use_mex>[true]</use_mex>
          <force_mex_if_use_mex>[false]</force_mex_if_use_mex>
          <log_level>1</log_level>
          <init_tests>[false]</init_tests>

@@ -1,4 +1,4 @@
-function varargout = herbert_version()
+function varargout = herbert_version(varargin)
 % Returns the version of this instance of Herbert
 %
 % If one or fewer output arguments are specified, the full version string is
@@ -39,10 +39,10 @@ end
 
 
 function version_str = read_from_version_file()
-    try
-        herbert_root = fileparts(fileparts(which('herbert_init')));
-        version_file = fullfile(herbert_root , 'VERSION');
-        version_str = [strtrim(fileread(version_file)), '.dev'];
-    catch
-        version_str = '0.0.0.dev';
-    end
+try
+    herbert_root = fileparts(fileparts(which('herbert_init')));
+    version_file = fullfile(herbert_root , 'VERSION');
+    version_str = [strtrim(fileread(version_file)), '.dev'];
+catch
+    version_str = '0.0.0.dev';
+end
